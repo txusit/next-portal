@@ -3,10 +3,10 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
+    "dev": "node_modules/next/dist/bin/next dev",
+    "build": "node_modules/next/dist/bin/next build",
+    "start": "node_modules/next/dist/bin/next start",
+    "lint": "node_modules/next/dist/bin/next lint"
   },
   "dependencies": {
     "@types/node": "18.15.11",
@@ -18,5 +18,8 @@
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "typescript": "5.0.3"
+  },
+  "engines": {
+    "node": ">=16.0.0"
   }
 }

@@ -2,32 +2,51 @@ name: Deploy master
 on:
   push:
     branches:
-    - master
+      - master
 
 jobs:
-  build:
+  build_and_deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
 
-    - name: Checkout source code
-      uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
 
-    - name: Generate deployment package
-      run: zip -r deploy.zip . -x '*.git*'
-      
-    - name: Generate build number
-      id: buildnumber
-      uses: einaregilsson/build-number@v3
-      with:
-        token: ${{secrets.github_token}} 
+      - name: Build
+        run: |
+          cd client
+          npm ci
+          npm run build
 
-    - name: Deploy to EB
-      uses: einaregilsson/beanstalk-deploy@v21
-      with:
-        aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        application_name: Next-Portal
-        environment_name: NextPortal-Environment
-        version_label: name-of-your-project-${{ steps.buildnumber.outputs.build_number }
-        region: us-west-2
-        deployment_package: deploy.zip
+      - name: Generate deployment package
+        run: |
+          cd client
+          zip -r deploy.zip . -x '*.git*' -x '*.DS_Store'
+          mv deploy.zip ../
+          cd ..
+
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{secrets.github_token}}
+
+      - name: Output Project Structure
+        run: |
+          ls
+          cd client && ls
+          cd ..
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: next-portal
+          environment_name: next-portal-env
+          version_label: next-portal-${{ steps.buildnumber.outputs.build_number }}
+          region: us-east-1
+          deployment_package: deploy.zip
