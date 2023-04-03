@@ -1,8 +1,8 @@
-name: Deploy master
+name: Deploy dev
 on:
   push:
     branches:
-      - master
+      - dev
 
 jobs:
   build_and_deploy:
@@ -46,7 +46,7 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: next-portal
-          environment_name: next-portal-prod
-          version_label: next-portal-prod-${{ steps.buildnumber.outputs.build_number }}
+          environment_name: next-portal-dev
+          version_label: next-portal-dev-${{ steps.buildnumber.outputs.build_number }}
           region: us-east-1
           deployment_package: deploy.zip
