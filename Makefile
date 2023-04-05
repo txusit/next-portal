@@ -34,3 +34,8 @@ frontend-shell:
 
 backend-shell:
 	docker exec -t -i next_portal_backend_container /bin/bash
+
+
+# Test Deploy
+test-deploy:
+	touch test_deploy && git add test_deploy && git commit -m "testing deployment" && git push && rm test_deploy
