@@ -4,8 +4,8 @@ ADD . /app
 
 WORKDIR /app
 
-EXPOSE 8080
-
 RUN npm i
+
+EXPOSE 3000
 
 ENTRYPOINT ["npm", "run", "dev"]

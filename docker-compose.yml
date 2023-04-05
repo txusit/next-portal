@@ -1,7 +1,21 @@
 version: '3.8'
 services:
-  # database image
+  # local test mongo database
+  db:
+    image: mongo:6.0.5
+    container_name: mongodb
+    volumes:
+      - ./test_database/mongod.conf:/etc/mongod.conf
+      - ./test_database/logs:/var/log/mongodb/
+      - ./test_database/db:/var/lib/mongodb
+    command: mongod --config /etc/mongod.conf
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: testadmin
+      MONGO_INITDB_ROOT_PASSWORD: password
 
+  # Build container for client
   frontend:
     build:
       context: ./client
@@ -16,8 +30,23 @@ services:
       - CHOKIDAR_USEPOLLING=true
       - PORT=3000
 
-  # backend
+  # Build container for server
+  backend:
+    build:
+      context: ./server # Maps backend directory on local drive to /app directory on container
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    ports:
+      - 8080:8080 # Maps port 8080 on local machine to 8080 on container
+    image: next_portal:backend # Image:tag
+    container_name: next_portal_backend_container
+    depends_on:
+      - db
+    environment:
+      WAIT_HOSTS: mongodb:27017
 
 networks:
+  db:
   frontend:
-  # backend:
+  backend:
