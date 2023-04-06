@@ -24,8 +24,8 @@ jobs:
       - name: Generate deployment package
         run: |
           cd client
-          zip -r deploy.zip . -x '*.git*' -x '*.DS_Store'
-          mv deploy.zip ../
+          zip -r deploy_frontend.zip . -x '*.git*' -x '*.DS_Store'
+          mv deploy_frontend.zip ../
           cd ..
 
       - name: Generate build number
@@ -49,4 +49,44 @@ jobs:
           environment_name: next-portal-prod
           version_label: next-portal-prod-${{ steps.buildnumber.outputs.build_number }}
           region: us-east-1
-          deployment_package: deploy.zip
+          deployment_package: deploy_frontend.zip
+
+  build_and_deploy_backend:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source code
+        uses: actions/checkout@v2
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Build
+        run: |
+          cd server
+          npm ci
+          npm run build --if-present
+
+      - name: Generate deployment package
+        run: |
+          cd server
+          zip -r deploy_backend.zip . -x '*.git*' -x '*.DS_Store'
+          mv deploy_backend.zip ../
+          cd ..
+
+      - name: Generate build number
+        id: buildnumber
+        uses: einaregilsson/build-number@v3
+        with:
+          token: ${{secrets.github_token}}
+
+      - name: Deploy to EB
+        uses: einaregilsson/beanstalk-deploy@v21
+        with:
+          aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          application_name: next-portal-server
+          environment_name: next-portal-server-prod
+          version_label: next-portal-server-prod-${{ steps.buildnumber.outputs.build_number }}
+          region: us-east-1
+          deployment_package: deploy_backend.zip
