@@ -9,7 +9,7 @@ import morgan from 'morgan'
 dotenv.config()
 const app = express()
 app.use(express.urlencoded({ extended: false }))
-app.use(express.json)
+app.use(express.json())
 app.use(helmet())
 app.use(helmet.crossOriginResourcePolicy({ policy: 'cross-origin' }))
 app.use(morgan('common'))
@@ -17,14 +17,22 @@ app.use(cors())
 
 /* MONGOOSE SETUP */
 // Get environment variables
+const HOST = '0.0.0.0'
 const PORT = process.env.PORT || 9000
 const MONGO_URL = process.env.MONGO_URL
+
+// Test Route
+app.get('/', (req, res) => {
+  res.send('Hello World')
+})
 
 // Connect to MongoDB
 mongoose.set('strictQuery', false)
 mongoose
   .connect(MONGO_URL)
   .then(() => {
-    app.listen(PORT, () => console.log(`Server Port: ${PORT}`))
+    app.listen(PORT, HOST, () =>
+      console.log(`Server running at http://${HOST}:${PORT}/`)
+    )
   })
   .catch((error) => console.log(`${error} did not connect`))

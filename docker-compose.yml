@@ -38,7 +38,7 @@ services:
       - ./server:/app
       - /app/node_modules
     ports:
-      - 8080:8080 # Maps port 8080 on local machine to 8080 on container
+      - 5001:5001 # Maps port 8080 on local machine to 8080 on container
     image: next_portal:backend # Image:tag
     container_name: next_portal_backend_container
     depends_on:

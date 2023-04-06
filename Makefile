@@ -27,6 +27,13 @@ clean-backend-db: clean
 backend-db:
 	docker-compose up db backend
 
+# Database
+clean-db: clean
+	docker-compose up --build db
+
+db:
+	docker-compose up db
+	
 
 # Access Docker Container Shells
 frontend-shell:

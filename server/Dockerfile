@@ -6,7 +6,7 @@ WORKDIR /app
 
 RUN npm i
 
-EXPOSE 8080
+EXPOSE 5001
 
 ## ENSURES DATABASE IS RUNNING BEFORE SERVER STARTS
 ADD https://github.com/ufoscout/docker-compose-wait/releases/download/2.2.1/wait /wait

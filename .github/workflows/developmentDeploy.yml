@@ -25,7 +25,7 @@ jobs:
         run: |
           cd client
           zip -r deploy_frontend.zip . -x '*.git*' -x '*.DS_Store'
-          mv deploy.zip ../
+          mv deploy_frontend.zip ../
           cd ..
 
       - name: Generate build number
