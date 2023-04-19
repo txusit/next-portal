@@ -20,6 +20,13 @@ clean-frontend: clean
 frontend:
 	docker-compose up frontend
 
+# Frontend and Database
+clean-frontend-db: clean
+	docker-compose up --build db frontend
+
+frontend-db:
+	docker-compose up db frontend
+
 # Backend and Database
 clean-backend-db: clean
 	docker-compose up --build db backend
