@@ -19,7 +19,7 @@ app.use(cors())
 // Get environment variables
 const HOST = '0.0.0.0'
 const PORT = process.env.PORT || 9000
-const MONGO_URL = process.env.MONGO_URL
+const MONGO_URI = process.env.MONGO_URI
 
 // Test Route
 app.get('/', (req, res) => {
@@ -29,7 +29,7 @@ app.get('/', (req, res) => {
 // Connect to MongoDB
 mongoose.set('strictQuery', false)
 mongoose
-  .connect(MONGO_URL)
+  .connect(MONGO_URI)
   .then(() => {
     app.listen(PORT, HOST, () =>
       console.log(`Server running at http://${HOST}:${PORT}/`)
