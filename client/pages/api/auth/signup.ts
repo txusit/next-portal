@@ -3,6 +3,8 @@ import User from '@/models/user'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
 import mongoose from 'mongoose'
+import { sendTemplateConfirmationEmail } from '@/helpers/emailService'
+import { sign, decode, verify } from 'jsonwebtoken'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   connectToMongoDB().catch((err) => res.json(err))
@@ -31,8 +33,20 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fullName,
       email,
       password: hashedPassword,
+      isConfirmed: false,
     })
       .then((newUser) => {
+        // DEBUG: test what _id is giving matches mongoDB user._id
+        console.log(`New User ID from 'newUser._id': {newUser._id}`)
+
+        // Generate JWT token with encrypted user_id
+        const token = sign(newUser._id, process.env.EMAIL_TOKEN_SECRET, {
+          expiresIn: '1d',
+        })
+
+        // Send confirmation email
+        sendTemplateConfirmationEmail(newUser.email, token)
+
         return res.status(201).json({
           success: true,
           newUser,
