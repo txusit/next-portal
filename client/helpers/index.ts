@@ -1,3 +1,4 @@
+import User from '@/models/user'
 import { LoginUserParams } from '@/types'
 import { InputError } from '@/types/error'
 import { signIn } from 'next-auth/react'

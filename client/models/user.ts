@@ -21,6 +21,10 @@ const UserSchema = new Schema({
     required: [true, 'Password is required'],
     select: false,
   },
+  isConfirmed: {
+    type: Boolean,
+    required: [true, 'isConfirmed is not set'],
+  },
 })
 
 // Return existing model or create a new one

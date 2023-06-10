@@ -62,16 +62,19 @@ const SignupForm = () => {
         if (apiRes?.data?.success) {
           // save data in session using next-auth
 
-          const loginRes = await loginUser({
-            email: data.email,
-            password: data.password,
-          })
+          router.push('/')
 
-          if (loginRes && !loginRes.ok) {
-            setSubmitError(loginRes.error || '')
-          } else {
-            router.push('/')
-          }
+          // TODO: REMOVE LOGIN
+          // const loginRes = await loginUser({
+          //   email: data.email,
+          //   password: data.password,
+          // })
+
+          // if (loginRes && !loginRes.ok) {
+          //   setSubmitError(loginRes.error || '')
+          // } else {
+          //   router.push('/')
+          // }
         }
       } catch (error: unknown) {
         if (error instanceof AxiosError) {
