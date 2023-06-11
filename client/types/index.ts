@@ -17,4 +17,6 @@ export type LoginUserParams = {
   password: string
 }
 
+export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
+
 export type Maybe<T> = T | null | undefined

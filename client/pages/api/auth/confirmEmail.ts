@@ -11,14 +11,12 @@ type Data = {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  console.log('req:', req)
   if (req.method === 'PATCH') {
     if (!req.body)
       return res.status(400).json({ ok: false, msg: 'Data is missing' })
 
     let { token } = req.body
     token = token as string
-    console.log('token:', token)
 
     const payload = jwt.verify(
       token,

@@ -9,7 +9,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
   return async (handler: NextApiHandler) => {
     try {
-      return handler(req, res)
+      return await handler(req, res)
     } catch (exception) {
       const { url, headers } = req
 

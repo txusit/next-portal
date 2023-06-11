@@ -13,7 +13,6 @@ const index = (props: Props) => {
 
   useEffect(() => {
     if (token) {
-      console.log(token)
       try {
         setMessage('Sending test mail')
         const response = axios.patch(

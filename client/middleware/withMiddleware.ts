@@ -1,6 +1,5 @@
-import { Maybe } from '@/types'
+import { Maybe, Middleware } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
-type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
 
 /**
  * @name withMiddleware
