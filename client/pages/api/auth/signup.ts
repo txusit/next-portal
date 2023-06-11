@@ -1,10 +1,11 @@
 import { connectToMongoDB } from '@/lib/mongodb'
-import User from '@/models/user'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
 import mongoose from 'mongoose'
-import { sendTemplateConfirmationEmail } from '@/helpers/emailService'
-import { sign, decode, verify } from 'jsonwebtoken'
+import * as jwt from 'jsonwebtoken'
+import { sendConfirmationEmailSES } from '@/services/awsSES'
+import User from '@/models/user'
+import { JwtEmailToken, User as TUser } from '@/types'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   connectToMongoDB().catch((err) => res.json(err))
@@ -36,16 +37,34 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       isConfirmed: false,
     })
       .then((newUser) => {
-        // DEBUG: test what _id is giving matches mongoDB user._id
-        console.log(`New User ID from 'newUser._id': {newUser._id}`)
+        // Type check with interface
+        newUser = newUser as TUser
 
-        // Generate JWT token with encrypted user_id
-        const token = sign(newUser._id, process.env.EMAIL_TOKEN_SECRET, {
-          expiresIn: '1d',
-        })
+        // Construct JWT token payload
+        const payload = { user_id: newUser._id }
+
+        // Generate JWT token with encrypted payload
+        const token = jwt.sign(
+          payload,
+          process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
+          {
+            expiresIn: '1d',
+          }
+        )
 
         // Send confirmation email
-        sendTemplateConfirmationEmail(newUser.email, token)
+        sendConfirmationEmailSES(newUser.email, token).then((result) => {
+          if (result.ok) {
+            return res.status(201).json({
+              ok: true,
+            })
+          } else {
+            return res.status(500).json({
+              ok: false,
+              msg: result.msg,
+            })
+          }
+        })
 
         return res.status(201).json({
           success: true,

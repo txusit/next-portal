@@ -1,9 +1,9 @@
 import { connectToMongoDB } from '@/lib/mongodb'
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import User from '@/models/user'
 import { compare } from 'bcryptjs'
-import { IUser } from '@/types'
+import User from '@/models/user'
+import { User as TUser } from '@/types'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -65,7 +65,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: async ({ session, token }) => {
-      const user = token.user as IUser
+      const user = token.user as TUser
       session.user = user
 
       return session
