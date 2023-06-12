@@ -3,7 +3,14 @@ import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { compare } from 'bcryptjs'
 import User from '@/models/user'
-import { User as TUser } from '@/types'
+import { ResponseData, User as TUser } from '@/types'
+import { NextApiRequest, NextApiResponse } from 'next'
+import { withMiddleware } from '@/middleware/withMiddleware'
+import withMongoDBConnection from '@/middleware/withMongoDBConnection'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
+import axios, { AxiosResponse, HttpStatusCode } from 'axios'
+import { ApiError } from 'next/dist/server/api-utils'
+import { AES, enc } from 'crypto-js'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -18,33 +25,34 @@ export const authOptions: NextAuthOptions = {
       },
 
       async authorize(credentials) {
-        await connectToMongoDB().catch((err) => {
-          throw new Error(err)
-        })
+        const validCredentials = credentials ? true : false
 
-        const user = await User.findOne({
-          email: credentials?.email,
-        }).select('+password +isConfirmed')
+        // Encrypt credentials
+        const aesKey: string = process.env.AES_KEY as string
+        const encryptedEmail = AES.encrypt(
+          credentials!.email,
+          aesKey
+        ).toString()
 
-        if (!user) {
-          throw new Error('Invalid credentials')
+        const encryptedPassword = AES.encrypt(
+          credentials!.password,
+          aesKey
+        ).toString()
+
+        const encryptedCredentials = {
+          encryptedEmail: encryptedEmail,
+          encryptedPassword: encryptedPassword,
         }
 
-        const isEmailConfirmed = (await user.isConfirmed) == true
-
-        const isPasswordCorrect = await compare(
-          credentials!.password,
-          user.password
+        let result = await axios.post<ResponseData>(
+          `${process.env.BASE_URL}/api/auth/authorizeWithCredentials`,
+          {
+            validCredentials: validCredentials,
+            encryptedCredentials: encryptedCredentials,
+          }
         )
 
-        if (!isEmailConfirmed) {
-          throw new Error('Email is not verified')
-        }
-
-        if (!isPasswordCorrect) {
-          throw new Error('Invalid credentials')
-        }
-
+        const user = result.data.msg
         return user
       },
     }),
