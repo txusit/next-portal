@@ -18,7 +18,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
       let statusCode, message, stack
 
-      // Add handling for specific errors here
+      // Handle specific exceptions
       if (exception instanceof mongoose.Error.ValidationError) {
         // Put all errors into json message
         const errors = Object.values(exception.errors).map(
