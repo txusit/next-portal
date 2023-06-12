@@ -1,4 +1,4 @@
-import withExceptionFilter from '@/helpers/errorHandler'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
 import { withMiddleware } from '@/middleware/withMiddleware'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'

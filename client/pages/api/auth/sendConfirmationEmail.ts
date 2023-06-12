@@ -1,10 +1,15 @@
 import { sendConfirmationEmailSES } from '../../../services/awsSES'
 import * as jwt from 'jsonwebtoken'
 import { connectToMongoDB } from '@/lib/mongodb'
-import { JwtEmailToken } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '@/models/user'
-import { User as TUser } from '@/types'
+import withMongoDBConnection from '@/middleware/withMongoDBConnection'
+import withMethodsGuard from '@/middleware/withMethodsGuard'
+import { withMiddleware } from '@/middleware/withMiddleware'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
+import { HttpStatusCode } from 'axios'
+import { generateTokenAndSendConfirmationEmail } from '@/helpers/serverSideHelpers'
+import { ApiError } from 'next/dist/server/api-utils'
 
 type Data = {
   ok: boolean
@@ -12,44 +17,45 @@ type Data = {
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  if (req.method === 'GET') {
+  const sendConfirmationEmail = async () => {
     if (!req.query)
       return res.status(400).json({ ok: false, msg: 'Data is missing' })
 
     const { email } = req.query
-
-    await connectToMongoDB().catch((err) => {
-      throw new Error(err)
-    })
 
     // TODO: CHECK IF EMAIL EXISTS
     const user = await User.findOne({
       email: email,
     }).lean()
 
-    const token = jwt.sign(
-      { user_id: user._id },
-      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-      {
-        expiresIn: '1d', // expires in 1 day
-      }
+    const result = await generateTokenAndSendConfirmationEmail(
+      user._id,
+      user.email
     )
 
-    const result = await sendConfirmationEmailSES(email as string, token)
-
     if (result.ok) {
-      return res.status(201).json({
+      return res.status(HttpStatusCode.Created).json({
         ok: true,
       })
     } else {
-      return res.status(500).json({
-        ok: false,
-        msg: result.msg,
-      })
+      throw new ApiError(
+        HttpStatusCode.ServiceUnavailable,
+        'Unable to send confirmation email'
+      )
+      // return res.status(HttpStatusCode.InternalServerError).json({
+      //   ok: false,
+      //   msg: result.msg,
+      // })
     }
-  } else {
-    return res.status(405).json({ ok: false, msg: 'Method Not Allowed' })
   }
+
+  const middlewareLoadedHandler = withMiddleware(
+    withMethodsGuard(['GET']),
+    withMongoDBConnection(),
+    sendConfirmationEmail
+  )
+
+  return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
 export default handler

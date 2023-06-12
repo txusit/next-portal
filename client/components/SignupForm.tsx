@@ -2,7 +2,7 @@ import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import axios, { AxiosError } from 'axios'
-import { getErrorMsg, loginUser } from '@/helpers'
+import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
 
 const SignupForm = () => {
   const [data, setData] = useState({
@@ -59,7 +59,7 @@ const SignupForm = () => {
           data
         )
 
-        if (apiRes?.data?.success) {
+        if (apiRes?.data?.ok) {
           // save data in session using next-auth
 
           router.push('/')

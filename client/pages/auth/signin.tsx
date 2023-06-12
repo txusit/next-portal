@@ -1,4 +1,4 @@
-import { loginUser } from '@/helpers'
+import { loginUser } from '@/helpers/clientSideHelpers'
 import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -13,21 +13,17 @@ const SignIn: NextPage = (props): JSX.Element => {
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
-
     try {
       setLoading(true)
-
       const loginRes = await loginUser({
         email: userInfo.email,
         password: userInfo.password,
       })
-
       if (loginRes && !loginRes.ok) {
         setSubmitError(loginRes.error || '')
       } else {
         router.push('/')
       }
-
       setLoading(false)
     } catch (error) {
       if (error instanceof AxiosError) {

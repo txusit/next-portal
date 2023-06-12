@@ -1,17 +1,21 @@
 import * as jwt from 'jsonwebtoken'
 import { connectToMongoDB } from '@/lib/mongodb'
-import { JwtEmailToken } from '@/types'
+import { JwtEmailToken, User as TUser } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '@/models/user'
-import { User as TUser } from '@/types'
+import withMethodsGuard from '@/middleware/withMethodsGuard'
+import withMongoDBConnection from '@/middleware/withMongoDBConnection'
+import { withMiddleware } from '@/middleware/withMiddleware'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
 
 type Data = {
   ok: boolean
   msg: string
+  updateResult?: any
 }
 
 const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
-  if (req.method === 'PATCH') {
+  const confirmEmail = async () => {
     if (!req.body)
       return res.status(400).json({ ok: false, msg: 'Data is missing' })
 
@@ -23,12 +27,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
     ) as JwtEmailToken
 
-    // // Email Confirmation Logic
-    connectToMongoDB().catch((err) => {
-      throw new Error(err) // TODO: REDO ERROR HANDLE
-    })
-
-    const user = await User.updateOne(
+    const updateResult = await User.updateOne(
       { _id: payload.user_id },
       {
         $set: {
@@ -37,8 +36,18 @@ const handler = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
       }
     )
 
-    return res.status(200)
+    res
+      .status(200)
+      .send({ ok: true, msg: 'email confirmed', updateResult: updateResult })
   }
+
+  const middlewareLoadedHandler = withMiddleware(
+    withMethodsGuard(['PATCH']),
+    withMongoDBConnection(),
+    confirmEmail
+  )
+
+  return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
 export default handler

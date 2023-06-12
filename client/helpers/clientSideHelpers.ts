@@ -19,3 +19,5 @@ export const loginUser = async ({ email, password }: LoginUserParams) => {
 
   return res
 }
+
+

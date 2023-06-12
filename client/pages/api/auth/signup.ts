@@ -1,16 +1,17 @@
 import { connectToMongoDB } from '@/lib/mongodb'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
-import mongoose from 'mongoose'
-import * as jwt from 'jsonwebtoken'
-import { sendConfirmationEmailSES } from '@/services/awsSES'
 import User from '@/models/user'
-import { JwtEmailToken, User as TUser } from '@/types'
+import { User as TUser } from '@/types'
+import { withMiddleware } from '@/middleware/withMiddleware'
+import withMethodsGuard from '@/middleware/withMethodsGuard'
+import withMongoDBConnection from '@/middleware/withMongoDBConnection'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
+import { generateTokenAndSendConfirmationEmail } from '@/helpers/serverSideHelpers'
+import { HttpStatusCode } from 'axios'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  connectToMongoDB().catch((err) => res.json(err))
-
-  if (req.method === 'POST') {
+  const signUpUser = async () => {
     if (!req.body) return res.status(400).json({ error: 'Data is missing' })
 
     const { fullName, email, password } = req.body
@@ -30,63 +31,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const hashedPassword = await hash(password, 12)
 
     // Create user and process any errors
-    User.create({
+    let newUser = await User.create({
       fullName,
       email,
       password: hashedPassword,
       isConfirmed: false,
     })
-      .then((newUser) => {
-        // Type check with interface
-        newUser = newUser as TUser
 
-        // Construct JWT token payload
-        const payload = { user_id: newUser._id }
+    // Type check newUser and send confirmation email with verification token
+    newUser = newUser as TUser
+    const result = await generateTokenAndSendConfirmationEmail(
+      newUser._id,
+      newUser.email
+    )
 
-        // Generate JWT token with encrypted payload
-        const token = jwt.sign(
-          payload,
-          process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-          {
-            expiresIn: '1d',
-          }
-        )
-
-        // Send confirmation email
-        sendConfirmationEmailSES(newUser.email, token).then((result) => {
-          if (result.ok) {
-            return res.status(201).json({
-              ok: true,
-            })
-          } else {
-            return res.status(500).json({
-              ok: false,
-              msg: result.msg,
-            })
-          }
-        })
-
-        return res.status(201).json({
-          success: true,
-          newUser,
-        })
+    // Handle response of sending email
+    if (result.ok) {
+      return res.status(HttpStatusCode.Created).json({
+        ok: true,
       })
-      .catch((error) => {
-        if (error instanceof mongoose.Error.ValidationError) {
-          // Mongoose validation error occurred
-          // Put all errors into json message
-          const errors = Object.values(error.errors).map(
-            (err: any) => err.message
-          )
-          return res.status(409).json({ error: errors.join(', ') })
-        } else {
-          // Other error occurred
-          return res.status(500).json({ error: 'Server error' })
-        }
+    } else {
+      return res.status(HttpStatusCode.InternalServerError).json({
+        ok: false,
+        msg: result.msg,
       })
-  } else {
-    res.status(405).json({ error: 'Method Not Allowed' })
+    }
   }
+
+  const middlewareLoadedHandler = withMiddleware(
+    withMethodsGuard(['POST']),
+    withMongoDBConnection(),
+    signUpUser
+  )
+
+  return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
 export default handler
