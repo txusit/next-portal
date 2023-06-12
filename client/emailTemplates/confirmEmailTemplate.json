@@ -1,8 +1,0 @@
-{
-  "Template": {
-    "TemplateName": "ConfirmEmailTemplate",
-    "SubjectPart": "Confirm your email for USIT-Portal",
-    "HtmlPart": "",
-    "TextPart": "Verify your email through this link {{url}}"
-  }
-}
