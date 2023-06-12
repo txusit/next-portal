@@ -1,8 +1,9 @@
 import { getLogger } from '@/logging/log-util'
-import { HttpStatusCode } from 'axios'
+import { AxiosError, HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
+import JsonWebTokenError from 'jsonwebtoken'
 
 // wrap all api endpoint handlers with this method before exporting
 const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
@@ -10,6 +11,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
   return async (handler: NextApiHandler) => {
     try {
+      // throw new ApiError(404, 'testing')
       return await handler(req, res)
     } catch (exception) {
       const { url, headers } = req
@@ -26,6 +28,8 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
         message = { error: errors.join(', ') }
       }
 
+      // TODO: Possible specific error handling for jwt verifcation needed. add special error type and throw it instead of apierror
+
       // Handle generic API Errors if not handled by specific error handling above
       statusCode = statusCode ? statusCode : getExceptionStatus(exception)
       message = message ? message : getExceptionMessage(exception)
@@ -33,6 +37,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
       // this is the context being logged
       const requestContext = {
+        statusCode,
         url,
         message,
       }
@@ -53,7 +58,8 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
       const responseBody = {
         statusCode,
         timestamp,
-        path: req.url,
+        path: url,
+        message,
       }
 
       return res.status(statusCode).send(responseBody)

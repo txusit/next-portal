@@ -1,4 +1,3 @@
-import { connectToMongoDB } from '@/lib/mongodb'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
 import User from '@/models/user'
@@ -9,24 +8,34 @@ import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import { generateTokenAndSendConfirmationEmail } from '@/helpers/serverSideHelpers'
 import { HttpStatusCode } from 'axios'
+import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const signUpUser = async () => {
-    if (!req.body) return res.status(400).json({ error: 'Data is missing' })
-
+    // Parse request body
     const { fullName, email, password } = req.body
+    if (!fullName || !email || !password)
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because of missing or invalid user information'
+      )
 
     // Check for existing user
     const userExists = await User.findOne({ email })
     if (userExists) {
-      return res.status(409).json({ error: 'User already exists' })
+      throw new ApiError(
+        HttpStatusCode.Conflict,
+        'Unable to sign up because user already exists'
+      )
     }
 
     // Check for valid password and hash it
     if (password.length < 6) {
-      return res
-        .status(409)
-        .json({ error: 'Password should be 6 characters long' })
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because password should be 6 characters long'
+      )
     }
     const hashedPassword = await hash(password, 12)
 
@@ -44,22 +53,22 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       newUser._id,
       newUser.email
     )
-
-    // Handle response of sending email
-    if (result.ok) {
-      return res.status(HttpStatusCode.Created).json({
-        ok: true,
-      })
-    } else {
-      return res.status(HttpStatusCode.InternalServerError).json({
-        ok: false,
-        msg: result.msg,
-      })
+    if (!result.ok) {
+      throw new ApiError(
+        HttpStatusCode.ServiceUnavailable,
+        'Unable to send confirmation email'
+      )
     }
+
+    // Send successful response
+    return res.status(HttpStatusCode.Created).json({
+      ok: true,
+    })
   }
 
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
+    withRequestBodyGuard(),
     withMongoDBConnection(),
     signUpUser
   )

@@ -1,4 +1,6 @@
 import * as AWS from 'aws-sdk'
+import { HttpStatusCode } from 'axios'
+import { ApiError } from 'next/dist/server/api-utils'
 import * as nodemailer from 'nodemailer'
 import hbs from 'nodemailer-express-handlebars'
 import path from 'path'
@@ -45,17 +47,18 @@ export const sendConfirmationEmailSES = async (
     subject: 'USIT Portal Sign Up Verification',
     template: 'confirmEmailTemplate', // the name of the template file i.e confirmEmailTemplate.handlebars
     context: {
-      url: url, // replace {{url}} with url
+      url: url, // replacing {{url}} with url
     },
   }
 
-  try {
-    const response = await transporter.sendMail(mailOptions)
-    return response?.messageId
-      ? { ok: true }
-      : { ok: false, msg: 'Failed to send email' }
-  } catch (error: any) {
-    console.log('ERROR', error.message)
-    return { ok: false, msg: 'Failed to send email' }
+  const response = await transporter.sendMail(mailOptions)
+
+  if (!response?.messageId) {
+    throw new ApiError(
+      HttpStatusCode.ServiceUnavailable,
+      'Unable to send email'
+    )
+  } else {
+    return { ok: true }
   }
 }

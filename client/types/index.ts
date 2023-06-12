@@ -20,3 +20,8 @@ export type LoginUserParams = {
 export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
 
 export type Maybe<T> = T | null | undefined
+
+export type ResponseData = {
+  ok: boolean
+  msg?: any
+}
