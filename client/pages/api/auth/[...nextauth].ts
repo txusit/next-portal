@@ -24,22 +24,16 @@ export const authOptions: NextAuthOptions = {
 
         const user = await User.findOne({
           email: credentials?.email,
-        }).select('+password +isConfirmed')
+        }).select('+password')
 
         if (!user) {
           throw new Error('Invalid credentials')
         }
 
-        const isEmailConfirmed = (await user.isConfirmed) == true
-
         const isPasswordCorrect = await compare(
           credentials!.password,
           user.password
         )
-
-        if (!isEmailConfirmed) {
-          throw new Error('Email is not verified')
-        }
 
         if (!isPasswordCorrect) {
           throw new Error('Invalid credentials')
