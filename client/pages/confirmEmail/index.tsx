@@ -15,7 +15,7 @@ const Index = (props: Props) => {
     const confirmEmail = async () => {
       if (token) {
         try {
-          setMessage('Sending test mail')
+          setMessage('Confirming email...')
           // await needed here to catch any errors that occur duing async code execution
           const response = await axios.patch(
             'http://localhost:3000/api/auth/confirmEmail',
@@ -23,6 +23,8 @@ const Index = (props: Props) => {
               token: token,
             }
           )
+
+          setMessage('Email confirmed!')
           // Process the successful response here if needed
         } catch (error) {
           console.log(error)
@@ -38,7 +40,7 @@ const Index = (props: Props) => {
 
   return (
     <div>
-      <h1>Confirming Email</h1>
+      <h1>Account Verification</h1>
       <p>{message}</p>
     </div>
   )

@@ -8,20 +8,18 @@ const index = (props: Props) => {
   const sendMail = async () => {
     try {
       setMessage('Sending test mail')
-      const response = await axios.get(
+      const result = await axios.post(
         'http://localhost:3000/api/auth/sendConfirmationEmail',
         {
-          params: {
-            email: 'aaronlee232@gmail.com',
-          },
+          email: 'aaronlee232@gmail.com',
         }
       )
-      if (response['transporter_status']['ok']) {
-        setMessage('Successfully send test mail')
-      }
+
+      setMessage('Test mail sent')
     } catch (error) {
       console.log(error)
       // handle the error
+      setMessage('Unable to send test mail')
     }
   }
 
