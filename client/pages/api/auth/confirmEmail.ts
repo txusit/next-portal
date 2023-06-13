@@ -52,7 +52,7 @@ const handler = async (
     if (!updateResult.modifiedCount)
       throw new ApiError(
         HttpStatusCode.NotFound,
-        'Unable to send confirm email because there is no account associated with the _id provided'
+        `Unable to send confirm email because there is no account associated with the _id provided: ${payload.user_id}`
       )
 
     // Send successful response

@@ -44,6 +44,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       fullName,
       email,
       password: hashedPassword,
+      isConfirmed: false,
     })
 
     // Type check newUser and send confirmation email with verification token
