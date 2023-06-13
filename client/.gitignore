@@ -11,11 +11,12 @@
 # next.js
 /.next/
 /out/
+.swc
 
 # production
 /build
 
-# misc
+# mis
 .DS_Store
 *.pem
 
@@ -34,3 +35,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cypress
+cypress/videos/
+cypress/screenshots/
+
+# Jest
+__snapshots__/
