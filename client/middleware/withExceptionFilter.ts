@@ -11,24 +11,11 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
   return async (handler: NextApiHandler) => {
     try {
-      // throw new ApiError(404, 'testing')
       return await handler(req, res)
     } catch (exception) {
       const { url, headers } = req
 
       let statusCode, message, stack
-
-      // Handle specific exceptions
-      if (exception instanceof mongoose.Error.ValidationError) {
-        // Put all errors into json message
-        const errors = Object.values(exception.errors).map(
-          (err: any) => err.message
-        )
-        statusCode = HttpStatusCode.Conflict
-        message = { error: errors.join(', ') }
-      }
-
-      // TODO: Possible specific error handling for jwt verifcation needed. add special error type and throw it instead of apierror
 
       // Handle generic API Errors if not handled by specific error handling above
       statusCode = statusCode ? statusCode : getExceptionStatus(exception)
@@ -62,6 +49,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
         message,
       }
 
+      // const serializedResponse = JSON.stringify(responseBody)
       return res.status(statusCode).json(responseBody)
     }
   }
