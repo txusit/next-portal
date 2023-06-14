@@ -15,7 +15,6 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendConfirmationEmail = async () => {
-    throw new ApiError(123, 'testing')
     // Parse request body
     const { email } = req.body
     if (!email)
