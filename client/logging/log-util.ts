@@ -1,5 +1,4 @@
 import pino, { Logger } from 'pino'
-import pretty from 'pino-pretty'
 import papertrail from 'pino-papertrail'
 
 export function getLogger(): Logger {
@@ -14,15 +13,7 @@ export function getLogger(): Logger {
     appname,
   })
 
-  const streams = [
-    { stream: writeStream },
-    {
-      stream: pretty({
-        colorize: true,
-        sync: true,
-      }),
-    },
-  ]
+  const streams = [{ stream: writeStream }]
 
   const logger = pino(
     {
