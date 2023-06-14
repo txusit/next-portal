@@ -1,10 +1,14 @@
 FROM node:19.8.1
 
-ADD . /app
-
 WORKDIR /app
 
+COPY package.json /app/package.json
+
+COPY package-lock.json /app/package-lock.json
+
 RUN npm i
+
+COPY . /app
 
 EXPOSE 3000
 
