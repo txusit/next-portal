@@ -47,6 +47,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       isConfirmed: false,
     })
 
+    // TODO: failed to create user error
+
     // Type check newUser and send confirmation email with verification token
     newUser = newUser as TUser
     const result = await generateTokenAndSendConfirmationEmail(
