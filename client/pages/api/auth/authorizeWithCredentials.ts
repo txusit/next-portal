@@ -6,7 +6,6 @@ import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import User from '@/models/user'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
-import { compare } from 'bcryptjs'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 import { AES, enc } from 'crypto-js'
@@ -44,7 +43,7 @@ const handler = async (
       throw new ApiError(HttpStatusCode.Unauthorized, 'Email is not verified')
     }
 
-    const isPasswordCorrect = await compare(password, user.password)
+    const isPasswordCorrect = password == user.password
     if (!isPasswordCorrect) {
       throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
     }

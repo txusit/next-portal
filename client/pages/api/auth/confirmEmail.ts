@@ -9,6 +9,7 @@ import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
+import { AES } from 'crypto-js'
 
 const handler = async (
   req: NextApiRequest,
@@ -49,18 +50,31 @@ const handler = async (
         },
       },
       { new: true }
-    )
+    ).select('+password')
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
         `Unable to send confirm email because there is no account associated with the _id provided: ${payload.user_id}`
       )
 
+    // Encrypt user credentials to send to client for login
+    /**
+     * NOTE: encryption seems redundant since we are decrypting credentials during authorization
+     * but it seems to be the only way to avoid exposing the AES KEY to client
+     *  */
+    const aesKey: string = process.env.AES_KEY as string
+    const encryptedEmail = AES.encrypt(updatedUser!.email, aesKey).toString()
+    const encryptedPassword = AES.encrypt(
+      updatedUser!.password,
+      aesKey
+    ).toString()
+    const encryptedUser = { email: encryptedEmail, password: encryptedPassword }
+
     // Send successful response
     res.status(200).send({
       ok: true,
       msg: 'successfully verified email',
-      data: updatedUser,
+      data: encryptedUser,
     })
   }
 

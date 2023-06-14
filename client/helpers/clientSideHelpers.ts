@@ -9,15 +9,18 @@ export const getErrorMsg = (key: string, errors: InputError[]) => {
   }
 }
 
-export const loginUser = async ({ email, password }: LoginUserParams) => {
-  // references credential provider
+export const loginUser = async ({
+  email,
+  password,
+  preEncrypted,
+}: LoginUserParams) => {
+  // references credential provider in [...nextauth].ts
   const res = await signIn('credentials', {
     redirect: false,
     email,
     password,
+    preEncrypted,
   })
 
   return res
 }
-
-

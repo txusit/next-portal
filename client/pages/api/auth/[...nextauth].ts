@@ -3,6 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { ResponseData, User as TUser } from '@/types'
 import axios from 'axios'
 import { AES } from 'crypto-js'
+import { hash } from 'bcryptjs'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -14,6 +15,11 @@ export const authOptions: NextAuthOptions = {
       credentials: {
         email: { label: 'Email', type: 'text' },
         password: { label: 'Password', type: 'password' },
+        preEncrypted: {
+          label: 'Pre-Encrypted',
+          type: 'hidden',
+          value: 'false',
+        },
       },
 
       async authorize(credentials) {
@@ -24,13 +30,20 @@ export const authOptions: NextAuthOptions = {
         // Encrypt credentials if available
         let encryptedEmail, encryptedPassword
         if (credentials) {
-          const aesKey: string = process.env.AES_KEY as string
-          encryptedEmail = AES.encrypt(credentials!.email, aesKey).toString()
-          encryptedPassword = AES.encrypt(
-            credentials!.password,
-            aesKey
-          ).toString()
+          if (credentials.preEncrypted === 'true') {
+            // Login attempt in confirm email process passes in pre-encrypted credentials
+            // password is already hashed as well
+            encryptedEmail = credentials!.email
+            encryptedPassword = credentials!.password
+          } else {
+            // Normal sign in credentials are not pre-encrypted
+            const hashedPassword = await hash(credentials.password, 12)
+            const aesKey: string = process.env.AES_KEY as string
+            encryptedEmail = AES.encrypt(credentials!.email, aesKey).toString()
+            encryptedPassword = AES.encrypt(hashedPassword, aesKey).toString()
+          }
         } else {
+          // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
           encryptedEmail = ''
           encryptedPassword = ''
         }
@@ -48,7 +61,6 @@ export const authOptions: NextAuthOptions = {
             encryptedCredentials: encryptedCredentials,
           }
         )
-        // first data is to retrieve normal response from axios response
         const user = result.data.data
 
         return user
