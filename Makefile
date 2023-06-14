@@ -1,5 +1,5 @@
 # Default script that gets run when only 'make' is run
-.DEFAULT_GOAL := clean-full-test
+.DEFAULT_GOAL := clean-frontend-db
 
 
 # Cleans up docker containers, volumes, and networks in project (fresh start)
