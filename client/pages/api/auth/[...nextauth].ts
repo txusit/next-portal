@@ -48,7 +48,8 @@ export const authOptions: NextAuthOptions = {
             encryptedCredentials: encryptedCredentials,
           }
         )
-        const user = result.data.msg
+        // first data is to retrieve normal response from axios response
+        const user = result.data.data
 
         return user
       },

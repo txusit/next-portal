@@ -27,7 +27,9 @@ const handler = async (
     // Used to test if connection to mongoDB is valid
     const result = await User.find()
 
-    res.status(HttpStatusCode.Accepted).send({ ok: true, msg: result })
+    res
+      .status(HttpStatusCode.Accepted)
+      .send({ ok: true, msg: 'example endpoint response', data: result })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

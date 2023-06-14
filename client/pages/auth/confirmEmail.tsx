@@ -1,11 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import axios from 'axios'
+import { loginUser } from '@/helpers/clientSideHelpers'
 
 type Props = {}
 
 const Index = (props: Props) => {
   const [message, setMessage] = useState('')
+  const [submitError, setSubmitError] = useState<string>('')
+
   // Get token from URL Params
   const router = useRouter()
 
@@ -26,17 +29,18 @@ const Index = (props: Props) => {
 
           setMessage('Email confirmed!')
 
-          // TODO: REMOVE LOGIN
-          // const loginRes = await loginUser({
-          //   email: data.email,
-          //   password: data.password,
-          // })
+          const user = response.data.data
 
-          // if (loginRes && !loginRes.ok) {
-          //   setSubmitError(loginRes.error || '')
-          // } else {
-          //   router.push('/')
-          // }
+          const loginRes = await loginUser({
+            email: user.email,
+            password: user.password,
+          })
+
+          if (loginRes && !loginRes.ok) {
+            setSubmitError(loginRes.error || '')
+          } else {
+            router.push('/')
+          }
 
           // Process the successful response here if needed
         } catch (error) {
@@ -55,6 +59,7 @@ const Index = (props: Props) => {
     <div>
       <h1>Account Verification</h1>
       <p>{message}</p>
+      {submitError && <p>{submitError}</p>}
     </div>
   )
 }

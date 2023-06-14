@@ -23,5 +23,6 @@ export type Maybe<T> = T | null | undefined
 
 export type ResponseData = {
   ok: boolean
-  msg?: any
+  msg?: string
+  data?: any
 }

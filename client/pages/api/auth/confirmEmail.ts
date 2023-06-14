@@ -41,22 +41,27 @@ const handler = async (
     }
 
     // Update user to reflect confirmed email status
-    const updateResult = await User.updateOne(
+    const updatedUser = await User.findOneAndUpdate(
       { _id: payload.user_id },
       {
         $set: {
           isConfirmed: true,
         },
-      }
+      },
+      { new: true }
     )
-    if (!updateResult.modifiedCount)
+    if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
         `Unable to send confirm email because there is no account associated with the _id provided: ${payload.user_id}`
       )
 
     // Send successful response
-    res.status(200).send({ ok: true, msg: updateResult })
+    res.status(200).send({
+      ok: true,
+      msg: 'successfully verified email',
+      data: updatedUser,
+    })
   }
 
   const middlewareLoadedHandler = withMiddleware(
