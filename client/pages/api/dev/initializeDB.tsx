@@ -19,14 +19,14 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    await User.findOne()
+    // await User.findOne()
 
-    // let newUser = await User.create({
-    //   fullName: 'dummy full name',
-    //   email: 'dummyemail@gmail.com',
-    //   password: 'dummypassword',
-    //   isConfirmed: false,
-    // })
+    let newUser = await User.create({
+      fullName: 'dummy full name',
+      email: 'dummyemail2@gmail.com',
+      password: 'dummypassword',
+      isConfirmed: false,
+    })
 
     res.status(HttpStatusCode.Accepted).send({ ok: true, msg: 'connected' })
   }
