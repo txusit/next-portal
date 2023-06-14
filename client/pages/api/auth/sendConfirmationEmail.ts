@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import User from '@/models/user'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
-import { withMiddleware } from '@/middleware/withMiddleware'
+import withMiddleware from '@/middleware/withMiddleware'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import { HttpStatusCode } from 'axios'
 import { generateTokenAndSendConfirmationEmail } from '@/helpers/serverSideHelpers'
@@ -15,6 +15,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendConfirmationEmail = async () => {
+    throw new ApiError(123, 'testing')
     // Parse request body
     const { email } = req.body
     if (!email)

@@ -1,6 +1,6 @@
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
-import { withMiddleware } from '@/middleware/withMiddleware'
+import withMiddleware from '@/middleware/withMiddleware'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import User from '@/models/user'

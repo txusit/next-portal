@@ -6,7 +6,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
  * @description combine multiple middleware before handling your API endpoint
  * @param middlewares
  */
-export const withMiddleware = (...middlewares: Middleware[]) => {
+const withMiddleware = (...middlewares: Middleware[]) => {
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const evaluateHandler = async (
       middleware: Middleware,
@@ -46,3 +46,5 @@ export const withMiddleware = (...middlewares: Middleware[]) => {
     }
   }
 }
+
+export default withMiddleware

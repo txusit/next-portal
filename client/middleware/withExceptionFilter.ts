@@ -62,7 +62,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
         message,
       }
 
-      return res.status(statusCode).send(responseBody)
+      return res.status(statusCode).json(responseBody)
     }
   }
 }

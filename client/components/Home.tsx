@@ -2,6 +2,7 @@ import React from 'react'
 
 type Props = {}
 
+// Component to for example jest test
 const Home = (props: Props) => {
   return (
     <div>
