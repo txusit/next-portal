@@ -52,4 +52,4 @@ backend-shell:
 
 # Test Deploy
 test-deploy:
-	touch test_deploy && git add test_deploy && git commit -m "testing deployment" && git push && rm test_deploy
+	touch test_deploy && echo "Unique Text: $(date +%s)" > test_deploy && git add test_deploy && git commit -m "testing deployment" && git push && rm test_deploy
