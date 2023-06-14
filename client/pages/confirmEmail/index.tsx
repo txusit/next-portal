@@ -25,6 +25,19 @@ const Index = (props: Props) => {
           )
 
           setMessage('Email confirmed!')
+
+          // TODO: REMOVE LOGIN
+          // const loginRes = await loginUser({
+          //   email: data.email,
+          //   password: data.password,
+          // })
+
+          // if (loginRes && !loginRes.ok) {
+          //   setSubmitError(loginRes.error || '')
+          // } else {
+          //   router.push('/')
+          // }
+
           // Process the successful response here if needed
         } catch (error) {
           console.log(error)
