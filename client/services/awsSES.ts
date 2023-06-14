@@ -39,7 +39,7 @@ export const sendConfirmationEmailSES = async (
   userEmail: string,
   token: string
 ) => {
-  const url = `${process.env.BASE_URL}/confirmEmail?token=${token}`
+  const url = `${process.env.BASE_URL}/auth/confirmEmail?token=${token}`
 
   var mailOptions = {
     from: adminMail,
