@@ -18,6 +18,7 @@ const SignIn: NextPage = (props): JSX.Element => {
       const loginRes = await loginUser({
         email: userInfo.email,
         password: userInfo.password,
+        preEncrypted: 'false',
       })
       if (loginRes && !loginRes.ok) {
         setSubmitError(loginRes.error || '')
@@ -34,7 +35,7 @@ const SignIn: NextPage = (props): JSX.Element => {
   }
 
   return (
-    <div className='sign-in-form'>
+    <div className="sign-in-form">
       <form onSubmit={handleSubmit}>
         <h1>Login</h1>
         <input
@@ -42,18 +43,18 @@ const SignIn: NextPage = (props): JSX.Element => {
           onChange={({ target }) =>
             setUserInfo({ ...userInfo, email: target.value })
           }
-          type='email'
-          placeholder='john@email.com'
+          type="email"
+          placeholder="john@email.com"
         />
         <input
           value={userInfo.password}
           onChange={({ target }) =>
             setUserInfo({ ...userInfo, password: target.value })
           }
-          type='password'
-          placeholder='****'
+          type="password"
+          placeholder="****"
         />
-        <input type='submit' value='login' />
+        <input type="submit" value="login" />
         {submitError && <p>{submitError}</p>}
       </form>
     </div>

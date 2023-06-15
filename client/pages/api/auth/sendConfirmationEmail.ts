@@ -5,14 +5,14 @@ import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import { HttpStatusCode } from 'axios'
-import { generateTokenAndSendConfirmationEmail } from '@/helpers/serverSideHelpers'
+import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 import { ApiError } from 'next/dist/server/api-utils'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ResponseData } from '@/types'
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
+  res: NextApiResponse<ResponseData>,
 ) => {
   const sendConfirmationEmail = async () => {
     // Parse request body
@@ -20,7 +20,7 @@ const handler = async (
     if (!email)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to send confirmation email because of missing or invalid email'
+        'Unable to send confirmation email because of missing or invalid email',
       )
 
     // Find user that matches email
@@ -30,18 +30,19 @@ const handler = async (
     if (!user)
       throw new ApiError(
         HttpStatusCode.NotFound,
-        'Unable to send confirmation email because there is no account associated with the email provided'
+        'Unable to send confirmation email because there is no account associated with the email provided',
       )
 
     // Send confirmation email with verification token
-    const result = await generateTokenAndSendConfirmationEmail(
+    const result = await generateTokenAndSendActionEmail(
       user._id,
-      user.email
+      user.email,
+      'confirmEmail',
     )
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
-        'Unable to send confirmation email'
+        'Unable to send confirmation email',
       )
     }
 
@@ -56,7 +57,7 @@ const handler = async (
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    sendConfirmationEmail
+    sendConfirmationEmail,
   )
 
   return withExceptionFilter(req, res)(middlewareLoadedHandler)

@@ -35,17 +35,23 @@ const handlebarOptions: hbs.NodemailerExpressHandlebarsOptions = {
 // use a template file with nodemailer
 transporter.use('compile', hbs(handlebarOptions))
 
-export const sendConfirmationEmailSES = async (
+export const sendEmailSES = async (
   userEmail: string,
-  token: string
+  token: string,
+  action: string,
 ) => {
-  const url = `${process.env.BASE_URL}/auth/confirmEmail?token=${token}`
-
+  const url = `${process.env.BASE_URL}/auth/${action}?token=${token}`
+  const subject =
+    action == 'confirmEmail'
+      ? 'USIT Portal Sign Up Verification'
+      : 'USIT Portal Password Recovery'
+  const template =
+    action == 'confirmEmail' ? 'confirmEmailTemplate' : 'recoveryEmailTemplate'
   var mailOptions = {
     from: adminMail,
     to: userEmail,
-    subject: 'USIT Portal Sign Up Verification',
-    template: 'confirmEmailTemplate', // the name of the template file i.e confirmEmailTemplate.handlebars
+    subject,
+    template, // the name of the template file i.e confirmEmailTemplate.handlebars
     context: {
       url: url, // replacing {{url}} with url
     },
@@ -56,7 +62,7 @@ export const sendConfirmationEmailSES = async (
   if (!response?.messageId) {
     throw new ApiError(
       HttpStatusCode.ServiceUnavailable,
-      'Unable to send email'
+      'Unable to send email',
     )
   } else {
     return { ok: true }

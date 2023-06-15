@@ -3,7 +3,7 @@ import React, { useState } from 'react'
 
 type Props = {}
 
-const index = (props: Props) => {
+const Index = (props: Props) => {
   const [message, setMessage] = useState('')
   const sendMail = async () => {
     try {
@@ -12,14 +12,14 @@ const index = (props: Props) => {
         'http://localhost:3000/api/auth/sendConfirmationEmail',
         {
           email: 'aaronlee232@gmail.com',
-        }
+        },
       )
 
       setMessage('Test mail sent')
     } catch (error) {
       console.log(error)
       // handle the error
-      setMessage('Unable to send test mail')
+      setMessage('Unable to send test email')
     }
   }
 
@@ -31,4 +31,4 @@ const index = (props: Props) => {
   )
 }
 
-export default index
+export default Index
