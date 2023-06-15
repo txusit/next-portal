@@ -22,7 +22,10 @@ const handler = async (
 ) => {
   const handlerMainFunction = async () => {
     // Uncomment this to test central error handling
-    // throw new ApiError(HttpStatusCode.Forbidden, 'Error Handler Works!')
+    // throw new ApiError(
+    //   HttpStatusCode.InternalServerError,
+    //   'Error Handler Works!'
+    // )
 
     // Used to test if connection to mongoDB is valid
     const result = await User.find()
@@ -35,7 +38,7 @@ const handler = async (
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
-    withRequestBodyGuard(),
+    // withRequestBodyGuard(),
     withMongoDBConnection(),
     handlerMainFunction
   )
