@@ -17,6 +17,7 @@ export function getLogger(): Logger {
 
   const logger = pino(
     {
+      enabled: !(process.env.LOG_ENABLED === 'false'),
       level: 'info',
     },
     pino.multistream(streams)

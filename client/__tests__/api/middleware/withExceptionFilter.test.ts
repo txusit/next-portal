@@ -2,33 +2,38 @@
  * @jest-environment node
  */
 // required-header-for-jest-test.js
-import { NextApiRequest, NextApiResponse } from 'next'
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
+import { NextApiRequest, NextApiResponse } from 'next'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import { jest, describe, beforeEach, it, expect } from '@jest/globals'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { createMocks, RequestMethod } from 'node-mocks-http'
-import { createRequest } from 'node-mocks-http'
-import { createResponse } from 'node-mocks-http'
+import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
+import mongoose from 'mongoose'
 
 describe('withExceptionFilter', () => {
   let req: NextApiRequest
   let res: NextApiResponse
   let nextApiHandler: jest.Mock
+  const OLD_ENV = process.env
+  OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
-  // beforeEach(() => {
-  //   req = {} as NextApiRequest
-  //   res = {} as NextApiResponse
-  // })
+  beforeEach(() => {
+    process.env = { ...OLD_ENV } // Make a copy
+    nextApiHandler = jest.fn()
+  })
+
+  afterAll(() => {
+    process.env = OLD_ENV // Restore old environment
+  })
 
   const mockRequestResponse = (
     method: RequestMethod = 'GET'
   ): { req: NextApiRequest; res: NextApiResponse } => {
-    const req = createRequest({
+    req = createRequest({
       method: method,
     })
-    const res = createResponse()
+    res = createResponse()
 
     return { req, res }
   }
@@ -36,17 +41,19 @@ describe('withExceptionFilter', () => {
   it('should call the nextApiHandler with req and res', async () => {
     const { req, res } = mockRequestResponse()
 
-    nextApiHandler = jest.fn()
+    // nextApiHandler = jest.fn()
     const errorCatchingWrapper = withExceptionFilter(req, res)
     await errorCatchingWrapper(nextApiHandler)
 
     expect(nextApiHandler).toHaveBeenCalledWith(req, res)
   })
 
-  it('should handle a specific exception and return the appropriate response', async () => {
-    const { req, res } = mockRequestResponse()
+  // Generic Error Handling
+  it('should handle a generic exception and return the appropriate response', async () => {
+    req = mockRequestResponse().req
+    res = mockRequestResponse().res
 
-    // Set env variables
+    // Set mock variables
     const mockErrorCode = 123
     const mockErrorMessage = 'Mocked forbidden error'
 
@@ -58,21 +65,48 @@ describe('withExceptionFilter', () => {
     let actualRes: any = await errorCatchingWrapper(errorThrowingHandler)
     actualRes = actualRes._getJSONData()
 
-    // const expectedResBody = {
-    //   statusCode: mockErrorCode,
-    //   timestamp: expect.any(String),
-    //   path: expect.any(String),
-    //   message: mockErrorMessage,
-    // }
-
     await expect(actualRes.statusCode).toBe(mockErrorCode)
     await expect(actualRes.message).toBe(mockErrorMessage)
-
-    // expect(actualRes).toEqual(expect.objectContaining(expectedResBody))
   })
 
-  // Add more test cases to cover other scenarios and exception types
-  // ...
+  // Specific Error Handling
+  // * PLACEHOLDER SPECIFIC ERROR *
+  // Add additional specific error handling unit tests as they are added into withExceptionFilter
+  it('should handle a mongoose validation exception and return the appropriate response', async () => {
+    req = mockRequestResponse().req
+    res = mockRequestResponse().res
 
-  // Unit tests for the utility functions (getExceptionStatus, getExceptionMessage, getExceptionStack, isError) can be added as well.
+    const mockValidationError = new mongoose.Error.ValidationError()
+
+    const errorThrowingHandler = jest.fn(async () => {
+      throw mockValidationError
+    })
+
+    const errorCatchingWrapper = withExceptionFilter(req, res)
+    let actualRes: any = await errorCatchingWrapper(errorThrowingHandler)
+    actualRes = actualRes._getJSONData()
+
+    await expect(actualRes.statusCode).toBe(HttpStatusCode.InternalServerError)
+    await expect(actualRes.message).toBe('mongoose error caught')
+  })
+
+  it('should handle a non Error exception and return the appropriate response', async () => {
+    req = mockRequestResponse().req
+    res = mockRequestResponse().res
+
+    const mockNonError = {
+      message: 'this is a mock non-error',
+    }
+
+    const errorThrowingHandler = jest.fn(async () => {
+      throw mockNonError
+    })
+
+    const errorCatchingWrapper = withExceptionFilter(req, res)
+    let actualRes: any = await errorCatchingWrapper(errorThrowingHandler)
+    actualRes = actualRes._getJSONData()
+
+    await expect(actualRes.statusCode).toBe(HttpStatusCode.InternalServerError)
+    await expect(actualRes.message).toBe('Internal Server Error')
+  })
 })

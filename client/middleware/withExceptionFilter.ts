@@ -1,9 +1,8 @@
 import { getLogger } from '@/logging/log-util'
-import { AxiosError, HttpStatusCode } from 'axios'
+import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import JsonWebTokenError from 'jsonwebtoken'
 
 // wrap all api endpoint handlers with this method before exporting
 const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
@@ -16,6 +15,13 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
       const { url, headers } = req
 
       let statusCode, message, stack
+      // Handle Specific Errors
+      // * PLACEHOLDER SPECIFIC ERROR *
+      if (exception instanceof mongoose.Error.ValidationError) {
+        statusCode = HttpStatusCode.InternalServerError
+        message = 'mongoose error caught'
+        stack = 'no stack'
+      }
 
       // Handle generic API Errors if not handled by specific error handling above
       statusCode = statusCode ? statusCode : getExceptionStatus(exception)
