@@ -67,6 +67,7 @@ describe('authorizeWithCredentials', () => {
       email: 'test@example.com',
       password: 'password123',
       isConfirmed: true,
+      creationTime: new Date(),
     })
     await testUser.save()
     const aesKey = process.env.AES_KEY

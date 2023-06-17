@@ -53,6 +53,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       email,
       password: hashedPassword,
       isConfirmed: false,
+      creationTime: new Date(),
     })
 
     // TODO: failed to create user error

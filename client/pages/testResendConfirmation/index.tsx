@@ -10,7 +10,7 @@ const Index = (props: Props) => {
     try {
       setMessage('Sending test mail')
       const result = await axios.post(
-        `${process.env.BASE_URL}/api/auth/SendConfirmationEmail`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
         {
           asymEncryptEmail: encryptData('aaronlee232@gmail.com'),
         }

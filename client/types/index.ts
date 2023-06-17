@@ -5,6 +5,8 @@ export type User = {
   email: string
   fullName: string
   isConfirmed: boolean
+  creationTime: Date,
+
   // TODO: add additional fields like: EID, graduation year, college, role, etc
 }
 

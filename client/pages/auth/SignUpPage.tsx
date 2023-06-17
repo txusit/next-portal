@@ -4,6 +4,7 @@ import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
 import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
+import Link from 'next/link'
 
 export const SignUpPage = () => {
   const [data, setData] = useState({
@@ -16,6 +17,8 @@ export const SignUpPage = () => {
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
   const [submitError, setSubmitError] = useState<string>('')
   const [loading, setLoading] = useState(false)
+  const [displayResendOption, setDisplayResendOption] = useState(false)
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   // Check if data fields match requirements
@@ -67,10 +70,11 @@ export const SignUpPage = () => {
         )
 
         if (apiRes?.data?.ok) {
-          // save data in session using next-auth
+          setMessage(
+            'A confirmation email has been sent to the address specified. Please check your inbox.'
+          )
 
-          // Redirect or change page to show a message to check email
-          router.push('/')
+          setDisplayResendOption(true)
         }
       } catch (error) {
         if (error instanceof AxiosError) {
@@ -83,6 +87,24 @@ export const SignUpPage = () => {
     }
   }
 
+  const sendMail = async () => {
+    try {
+      setMessage('Sending confirmation mail')
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
+        {
+          asymEncryptEmail: encryptData(data.email),
+        }
+      )
+
+      setMessage('Confirmation sent')
+    } catch (error) {
+      console.log(error)
+      // handle the error
+      setMessage('Unable to send confirmation email')
+    }
+  }
+
   const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     // get property name from event.target.name and set the value from onChange in it
     // So name in our input component should be same as property in data state
@@ -92,6 +114,7 @@ export const SignUpPage = () => {
 
   return (
     <>
+      <h1>Create an Account</h1>
       <form onSubmit={handleSubmit}>
         <input
           type='text'
@@ -134,15 +157,25 @@ export const SignUpPage = () => {
         <button title={'Sign up'} type='submit' disabled={loading}>
           Sign Up
         </button>
-
-        {submitError && <p>{submitError}</p>}
-
-        {/* <InfoTextContainer>
-          <InfoText>Already have account?</InfoText>
-
-          <Link href={'/login'}>Login</Link>
-        </InfoTextContainer> */}
       </form>
+
+      <div>
+        {/* TODO Add 30 second cooldown timer */}
+        {displayResendOption && (
+          <button onClick={sendMail}>Resend Confirmation Email</button>
+        )}
+      </div>
+      {submitError && <p>{submitError}</p>}
+      {message && <p>{message}</p>}
+
+      <br />
+      <br />
+      <br />
+      <div>
+        <h2>Already have account?</h2>
+
+        <Link href='/auth/SignInPage'>Sign In</Link>
+      </div>
     </>
   )
 }
