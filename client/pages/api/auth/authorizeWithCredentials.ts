@@ -9,6 +9,7 @@ import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 import { AES, enc } from 'crypto-js'
+import { compare } from 'bcryptjs'
 
 const handler = async (
   req: NextApiRequest,
@@ -34,7 +35,10 @@ const handler = async (
       email: email,
     }).select('+password +isConfirmed')
     if (!user) {
-      throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
+      throw new ApiError(
+        HttpStatusCode.Unauthorized,
+        'Invalid credentials - cant find user'
+      )
     }
 
     // Check credentials
@@ -43,9 +47,14 @@ const handler = async (
       throw new ApiError(HttpStatusCode.Unauthorized, 'Email is not verified')
     }
 
-    const isPasswordCorrect = password == user.password
+    // check if password matches hash
+    const isPasswordCorrect =
+      password == user.password || compare(password, user.password)
     if (!isPasswordCorrect) {
-      throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
+      throw new ApiError(
+        HttpStatusCode.Unauthorized,
+        'Invalid credentials - wrong password'
+      )
     }
 
     // Send back successful response with user

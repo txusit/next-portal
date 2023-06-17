@@ -10,12 +10,11 @@ const PasswordRecovery = (props: Props) => {
     e.preventDefault()
     try {
       setMessage('Sending recovery email')
-      console.log(process.env.NEXT_PUBLIC_BASE_URL)
       await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/sendRecoveryEmail`,
         {
-          email: 'techchair@usiteam.org',
-        },
+          email,
+        }
       )
       setMessage('Test mail sent')
     } catch (error) {
@@ -32,11 +31,11 @@ const PasswordRecovery = (props: Props) => {
           onChange={({ target }) => {
             setEmail(target.value)
           }}
-          type="email"
-          placeholder="John@email.com"
+          type='email'
+          placeholder='John@email.com'
           required
         />
-        <input value="Recover Password" type="submit" />
+        <input value='Recover Password' type='submit' />
       </form>
       {message}
     </div>

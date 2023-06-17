@@ -14,16 +14,15 @@ import { hash } from 'bcryptjs'
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
+  res: NextApiResponse<ResponseData>
 ) => {
   const resetPassword = async () => {
     // Parse request body
-    console.log(req.body)
     let { token, password } = req.body
     if (!token)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to reset password because of missing or invalid token',
+        'Unable to reset password because of missing or invalid token'
       )
 
     // Type check token and get _id payload from token
@@ -34,31 +33,30 @@ const handler = async (
     try {
       payload = jwt.verify(
         token,
-        process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
+        process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
       ) as JwtEmailToken
     } catch (jwtTokenError) {
       throw new ApiError(
         HttpStatusCode.Unauthorized,
-        'verification of JWT Token failed',
+        'verification of JWT Token failed'
       )
     }
 
-    const hashedPassword = await hash(password, 12)
-    console.log('Hashed Password: ', hashedPassword)
+    // const hashedPassword = await hash(password, 12)
     // Update user to reflect confirmed email status
     const updatedUser = await User.findOneAndUpdate(
       { _id: payload.user_id },
       {
         $set: {
-          password: hashedPassword,
+          password: password,
         },
       },
-      { new: true },
+      { new: true }
     )
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
-        `Unable to update password because there is no account associated with the _id provided: ${payload.user_id}`,
+        `Unable to update password because there is no account associated with the _id provided: ${payload.user_id}`
       )
 
     // Send successful response
@@ -72,7 +70,7 @@ const handler = async (
     withMethodsGuard(['PATCH']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    resetPassword,
+    resetPassword
   )
 
   return withExceptionFilter(req, res)(middlewareLoadedHandler)

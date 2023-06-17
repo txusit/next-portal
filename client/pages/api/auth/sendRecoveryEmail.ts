@@ -12,31 +12,42 @@ import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
+  res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
     const { email } = req.body
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
-
-    if (!user || !user.isConfirmed) {
-      // TODO: HANDLE INVALID USER!!!!!
+    if (!user) {
+      res.status(HttpStatusCode.Accepted).json({
+        ok: true,
+        msg: 'If this email exists address in our database, a recovery email has been sent to it',
+      })
+    }
+    if (!user.isConfirmed) {
+      res
+        .status(HttpStatusCode.BadRequest)
+        .json({
+          ok: true,
+          msg: 'The email associated with this account has not been verified',
+        })
     }
 
     const result = await generateTokenAndSendActionEmail(
       user._id,
       email,
-      'resetPassword',
+      'resetPassword'
     )
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
-        'Unable to send confirmation email',
+        'Unable to send confirmation email'
       )
     }
 
-    res
-      .status(HttpStatusCode.Accepted)
-      .send({ ok: true, msg: 'Recovery email sent' })
+    res.status(HttpStatusCode.Accepted).json({
+      ok: true,
+      msg: 'If this email exists address in our database, a recovery email has been sent to it',
+    })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
@@ -44,7 +55,7 @@ const handler = async (
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    handlerMainFunction,
+    handlerMainFunction
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

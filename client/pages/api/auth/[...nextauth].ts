@@ -37,10 +37,10 @@ export const authOptions: NextAuthOptions = {
             encryptedPassword = credentials!.password
           } else {
             // Normal sign in credentials are not pre-encrypted
-            const hashedPassword = await hash(credentials.password, 12)
+            // const hashedPassword = await hash(credentials.password, 12)
             const aesKey: string = process.env.AES_KEY as string
             encryptedEmail = AES.encrypt(credentials!.email, aesKey).toString()
-            encryptedPassword = AES.encrypt(hashedPassword, aesKey).toString()
+            encryptedPassword = AES.encrypt(credentials!.password, aesKey).toString()
           }
         } else {
           // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
@@ -59,7 +59,7 @@ export const authOptions: NextAuthOptions = {
           {
             validCredentials: validCredentials,
             encryptedCredentials: encryptedCredentials,
-          },
+          }
         )
         const user = result.data.data
 

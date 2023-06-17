@@ -12,7 +12,6 @@ const ResetPassword = (props: Props) => {
   const [submitError, setSubmitError] = useState('')
   const router = useRouter()
   let { token } = router.query
-  console.log(token)
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     if (data.password != data.confirmPassword) {

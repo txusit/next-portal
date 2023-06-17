@@ -18,7 +18,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!fullName || !email || !password)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to sign up because of missing or invalid user information',
+        'Unable to sign up because of missing or invalid user information'
       )
 
     // Check for existing user
@@ -26,7 +26,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (userExists) {
       throw new ApiError(
         HttpStatusCode.Conflict,
-        'Unable to sign up because user already exists',
+        'Unable to sign up because user already exists'
       )
     }
 
@@ -34,7 +34,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (password.length < 6) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to sign up because password should be 6 characters long',
+        'Unable to sign up because password should be 6 characters long'
       )
     }
     const hashedPassword = await hash(password, 12)
@@ -54,12 +54,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await generateTokenAndSendActionEmail(
       newUser._id,
       newUser.email,
-      'confirmEmail',
+      'confirmEmail'
     )
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
-        'Unable to send confirmation email',
+        'Unable to send confirmation email'
       )
     }
 
@@ -73,7 +73,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    signUpUser,
+    signUpUser
   )
 
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
