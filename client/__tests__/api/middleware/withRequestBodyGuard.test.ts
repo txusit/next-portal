@@ -12,6 +12,7 @@ import { createRequest } from 'node-mocks-http'
 import { createResponse } from 'node-mocks-http'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 
+// Test Type: Unit Tests
 describe('withRequestBodyGuard', () => {
   let req: NextApiRequest
   let res: NextApiResponse

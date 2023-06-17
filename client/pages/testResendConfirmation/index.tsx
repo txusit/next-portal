@@ -9,10 +9,10 @@ const Index = (props: Props) => {
     try {
       setMessage('Sending test mail')
       const result = await axios.post(
-        'http://localhost:3000/api/auth/sendConfirmationEmail',
+        `${process.env.BASE_URL}/api/auth/sendConfirmationEmail`,
         {
           email: 'aaronlee232@gmail.com',
-        },
+        }
       )
 
       setMessage('Test mail sent')

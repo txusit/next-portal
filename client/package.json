@@ -7,7 +7,7 @@
     "build": "node_modules/next/dist/bin/next build",
     "start": "node_modules/next/dist/bin/next start",
     "lint": "node_modules/next/dist/bin/next lint",
-    "test": "DOTENV_CONFIG_PATH=.env.local jest --setupFiles=dotenv/config --watchAll --collect-coverage --coverageDirectory='coverage'",
+    "test": "DOTENV_CONFIG_PATH=.env.local jest --setupFiles=dotenv/config --watchAll --collect-coverage --coverageDirectory='coverage' --detectOpenHandles",
     "cypress": "cypress open"
   },
   "dependencies": {

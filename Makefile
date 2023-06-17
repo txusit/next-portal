@@ -49,6 +49,10 @@ frontend-shell:
 backend-shell:
 	docker exec -t -i next_portal_backend_container /bin/bash
 
+# Open Jest Coverage Report
+open-jest-report:
+	open ./client/coverage/lcov-report/index.html
+
 
 # Test Deploy
 test-deploy:

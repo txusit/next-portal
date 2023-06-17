@@ -11,6 +11,7 @@ import { HttpStatusCode } from 'axios'
 import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
 import mongoose from 'mongoose'
 
+// Test Type: Unit Tests
 describe('withExceptionFilter', () => {
   let req: NextApiRequest
   let res: NextApiResponse

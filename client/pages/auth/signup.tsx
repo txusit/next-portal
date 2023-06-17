@@ -54,7 +54,7 @@ export const LoginPage = () => {
       try {
         setLoading(true)
         const apiRes = await axios.post(
-          'http://localhost:3000/api/auth/signup',
+          `${process.env.BASE_URL}/api/auth/signup`,
           data
         )
 

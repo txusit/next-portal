@@ -1,12 +1,17 @@
 import { connectToMongoDB } from '@/lib/mongodb'
 import { Middleware } from '@/types'
 import { HttpStatusCode } from 'axios'
+import mongoose from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 
 type MiddlewareWithoutParams = () => Middleware
 
 const withMongoDBConnection: MiddlewareWithoutParams = () => {
+  if (mongoose.connection.readyState == 1)
+    return async (req: NextApiRequest, res: NextApiResponse) => {
+      // Do nothing. Use existing connection
+    }
   return async (req: NextApiRequest, res: NextApiResponse) => {
     try {
       await connectToMongoDB()

@@ -10,6 +10,7 @@ import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
 import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
 
+// Test Type: Unit Tests
 describe('withMethodsGuard', () => {
   let req: NextApiRequest
   let res: NextApiResponse

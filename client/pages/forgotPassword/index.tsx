@@ -9,10 +9,10 @@ const PasswordRecovery = (props: Props) => {
   const handleSubmit = async () => {
     try {
       const result = await axios.post(
-        'http://localhost:3000/api/auth/sendRecoveryEmail',
+        `${process.env.BASE_URL}/api/auth/sendRecoveryEmail`,
         {
           email,
-        },
+        }
       )
     } catch (error) {
       console.log(error)
@@ -28,10 +28,10 @@ const PasswordRecovery = (props: Props) => {
           onChange={({ target }) => {
             setEmail(target.value)
           }}
-          type="email"
-          placeholder="John@email.com"
+          type='email'
+          placeholder='John@email.com'
         />
-        <input value="Recover Password" type="submit" />
+        <input value='Recover Password' type='submit' />
       </form>
       {message}
     </div>

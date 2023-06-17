@@ -15,6 +15,7 @@ import { connectToMongoDB } from '@/lib/mongodb'
 // import * as withMongoDBConnection from '@/middleware/withMongoDBConnection'
 
 // TODO: Figure out a useful test or delete
+// Test Type: Unit Tests
 describe('connectToMongoDB', () => {
   afterAll(() => {
     jest.restoreAllMocks()
