@@ -40,7 +40,7 @@ const handler = async (
     const result = await generateTokenAndSendActionEmail(
       user._id,
       user.email,
-      'confirmEmail'
+      'ConfirmEmailPage'
     )
     if (!result.ok) {
       throw new ApiError(

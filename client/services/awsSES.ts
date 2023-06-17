@@ -38,15 +38,17 @@ transporter.use('compile', hbs(handlebarOptions))
 export const sendEmailSES = async (
   userEmail: string,
   token: string,
-  action: string,
+  actionPage: string
 ) => {
-  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/${action}?token=${token}`
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/${actionPage}?token=${token}`
   const subject =
-    action == 'confirmEmail'
+    actionPage == 'ConfirmEmailPage'
       ? 'USIT Portal Sign Up Verification'
-      : 'USIT Portal Password Recovery'
+      : 'USIT Portal Password Reset'
   const template =
-    action == 'confirmEmail' ? 'confirmEmailTemplate' : 'recoveryEmailTemplate'
+    actionPage == 'ConfirmEmailPage'
+      ? 'confirmEmailTemplate'
+      : 'resetPasswordEmailTemplate'
   var mailOptions = {
     from: adminMail,
     to: userEmail,
@@ -62,7 +64,7 @@ export const sendEmailSES = async (
   if (!response?.messageId) {
     throw new ApiError(
       HttpStatusCode.ServiceUnavailable,
-      'Unable to send email',
+      'Unable to send email'
     )
   } else {
     return { ok: true }

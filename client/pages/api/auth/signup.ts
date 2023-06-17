@@ -13,7 +13,7 @@ import { ApiError } from 'next/dist/server/api-utils'
 import { decryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const signUpUser = async () => {
+  const signUp = async () => {
     // Parse request body
     const { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } =
       req.body
@@ -62,7 +62,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await generateTokenAndSendActionEmail(
       newUser._id,
       newUser.email,
-      'confirmEmail'
+      'ConfirmEmailPage'
     )
     if (!result.ok) {
       throw new ApiError(
@@ -81,7 +81,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    signUpUser
+    signUp
   )
 
   return withExceptionFilter(req, res)(middlewareLoadedHandler)

@@ -4,33 +4,34 @@ import React, { FormEventHandler, useState } from 'react'
 
 type Props = {}
 
-const PasswordRecovery = (props: Props) => {
+const ForgotPasswordPage = (props: Props) => {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     try {
-      setMessage('Sending recovery email')
+      setMessage('Sending password reset email')
 
       // Asymmetrically encrypt email
       const asymEncryptEmail = encryptData(email)
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/sendRecoveryEmail`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendPasswordResetEmail`,
         {
           asymEncryptEmail,
         }
       )
-      setMessage('Test mail sent')
+      setMessage('Password reset email sent')
     } catch (error) {
       console.log(error)
-      setMessage('Unable to send recovery email')
+      setMessage('Unable to send password reset email')
     }
   }
   return (
     <div>
       <form onSubmit={handleSubmit}>
-        <h1>Password Recovery</h1>
+        <h1>Forgot Password</h1>
+        <p>Enter your email to reset your account's password</p>
         <input
           value={email}
           onChange={({ target }) => {
@@ -47,4 +48,4 @@ const PasswordRecovery = (props: Props) => {
   )
 }
 
-export default PasswordRecovery
+export default ForgotPasswordPage

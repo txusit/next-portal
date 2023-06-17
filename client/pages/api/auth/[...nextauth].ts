@@ -47,7 +47,7 @@ export const authOptions: NextAuthOptions = {
 
         // Perform authorization logic and get 'user' from result
         let result = await axios.post<ResponseData>(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorizeWithCredentials`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/AuthorizeWithCredentials`,
           {
             validCredentials,
             symEncryptCredentials,
@@ -60,7 +60,7 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/auth/SignInPage',
   },
   session: {
     strategy: 'jwt',

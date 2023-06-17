@@ -5,7 +5,7 @@ import axios, { AxiosError } from 'axios'
 import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 
-export const LoginPage = () => {
+export const SignUpPage = () => {
   const [data, setData] = useState({
     fullName: '',
     email: '',
@@ -62,7 +62,7 @@ export const LoginPage = () => {
       try {
         setLoading(true)
         const apiRes = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signup`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
           asymEncryptData
         )
 
@@ -147,4 +147,4 @@ export const LoginPage = () => {
   )
 }
 
-export default LoginPage
+export default SignUpPage

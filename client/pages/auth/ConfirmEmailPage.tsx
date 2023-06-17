@@ -6,7 +6,7 @@ import { ApiError } from 'next/dist/server/api-utils'
 
 type Props = {}
 
-const Index = (props: Props) => {
+const ConfirmEmailPage = (props: Props) => {
   const [message, setMessage] = useState('')
   const [submitError, setSubmitError] = useState<string>('')
 
@@ -22,7 +22,7 @@ const Index = (props: Props) => {
           // Pass token to confirmEmail endpoint to handle email verification logic
           setMessage('Confirming email...')
           const response = await axios.patch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/confirmEmail`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/ConfirmEmail`,
             {
               token: token,
             }
@@ -60,4 +60,4 @@ const Index = (props: Props) => {
   )
 }
 
-export default Index
+export default ConfirmEmailPage

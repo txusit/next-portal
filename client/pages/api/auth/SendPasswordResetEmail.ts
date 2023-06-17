@@ -15,7 +15,7 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const handlerMainFunction = async () => {
+  const sendPasswordResetEmail = async () => {
     const { asymEncryptEmail } = req.body
     const email = decryptData(asymEncryptEmail)
 
@@ -36,7 +36,7 @@ const handler = async (
     const result = await generateTokenAndSendActionEmail(
       user._id,
       email,
-      'resetPassword'
+      'ResetPasswordPage'
     )
     if (!result.ok) {
       throw new ApiError(
@@ -56,7 +56,7 @@ const handler = async (
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    handlerMainFunction
+    sendPasswordResetEmail
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

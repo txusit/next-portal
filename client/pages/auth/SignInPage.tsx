@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import { FormEventHandler, useState } from 'react'
 
 interface Props {}
-const SignIn: NextPage = (props): JSX.Element => {
+const SignInPage: NextPage = (props): JSX.Element => {
   const [userInfo, setUserInfo] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string>('')
@@ -68,4 +68,4 @@ const SignIn: NextPage = (props): JSX.Element => {
     </div>
   )
 }
-export default SignIn
+export default SignInPage

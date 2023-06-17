@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
 
 type Props = {}
-const ResetPassword = (props: Props) => {
+const ResetPasswordPage = (props: Props) => {
   const [data, setData] = useState({
     password: '',
     confirmPassword: '',
@@ -24,7 +24,7 @@ const ResetPassword = (props: Props) => {
         const asymEncryptPassword = encryptData(data.password)
 
         await axios.patch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/resetPassword`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/ResetPassword`,
           {
             asymEncryptPassword,
             token: token,
@@ -69,4 +69,4 @@ const ResetPassword = (props: Props) => {
   )
 }
 
-export default ResetPassword
+export default ResetPasswordPage
