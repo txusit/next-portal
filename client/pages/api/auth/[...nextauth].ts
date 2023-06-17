@@ -4,6 +4,7 @@ import { ResponseData, User as TUser } from '@/types'
 import axios from 'axios'
 import { AES } from 'crypto-js'
 import { hash } from 'bcryptjs'
+import { decryptData } from '@/helpers/encryptionHelpers'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -30,18 +31,16 @@ export const authOptions: NextAuthOptions = {
         // Encrypt credentials if available
         let encryptedEmail, encryptedPassword
         if (credentials) {
-          if (credentials.preEncrypted === 'true') {
-            // Login attempt in confirm email process passes in pre-encrypted credentials
-            // password is already hashed as well
-            encryptedEmail = credentials!.email
-            encryptedPassword = credentials!.password
-          } else {
-            // Normal sign in credentials are not pre-encrypted
-            // const hashedPassword = await hash(credentials.password, 12)
-            const aesKey: string = process.env.AES_KEY as string
-            encryptedEmail = AES.encrypt(credentials!.email, aesKey).toString()
-            encryptedPassword = AES.encrypt(credentials!.password, aesKey).toString()
-          }
+          // Recieve and decrypt asymmetrically encrypted credentials from client
+          const asymmetricEncryptedEmail = credentials.email
+          const asymmetricEncryptedPassword = credentials.password
+          const email = decryptData(asymmetricEncryptedEmail)
+          const password = decryptData(asymmetricEncryptedPassword)
+
+          // Encrypt symmetrically to transfer to server endpoint for authorization logic
+          const aesKey: string = process.env.AES_KEY as string
+          encryptedEmail = AES.encrypt(email, aesKey).toString()
+          encryptedPassword = AES.encrypt(password, aesKey).toString()
         } else {
           // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
           encryptedEmail = ''

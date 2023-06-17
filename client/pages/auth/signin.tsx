@@ -1,4 +1,5 @@
 import { loginUser } from '@/helpers/clientSideHelpers'
+import { encryptData } from '@/helpers/encryptionHelpers'
 import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -16,8 +17,8 @@ const SignIn: NextPage = (props): JSX.Element => {
     try {
       setLoading(true)
       const loginRes = await loginUser({
-        email: userInfo.email,
-        password: userInfo.password,
+        email: encryptData(userInfo.email),
+        password: encryptData(userInfo.password),
         preEncrypted: 'false',
       })
       if (loginRes && !loginRes.ok) {
@@ -35,7 +36,7 @@ const SignIn: NextPage = (props): JSX.Element => {
   }
 
   return (
-    <div className="sign-in-form">
+    <div className='sign-in-form'>
       <form onSubmit={handleSubmit}>
         <h1>Login</h1>
         <input
@@ -43,18 +44,18 @@ const SignIn: NextPage = (props): JSX.Element => {
           onChange={({ target }) =>
             setUserInfo({ ...userInfo, email: target.value })
           }
-          type="email"
-          placeholder="john@email.com"
+          type='email'
+          placeholder='john@email.com'
         />
         <input
           value={userInfo.password}
           onChange={({ target }) =>
             setUserInfo({ ...userInfo, password: target.value })
           }
-          type="password"
-          placeholder="****"
+          type='password'
+          placeholder='****'
         />
-        <input type="submit" value="login" />
+        <input type='submit' value='login' />
         {submitError && <p>{submitError}</p>}
       </form>
     </div>

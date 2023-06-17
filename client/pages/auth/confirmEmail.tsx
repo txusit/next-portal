@@ -25,12 +25,14 @@ const Index = (props: Props) => {
             `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/confirmEmail`,
             {
               token: token,
-            },
+            }
           )
           setMessage('Email confirmed!')
 
-          // Log in user of confirmed email and redirect to home
+          // Unpack asymmetrically encrypted user credentials from server response
           const encryptedUser = response.data.data
+
+          // Log in user of confirmed email and redirect to home
           await loginUser({
             email: encryptedUser.email,
             password: encryptedUser.password,

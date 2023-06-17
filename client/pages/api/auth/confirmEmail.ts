@@ -10,6 +10,7 @@ import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
 import { AES } from 'crypto-js'
+import { encryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (
   req: NextApiRequest,
@@ -57,17 +58,9 @@ const handler = async (
         `Unable to send confirm email because there is no account associated with the _id provided: ${payload.user_id}`
       )
 
-    // Encrypt user credentials to send to client for login
-    /**
-     * NOTE: encryption seems redundant since we are decrypting credentials during authorization
-     * but it seems to be the only way to avoid exposing the AES KEY to client
-     *  */
-    const aesKey: string = process.env.AES_KEY as string
-    const encryptedEmail = AES.encrypt(updatedUser!.email, aesKey).toString()
-    const encryptedPassword = AES.encrypt(
-      updatedUser!.password,
-      aesKey
-    ).toString()
+    // Encrypt user credentials to send to client for login using asymmetric public key
+    const encryptedEmail = encryptData(updatedUser!.email)
+    const encryptedPassword = encryptData(updatedUser!.password)
     const encryptedUser = { email: encryptedEmail, password: encryptedPassword }
 
     // Send successful response
