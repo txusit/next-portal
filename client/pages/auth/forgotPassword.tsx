@@ -1,19 +1,23 @@
 import axios from 'axios'
-import React, { useState } from 'react'
+import React, { FormEventHandler, useState } from 'react'
 
 type Props = {}
 
 const PasswordRecovery = (props: Props) => {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
-  const handleSubmit = async () => {
+  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
+    e.preventDefault()
     try {
-      const result = await axios.post(
-        `${process.env.BASE_URL}/api/auth/sendRecoveryEmail`,
+      setMessage('Sending recovery email')
+      console.log(process.env.NEXT_PUBLIC_BASE_URL)
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/sendRecoveryEmail`,
         {
-          email,
-        }
+          email: 'techchair@usiteam.org',
+        },
       )
+      setMessage('Test mail sent')
     } catch (error) {
       console.log(error)
       setMessage('Unable to send recovery email')
@@ -28,10 +32,11 @@ const PasswordRecovery = (props: Props) => {
           onChange={({ target }) => {
             setEmail(target.value)
           }}
-          type='email'
-          placeholder='John@email.com'
+          type="email"
+          placeholder="John@email.com"
+          required
         />
-        <input value='Recover Password' type='submit' />
+        <input value="Recover Password" type="submit" />
       </form>
       {message}
     </div>

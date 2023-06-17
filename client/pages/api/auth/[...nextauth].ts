@@ -55,11 +55,11 @@ export const authOptions: NextAuthOptions = {
 
         // Perform authorization logic and get 'user' from result
         let result = await axios.post<ResponseData>(
-          `${process.env.BASE_URL}/api/auth/authorizeWithCredentials`,
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorizeWithCredentials`,
           {
             validCredentials: validCredentials,
             encryptedCredentials: encryptedCredentials,
-          }
+          },
         )
         const user = result.data.data
 

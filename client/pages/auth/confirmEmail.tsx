@@ -22,10 +22,10 @@ const Index = (props: Props) => {
           // Pass token to confirmEmail endpoint to handle email verification logic
           setMessage('Confirming email...')
           const response = await axios.patch(
-            `${process.env.BASE_URL}/api/auth/confirmEmail`,
+            `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/confirmEmail`,
             {
               token: token,
-            }
+            },
           )
           setMessage('Email confirmed!')
 

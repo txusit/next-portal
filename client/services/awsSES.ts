@@ -40,7 +40,7 @@ export const sendEmailSES = async (
   token: string,
   action: string,
 ) => {
-  const url = `${process.env.BASE_URL}/auth/${action}?token=${token}`
+  const url = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/${action}?token=${token}`
   const subject =
     action == 'confirmEmail'
       ? 'USIT Portal Sign Up Verification'

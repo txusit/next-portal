@@ -54,8 +54,8 @@ export const LoginPage = () => {
       try {
         setLoading(true)
         const apiRes = await axios.post(
-          `${process.env.BASE_URL}/api/auth/signup`,
-          data
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signup`,
+          data,
         )
 
         if (apiRes?.data?.ok) {
@@ -64,7 +64,7 @@ export const LoginPage = () => {
           // Redirect or change page to show a message to check email
           router.push('/')
         }
-      } catch (error: unknown) {
+      } catch (error) {
         if (error instanceof AxiosError) {
           const errorMsg = error.response?.data?.error
           setSubmitError(errorMsg)
@@ -86,44 +86,44 @@ export const LoginPage = () => {
     <>
       <form onSubmit={handleSubmit}>
         <input
-          type='text'
+          type="text"
           placeholder={'Full Name'}
           value={data.fullName}
-          name='fullName'
+          name="fullName"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('fullName', validationErrors)}</p>
 
         <input
-          type='email'
+          type="email"
           placeholder={'Email'}
           value={data.email}
-          name='email'
+          name="email"
           onChange={handleInputChange}
           required
         />
         <input
-          type='password'
+          type="password"
           placeholder={'Password'}
           value={data.password}
-          name='password'
+          name="password"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('password', validationErrors)}</p>
 
         <input
-          type='password'
+          type="password"
           placeholder={'Confirm Password'}
           value={data.confirmPassword}
-          name='confirmPassword'
+          name="confirmPassword"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('confirmPassword', validationErrors)}</p>
 
-        <button title={'Sign up'} type='submit' disabled={loading}>
+        <button title={'Sign up'} type="submit" disabled={loading}>
           Sign Up
         </button>
 
