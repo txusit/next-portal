@@ -31,7 +31,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
       // this is the context being logged
       const requestContext = {
         statusCode,
-        url,
+        path: url,
         message,
       }
 
@@ -49,10 +49,8 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
 
       // return just enough information without leaking any data
       const responseBody = {
-        statusCode,
+        ...requestContext,
         timestamp,
-        path: url,
-        message,
       }
 
       // const serializedResponse = JSON.stringify(responseBody)

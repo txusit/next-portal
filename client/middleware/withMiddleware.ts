@@ -1,4 +1,5 @@
 import { Maybe, Middleware } from '@/types'
+import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 
@@ -17,10 +18,13 @@ const withMiddleware = (...middlewares: Middleware[]) => {
         // return early when the request has
         // been ended by a previous middleware
         if (res.headersSent) {
-          // return
-          throw new ApiError(444, 'headers sent back early')
+          throw new ApiError(
+            HttpStatusCode.InternalServerError,
+            'headers sent back early'
+          )
         }
 
+        // Run the middleware/inner middlewares
         if (typeof middleware === 'function') {
           const handler = await middleware(req, res)
 
@@ -41,6 +45,7 @@ const withMiddleware = (...middlewares: Middleware[]) => {
         }
       }
 
+      // Run the middlewares in the order that they are passed in
       for (let index = 0; index < middlewares.length; index++) {
         const middleware = middlewares[index]
         const nextMiddleware = middlewares[index + 1]
@@ -48,6 +53,7 @@ const withMiddleware = (...middlewares: Middleware[]) => {
         await evaluateHandler(middleware, nextMiddleware)
       }
     } catch (error) {
+      // Throw any errors for the exception filter to catch (if wrapped)
       throw error
     }
   }
