@@ -3,6 +3,7 @@ import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
 import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
+import { encryptData } from '@/helpers/encryptionHelpers'
 
 export const LoginPage = () => {
   const [data, setData] = useState({
@@ -51,11 +52,18 @@ export const LoginPage = () => {
     if (isValid) {
       // sign up
 
+      // Encrypt sensitive data asymmetrically
+      const asymEncryptData = {
+        asymEncryptFullName: encryptData(data.fullName),
+        asymEncryptEmail: encryptData(data.email),
+        asymEncryptPassword: encryptData(data.password),
+      }
+
       try {
         setLoading(true)
         const apiRes = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/signup`,
-          data
+          asymEncryptData
         )
 
         if (apiRes?.data?.ok) {

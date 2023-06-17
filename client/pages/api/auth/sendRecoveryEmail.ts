@@ -1,3 +1,4 @@
+import { decryptData } from '@/helpers/encryptionHelpers'
 import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
@@ -15,7 +16,9 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    const { email } = req.body
+    const { asymEncryptEmail } = req.body
+    const email = decryptData(asymEncryptEmail)
+
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
     if (!user) {
       res.status(HttpStatusCode.Accepted).json({
@@ -24,12 +27,10 @@ const handler = async (
       })
     }
     if (!user.isConfirmed) {
-      res
-        .status(HttpStatusCode.BadRequest)
-        .json({
-          ok: true,
-          msg: 'The email associated with this account has not been verified',
-        })
+      res.status(HttpStatusCode.BadRequest).json({
+        ok: true,
+        msg: 'The email associated with this account has not been verified',
+      })
     }
 
     const result = await generateTokenAndSendActionEmail(

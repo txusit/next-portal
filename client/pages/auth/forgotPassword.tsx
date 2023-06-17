@@ -1,3 +1,4 @@
+import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import React, { FormEventHandler, useState } from 'react'
 
@@ -10,10 +11,14 @@ const PasswordRecovery = (props: Props) => {
     e.preventDefault()
     try {
       setMessage('Sending recovery email')
+
+      // Asymmetrically encrypt email
+      const asymEncryptEmail = encryptData(email)
+
       await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/sendRecoveryEmail`,
         {
-          email,
+          asymEncryptEmail,
         }
       )
       setMessage('Test mail sent')

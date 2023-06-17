@@ -10,11 +10,19 @@ import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 import { HttpStatusCode } from 'axios'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ApiError } from 'next/dist/server/api-utils'
+import { decryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const signUpUser = async () => {
     // Parse request body
-    const { fullName, email, password } = req.body
+    const { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } =
+      req.body
+
+    // Decrypt asymmetrically encrypted data
+    const fullName = decryptData(asymEncryptFullName)
+    const email = decryptData(asymEncryptEmail)
+    const password = decryptData(asymEncryptPassword)
+
     if (!fullName || !email || !password)
       throw new ApiError(
         HttpStatusCode.BadRequest,

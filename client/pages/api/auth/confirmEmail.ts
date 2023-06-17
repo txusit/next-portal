@@ -9,7 +9,6 @@ import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { AES } from 'crypto-js'
 import { encryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (
@@ -28,7 +27,7 @@ const handler = async (
     // Type check token and get _id payload from token
     token = token as string
 
-    // try catch block used here as an exception to central error handling. forwarding reformatted api error to error handler
+    // try catch block used here as an exception to central error handling. catch jwtTokenError, reformat it, and send to error handler
     let payload
     try {
       payload = jwt.verify(
@@ -59,15 +58,18 @@ const handler = async (
       )
 
     // Encrypt user credentials to send to client for login using asymmetric public key
-    const encryptedEmail = encryptData(updatedUser!.email)
-    const encryptedPassword = encryptData(updatedUser!.password)
-    const encryptedUser = { email: encryptedEmail, password: encryptedPassword }
+    const asymEncryptEmail = encryptData(updatedUser!.email)
+    const asymEncryptPassword = encryptData(updatedUser!.password)
+    const asymEncryptUser = {
+      asymEncryptEmail,
+      asymEncryptPassword,
+    }
 
     // Send successful response
     res.status(200).send({
       ok: true,
       msg: 'successfully verified email',
-      data: encryptedUser,
+      data: asymEncryptUser,
     })
   }
 

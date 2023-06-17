@@ -30,13 +30,13 @@ const Index = (props: Props) => {
           setMessage('Email confirmed!')
 
           // Unpack asymmetrically encrypted user credentials from server response
-          const encryptedUser = response.data.data
+          const asymEncryptUser = response.data.data
+          const { asymEncryptEmail, asymEncryptPassword } = asymEncryptUser
 
           // Log in user of confirmed email and redirect to home
           await loginUser({
-            email: encryptedUser.email,
-            password: encryptedUser.password,
-            preEncrypted: 'true',
+            asymEncryptEmail,
+            asymEncryptPassword,
           })
           router.push('/')
         } catch (error) {

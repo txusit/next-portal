@@ -13,9 +13,8 @@ export type JwtEmailToken = {
 }
 
 export type LoginUserParams = {
-  email: string
-  password: string
-  preEncrypted: string
+  asymEncryptEmail: string
+  asymEncryptPassword: string
 }
 
 export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown

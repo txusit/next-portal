@@ -1,3 +1,4 @@
+import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import React, { useState } from 'react'
 
@@ -11,7 +12,7 @@ const Index = (props: Props) => {
       const result = await axios.post(
         `${process.env.BASE_URL}/api/auth/sendConfirmationEmail`,
         {
-          email: 'aaronlee232@gmail.com',
+          asymEncryptEmail: encryptData('aaronlee232@gmail.com'),
         }
       )
 

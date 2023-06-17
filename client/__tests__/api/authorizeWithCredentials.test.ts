@@ -72,16 +72,16 @@ describe('authorizeWithCredentials', () => {
     const aesKey = process.env.AES_KEY
 
     const validCredentials = true
-    const encryptedCredentials = {
+    const symEncryptCredentials = {
       // @ts-ignore
-      encryptedEmail: AES.encrypt('test@example.com', aesKey).toString(),
+      symEncryptEmail: AES.encrypt('test@example.com', aesKey).toString(),
       // @ts-ignore
-      encryptedPassword: AES.encrypt('password123', aesKey).toString(),
+      symEncryptPassword: AES.encrypt('password123', aesKey).toString(),
     }
 
     const req = mockRequestResponse().req
     req.method = 'POST'
-    req.body = { validCredentials, encryptedCredentials }
+    req.body = { validCredentials, symEncryptCredentials }
     const res = {
       status: jest.fn().mockImplementation((statusCode) => {
         return {

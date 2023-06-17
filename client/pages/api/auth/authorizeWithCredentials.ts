@@ -17,8 +17,8 @@ const handler = async (
 ) => {
   const authorizeWithCredentials = async () => {
     // Unpack request body
-    const { validCredentials, encryptedCredentials } = req.body
-    const { encryptedEmail, encryptedPassword } = encryptedCredentials
+    const { validCredentials, symEncryptCredentials } = req.body
+    const { symEncryptEmail, symEncryptPassword } = symEncryptCredentials
     if (!validCredentials)
       throw new ApiError(
         HttpStatusCode.Unauthorized,
@@ -27,8 +27,8 @@ const handler = async (
 
     // Decrypt credentials
     const aesKey: string = process.env.AES_KEY as string
-    const email = AES.decrypt(encryptedEmail, aesKey).toString(enc.Utf8)
-    const password = AES.decrypt(encryptedPassword, aesKey).toString(enc.Utf8)
+    const email = AES.decrypt(symEncryptEmail, aesKey).toString(enc.Utf8)
+    const password = AES.decrypt(symEncryptPassword, aesKey).toString(enc.Utf8)
 
     // Find user with matching email
     const user = await User.findOne({

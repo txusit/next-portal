@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { ResponseData, User as TUser } from '@/types'
 import axios from 'axios'
 import { AES } from 'crypto-js'
-import { hash } from 'bcryptjs'
 import { decryptData } from '@/helpers/encryptionHelpers'
 
 export const authOptions: NextAuthOptions = {
@@ -14,50 +13,44 @@ export const authOptions: NextAuthOptions = {
       type: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-        preEncrypted: {
-          label: 'Pre-Encrypted',
-          type: 'hidden',
-          value: 'false',
-        },
+        asymEncryptEmail: { label: 'Email', type: 'text' },
+        asymEncryptPassword: { label: 'Password', type: 'password' },
       },
 
       async authorize(credentials) {
-        // NOTE: Any errors that occur in this scope are delayed and will be thrown/caught in the authorizeWithCredential endpoint by design
         // Check if credentials exists
         const validCredentials = credentials ? true : false
 
-        // Encrypt credentials if available
-        let encryptedEmail, encryptedPassword
-        if (credentials) {
-          // Recieve and decrypt asymmetrically encrypted credentials from client
-          const asymmetricEncryptedEmail = credentials.email
-          const asymmetricEncryptedPassword = credentials.password
-          const email = decryptData(asymmetricEncryptedEmail)
-          const password = decryptData(asymmetricEncryptedPassword)
-
-          // Encrypt symmetrically to transfer to server endpoint for authorization logic
-          const aesKey: string = process.env.AES_KEY as string
-          encryptedEmail = AES.encrypt(email, aesKey).toString()
-          encryptedPassword = AES.encrypt(password, aesKey).toString()
-        } else {
-          // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
-          encryptedEmail = ''
-          encryptedPassword = ''
+        // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
+        const symEncryptCredentials = {
+          symEncryptEmail: '',
+          symEncryptPassword: '',
         }
 
-        const encryptedCredentials = {
-          encryptedEmail: encryptedEmail,
-          encryptedPassword: encryptedPassword,
+        // Replace fillers with actual credentials if available
+        if (credentials) {
+          // Recieve and decrypt asymmetrically encrypted credentials from client
+          const email = decryptData(credentials.asymEncryptEmail)
+          const password = decryptData(credentials.asymEncryptPassword)
+
+          // Encrypt credentials symmetrically and replace filler values
+          const aesKey: string = process.env.AES_KEY as string
+          symEncryptCredentials.symEncryptEmail = AES.encrypt(
+            email,
+            aesKey
+          ).toString()
+          symEncryptCredentials.symEncryptPassword = AES.encrypt(
+            password,
+            aesKey
+          ).toString()
         }
 
         // Perform authorization logic and get 'user' from result
         let result = await axios.post<ResponseData>(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorizeWithCredentials`,
           {
-            validCredentials: validCredentials,
-            encryptedCredentials: encryptedCredentials,
+            validCredentials,
+            symEncryptCredentials,
           }
         )
         const user = result.data.data

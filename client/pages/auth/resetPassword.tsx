@@ -1,3 +1,4 @@
+import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
@@ -19,12 +20,15 @@ const ResetPassword = (props: Props) => {
       setSubmitError('Passwords do not match')
     } else {
       try {
+        // Asymmetrically encrypt password
+        const asymEncryptPassword = encryptData(data.password)
+
         await axios.patch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/resetPassword`,
           {
-            password: data.password,
+            asymEncryptPassword,
             token: token,
-          },
+          }
         )
         setMessage('Password reset')
       } catch (error) {
@@ -44,20 +48,20 @@ const ResetPassword = (props: Props) => {
         <input
           value={data.password}
           onChange={handleInputChange}
-          type="password"
-          placeholder="Type new password"
-          name="password"
+          type='password'
+          placeholder='Type new password'
+          name='password'
           required
         />
         <input
           value={data.confirmPassword}
           onChange={handleInputChange}
-          type="password"
-          placeholder="Retype new password"
-          name="confirmPassword"
+          type='password'
+          placeholder='Retype new password'
+          name='confirmPassword'
           required
         />
-        <input value="Reset Password" type="submit" />
+        <input value='Reset Password' type='submit' />
       </form>
       {message}
       {submitError}

@@ -9,8 +9,7 @@ import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { AES } from 'crypto-js'
-import { hash } from 'bcryptjs'
+import { decryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (
   req: NextApiRequest,
@@ -18,7 +17,9 @@ const handler = async (
 ) => {
   const resetPassword = async () => {
     // Parse request body
-    let { token, password } = req.body
+    let { token, asymEncryptPassword } = req.body
+    const password = decryptData(asymEncryptPassword)
+
     if (!token)
       throw new ApiError(
         HttpStatusCode.BadRequest,
@@ -42,7 +43,6 @@ const handler = async (
       )
     }
 
-    // const hashedPassword = await hash(password, 12)
     // Update user to reflect confirmed email status
     const updatedUser = await User.findOneAndUpdate(
       { _id: payload.user_id },

@@ -16,16 +16,23 @@ const SignIn: NextPage = (props): JSX.Element => {
     e.preventDefault()
     try {
       setLoading(true)
+      // Asymmetrically encrypt credentials
+      const asymEncryptEmail = encryptData(userInfo.email)
+      const asymEncryptPassword = encryptData(userInfo.password)
+
+      // Attempt Login
       const loginRes = await loginUser({
-        email: encryptData(userInfo.email),
-        password: encryptData(userInfo.password),
-        preEncrypted: 'false',
+        asymEncryptEmail,
+        asymEncryptPassword,
       })
+
+      // Handle login response
       if (loginRes && !loginRes.ok) {
         setSubmitError(loginRes.error || '')
       } else {
         router.push('/')
       }
+
       setLoading(false)
     } catch (error) {
       if (error instanceof AxiosError) {
