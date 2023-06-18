@@ -26,10 +26,10 @@ const transporter = nodemailer.createTransport({
 // point to the template folder
 const handlebarOptions: hbs.NodemailerExpressHandlebarsOptions = {
   viewEngine: {
-    partialsDir: path.resolve(process.cwd(), 'services/emailTemplates'),
+    partialsDir: path.resolve(process.cwd(), 'services/email/emailTemplates'),
     defaultLayout: false,
   },
-  viewPath: path.resolve(process.cwd(), 'services/emailTemplates'),
+  viewPath: path.resolve(process.cwd(), 'services/email/emailTemplates'),
 }
 
 // use a template file with nodemailer

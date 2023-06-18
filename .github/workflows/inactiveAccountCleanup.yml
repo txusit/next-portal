@@ -1,0 +1,22 @@
+name: Remove Inactive Accounts
+
+on:
+  schedule:
+    - cron: '0 0 * * *' # Run job every midnight
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run Cron Job to Remove Inactive Accounts on localhost deployment
+        run: |
+          curl -X DELETE http://localhost:3000/api/cronJobs/inactiveAccountCleanupHandler
+
+      - name: Run Cron Job to Remove Inactive Accounts on development environment
+        run: |
+          curl -X DELETE https://dev.portal.texasusit.org/api/cronJobs/inactiveAccountCleanupHandler
+
+      - name: Run Cron Job to Remove Inactive Accounts on production env
+        run: |
+          curl -X DELETE https://temp.portal.texasusit.org/api/cronJobs/inactiveAccountCleanupHandler

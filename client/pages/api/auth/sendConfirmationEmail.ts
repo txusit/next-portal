@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
-import User from '@/models/user'
+import User from '@/models/User'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'

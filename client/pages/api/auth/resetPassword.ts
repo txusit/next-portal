@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import { JwtEmailToken, ResponseData } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
-import User from '@/models/user'
+import User from '@/models/User'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withMiddleware from '@/middleware/withMiddleware'

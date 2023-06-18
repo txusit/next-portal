@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
-import User from '@/models/user'
+import User from '@/models/User'
 import { User as TUser } from '@/types'
 import withMiddleware from '@/middleware/withMiddleware'
 import withMethodsGuard from '@/middleware/withMethodsGuard'

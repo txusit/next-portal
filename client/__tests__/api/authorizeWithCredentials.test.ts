@@ -4,15 +4,13 @@
 // required-header-for-jest-test.js
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
-import handler from '@/pages/api/auth/authorizeWithCredentials'
+import handler from '@/pages/api/auth/AuthorizeWithCredentials'
 import { describe, beforeEach, it, expect } from '@jest/globals'
-import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
 import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import User from '@/models/user'
-import withMiddleware from '@/middleware/withMiddleware'
+import User from '@/models/User'
 import { AES } from 'crypto-js'
 
 // success test:

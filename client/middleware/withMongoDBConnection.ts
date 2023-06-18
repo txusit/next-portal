@@ -8,10 +8,10 @@ import { ApiError } from 'next/dist/server/api-utils'
 type MiddlewareWithoutParams = () => Middleware
 
 const withMongoDBConnection: MiddlewareWithoutParams = () => {
+  // Do nothing. Use existing connection
   if (mongoose.connection.readyState == 1)
-    return async (req: NextApiRequest, res: NextApiResponse) => {
-      // Do nothing. Use existing connection
-    }
+    return async (req: NextApiRequest, res: NextApiResponse) => {}
+
   return async (req: NextApiRequest, res: NextApiResponse) => {
     // Connect to mongoDB if there is no existing connection
     try {
