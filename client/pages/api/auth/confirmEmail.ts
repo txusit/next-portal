@@ -36,21 +36,29 @@ const handler = async (
       ) as JwtEmailToken
     } catch (jwtTokenError) {
       throw new ApiError(
-        HttpStatusCode.Unauthorized,
+        HttpStatusCode.BadRequest,
         'verification of JWT Token failed'
       )
     }
 
     // Update user to reflect confirmed email status
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: payload.user_id },
-      {
-        $set: {
-          isConfirmed: true,
+    let updatedUser
+    try {
+      updatedUser = await User.findOneAndUpdate(
+        { _id: payload.user_id },
+        {
+          $set: {
+            isConfirmed: true,
+          },
         },
-      },
-      { new: true }
-    ).select('+password')
+        { new: true }
+      ).select('+password')
+    } catch (error) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to find user because user_id is not of type ObjectId'
+      )
+    }
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
@@ -66,7 +74,7 @@ const handler = async (
     }
 
     // Send successful response
-    res.status(200).send({
+    res.status(HttpStatusCode.Accepted).send({
       ok: true,
       msg: 'successfully verified email',
       data: asymEncryptUser,

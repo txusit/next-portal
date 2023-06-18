@@ -35,10 +35,7 @@ const handler = async (
       email: email,
     }).select('+password +isConfirmed')
     if (!user) {
-      throw new ApiError(
-        HttpStatusCode.Unauthorized,
-        'Invalid credentials - cant find user'
-      )
+      throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
     }
 
     // Check credentials
@@ -49,12 +46,9 @@ const handler = async (
 
     // check if password matches hash
     const isPasswordCorrect =
-      password == user.password || compare(password, user.password)
+      password == user.password || (await compare(password, user.password))
     if (!isPasswordCorrect) {
-      throw new ApiError(
-        HttpStatusCode.Unauthorized,
-        'Invalid credentials - wrong password'
-      )
+      throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
     }
 
     // Send back successful response with user
