@@ -18,18 +18,17 @@ const handler = async (
   const resetPassword = async () => {
     // Parse request body
     let { token, asymEncryptPassword } = req.body
-    const password = decryptData(asymEncryptPassword)
-
-    if (!token)
+    if (!token || !asymEncryptPassword)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to reset password because of missing or invalid token'
+        'Unable to reset password because of missing token and/or asymEncryptedPassword'
       )
+
+    // decrypt password
+    const password = decryptData(asymEncryptPassword)
 
     // Type check token and get _id payload from token
     token = token as string
-
-    // try catch block used here as an exception to central error handling. forwarding reformatted api error to error handler
     let payload
     try {
       payload = jwt.verify(
@@ -37,6 +36,7 @@ const handler = async (
         process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
       ) as JwtEmailToken
     } catch (jwtTokenError) {
+      // Reformat and forward any jwt errors as api errors to error handler
       throw new ApiError(
         HttpStatusCode.Unauthorized,
         'verification of JWT Token failed'
@@ -44,23 +44,31 @@ const handler = async (
     }
 
     // Update user to reflect confirmed email status
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: payload.user_id },
-      {
-        $set: {
-          password: password,
+    let updatedUser
+    try {
+      updatedUser = await User.findOneAndUpdate(
+        { _id: payload.user_id },
+        {
+          $set: {
+            password: password,
+          },
         },
-      },
-      { new: true }
-    )
+        { new: true }
+      )
+    } catch (error) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to find user because user_id is not of type ObjectId'
+      )
+    }
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
-        `Unable to update password because there is no account associated with the _id provided: ${payload.user_id}`
+        'Unable to update password because there is no account associated with the _id provided'
       )
 
     // Send successful response
-    res.status(200).json({
+    res.status(HttpStatusCode.Accepted).json({
       ok: true,
       message: 'successfully updated password',
     })

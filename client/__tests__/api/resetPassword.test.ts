@@ -4,7 +4,7 @@
 // required-header-for-jest-test.js
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
-import handler from '@/pages/api/auth/ConfirmEmail'
+import handler from '@/pages/api/auth/ResetPassword'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { createRequest } from 'node-mocks-http'
@@ -12,6 +12,7 @@ import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
 import * as jwt from 'jsonwebtoken'
+import { encryptData } from '@/helpers/encryptionHelpers'
 
 describe('confirmEmail', () => {
   const OLD_ENV = process.env
@@ -74,8 +75,9 @@ describe('confirmEmail', () => {
   })
 
   // PERFORM TESTS
-  it('should confirm email without errors', async () => {
-    // Construct token
+  it('should reset password without errors', async () => {
+    // Construct token and encrypt password asymmetrically
+    const asymEncryptPassword = encryptData('password123')
     const user = await User.findOne({ email: 'test@example.com' })
     const payload = { user_id: user._id }
     const token = jwt.sign(
@@ -88,17 +90,20 @@ describe('confirmEmail', () => {
 
     // Configure Mocks
     req.method = 'PATCH'
-    req.body = { token }
+    req.body = { token, asymEncryptPassword }
 
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
     expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'successfully verified email' })
+      expect.objectContaining({ message: 'successfully updated password' })
     )
   })
 
-  it('should fail with error when missing token', async () => {
+  it('should fail with error when missing token and/or asymEncryptedPassword', async () => {
+    // // Construct token and encrypt password asymmetrically
+    // const asymEncryptPassword = encryptData('password123')
+
     // Configure Mocks
     req.method = 'PATCH'
     req.body = {} // key test item
@@ -108,19 +113,23 @@ describe('confirmEmail', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Unable to confirm email because of missing or invalid token',
+        message:
+          'Unable to reset password because of missing token and/or asymEncryptedPassword',
       })
     )
   })
 
   it('should fail with error when token is invalid', async () => {
+    // Construct token and encrypt password asymmetrically
+    const asymEncryptPassword = encryptData('password123')
+
     // Configure Mocks
     req.method = 'PATCH'
-    req.body = { token: 'notavalidtoken' } // key test item
+    req.body = { asymEncryptPassword, token: 'notavalidtoken' } // key test item
 
     // Run endpoint handler and check response
     await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         message: 'verification of JWT Token failed',
@@ -129,7 +138,8 @@ describe('confirmEmail', () => {
   })
 
   it('should fail with error when token payload contains non ObjectId user_id ', async () => {
-    // Construct token
+    // Construct token and encrypt password asymmetrically
+    const asymEncryptPassword = encryptData('password123')
     const user_id = 'nonobjectiduserid'
     const payload = { user_id } // key test item
     const token = jwt.sign(
@@ -142,7 +152,7 @@ describe('confirmEmail', () => {
 
     // Configure Mocks
     req.method = 'PATCH'
-    req.body = { token }
+    req.body = { asymEncryptPassword, token }
 
     // Run endpoint handler and check response
     await handler(req, res)
@@ -155,7 +165,8 @@ describe('confirmEmail', () => {
   })
 
   it('should fail with error when no account is associated with user_id in token', async () => {
-    // Construct token
+    // Construct token and encrypt password asymmetrically
+    const asymEncryptPassword = encryptData('password123')
     const incorrectObjectId = 12312312312312312313112312
     const user_id = new mongoose.Types.ObjectId(incorrectObjectId)
     const payload = { user_id } // key test item
@@ -169,7 +180,7 @@ describe('confirmEmail', () => {
 
     // Configure Mocks
     req.method = 'PATCH'
-    req.body = { token }
+    req.body = { asymEncryptPassword, token }
 
     // Run endpoint handler and check response
     await handler(req, res)
@@ -177,7 +188,7 @@ describe('confirmEmail', () => {
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         message:
-          'Unable to send confirm email because there is no account associated with the _id provided',
+          'Unable to update password because there is no account associated with the _id provided',
       })
     )
   })

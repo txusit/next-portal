@@ -90,7 +90,7 @@ describe('authorizeWithCredentials', () => {
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
 
-    // @ts-ignore
+    // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
     expect(res.json).toHaveBeenCalledWith(
@@ -110,7 +110,7 @@ describe('authorizeWithCredentials', () => {
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
 
-    // @ts-ignore
+    // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
   })
@@ -130,7 +130,7 @@ describe('authorizeWithCredentials', () => {
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
 
-    // @ts-ignore
+    // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
     expect(res.json).toHaveBeenCalledWith(
@@ -154,11 +154,10 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    // const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
 
-    // @ts-ignore
+    // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
     expect(res.json).toHaveBeenCalledWith(
@@ -180,7 +179,7 @@ describe('authorizeWithCredentials', () => {
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
 
-    // @ts-ignore
+    // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
     expect(res.json).toHaveBeenCalledWith(
