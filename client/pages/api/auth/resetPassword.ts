@@ -60,9 +60,9 @@ const handler = async (
       )
 
     // Send successful response
-    res.status(200).send({
+    res.status(200).json({
       ok: true,
-      msg: 'successfully updated password',
+      message: 'successfully updated password',
     })
   }
 

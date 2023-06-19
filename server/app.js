@@ -23,7 +23,7 @@ const MONGO_URI = process.env.MONGO_URI
 
 // Test Route
 app.get('/', (req, res) => {
-  res.send('Hello World')
+  res.json('Hello World')
 })
 
 // Connect to MongoDB

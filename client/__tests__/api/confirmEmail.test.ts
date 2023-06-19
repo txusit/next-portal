@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import handler from '@/pages/api/auth/ConfirmEmail'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
@@ -17,11 +17,12 @@ describe('confirmEmail', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
   let mongoServer: MongoMemoryServer
+  let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create()
     const mongoUri = mongoServer.getUri()
-    const { connection } = await mongoose.connect(mongoUri, {
+    await mongoose.connect(mongoUri, {
       dbName: 'next-portal',
       autoCreate: true,
     })
@@ -37,31 +38,42 @@ describe('confirmEmail', () => {
   })
 
   beforeEach(async () => {
-    process.env = { ...OLD_ENV } // Make a copy
+    // Make a copy of original process.env
+    process.env = { ...OLD_ENV }
+
+    // Set up mock req and res objects
+    req = createRequest({
+      method: 'GET',
+    })
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as jest.Mocked<NextApiResponse>
+
+    // Reset MonboDB test User
     await User.findOneAndUpdate(
       { email: 'test@example.com' },
       {
         fullName: 'test user',
         email: 'test@example.com',
         password: 'password123',
-        isConfirmed: false,
+        isConfirmed: true,
         creationTime: new Date(),
       }
     )
   })
 
-  // PRE-TEST SETUP
-  const mockRequestResponse = (
-    method: RequestMethod = 'GET'
-  ): { req: NextApiRequest; res: NextApiResponse } => {
-    const req = createRequest({
-      method: method,
-    })
-    const res = createResponse()
+  afterAll(async () => {
+    // Restore old environment
+    process.env = OLD_ENV
 
-    return { req, res }
-  }
+    // Disconnect from DB
+    await mongoose.disconnect()
+    await mongoServer.stop()
+  })
 
+  // PERFORM TESTS
   it('should succeed without errors', async () => {
     // Construct test token
     const user = await User.findOne({ email: 'test@example.com' })
@@ -74,68 +86,46 @@ describe('confirmEmail', () => {
       }
     )
 
-    const req = mockRequestResponse().req
+    // Configure Mocks
     req.method = 'PATCH'
     req.body = { token }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'successfully verified email' })
+    )
   })
 
   it('should fail with error when missing token', async () => {
-    const req = mockRequestResponse().req
+    // Configure Mocks
     req.method = 'PATCH'
     req.body = {} // key test item
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Unable to confirm email because of missing or invalid token',
+      })
+    )
   })
 
   it('should fail with error when token is invalid', async () => {
-    // Construct test token
-    const user = await User.findOne({ email: 'test@example.com' })
-    const payload = { user_id: user._id }
-    const token = jwt.sign(
-      payload,
-      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-      {
-        expiresIn: '1d', // expires in 1 day
-      }
-    )
-
-    const req = mockRequestResponse().req
+    // Configure Mocks
     req.method = 'PATCH'
     req.body = { token: 'notavalidtoken' } // key test item
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'verification of JWT Token failed',
+      })
+    )
   })
 
   it('should fail with error when token payload contains non ObjectId user_id ', async () => {
@@ -150,21 +140,18 @@ describe('confirmEmail', () => {
       }
     )
 
-    const req = mockRequestResponse().req
+    // Configure Mocks
     req.method = 'PATCH'
     req.body = { token }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Unable to find user because user_id is not of type ObjectId',
+      })
+    )
   })
 
   it('should fail with error when no account is associated with user_id in token', async () => {
@@ -180,20 +167,18 @@ describe('confirmEmail', () => {
       }
     )
 
-    const req = mockRequestResponse().req
+    // Configure Mocks
     req.method = 'PATCH'
     req.body = { token }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          'Unable to send confirm email because there is no account associated with the _id provided',
+      })
+    )
   })
 })

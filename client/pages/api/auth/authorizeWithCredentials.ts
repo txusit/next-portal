@@ -54,7 +54,7 @@ const handler = async (
     // Send back successful response with user
     return res
       .status(HttpStatusCode.Accepted)
-      .send({ ok: true, msg: 'successfully authorized user', data: user })
+      .json({ ok: true, message: 'successfully authorized user', data: user })
   }
 
   const middlewareLoadedHandler = withMiddleware(

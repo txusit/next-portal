@@ -5,7 +5,7 @@ export type User = {
   email: string
   fullName: string
   isConfirmed: boolean
-  creationTime: Date,
+  creationTime: Date
 
   // TODO: add additional fields like: EID, graduation year, college, role, etc
 }
@@ -25,6 +25,6 @@ export type Maybe<T> = T | null | undefined
 
 export type ResponseData = {
   ok: boolean
-  msg?: string
+  message?: string
   data?: any
 }

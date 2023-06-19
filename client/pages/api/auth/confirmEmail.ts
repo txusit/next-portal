@@ -62,7 +62,7 @@ const handler = async (
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
-        `Unable to send confirm email because there is no account associated with the _id provided: ${payload.user_id}`
+        'Unable to send confirm email because there is no account associated with the _id provided'
       )
 
     // Encrypt user credentials to send to client for login using asymmetric public key
@@ -74,9 +74,9 @@ const handler = async (
     }
 
     // Send successful response
-    res.status(HttpStatusCode.Accepted).send({
+    res.status(HttpStatusCode.Accepted).json({
       ok: true,
-      msg: 'successfully verified email',
+      message: 'successfully verified email',
       data: asymEncryptUser,
     })
   }

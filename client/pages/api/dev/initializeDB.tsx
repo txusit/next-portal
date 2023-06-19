@@ -21,7 +21,7 @@ const handler = async (
   const handlerMainFunction = async () => {
     await User.findOne()
 
-    res.status(HttpStatusCode.Accepted).send({ ok: true, msg: 'connected' })
+    res.status(HttpStatusCode.Accepted).json({ ok: true, message: 'connected' })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

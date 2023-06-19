@@ -23,13 +23,14 @@ const handler = async (
     if (!user) {
       res.status(HttpStatusCode.Accepted).json({
         ok: true,
-        msg: 'If this email exists address in our database, a recovery email has been sent to it',
+        message:
+          'If this email exists address in our database, a recovery email has been sent to it',
       })
     }
     if (!user.isConfirmed) {
       res.status(HttpStatusCode.BadRequest).json({
         ok: true,
-        msg: 'The email associated with this account has not been verified',
+        message: 'The email associated with this account has not been verified',
       })
     }
 
@@ -47,7 +48,7 @@ const handler = async (
 
     res.status(HttpStatusCode.Accepted).json({
       ok: true,
-      msg: 'If this email exists address in our database, a recovery email has been sent to it',
+      message: 'If this email exists address in our database, a recovery email has been sent to it',
     })
   }
 

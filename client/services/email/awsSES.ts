@@ -60,13 +60,12 @@ export const sendEmailSES = async (
   }
 
   const response = await transporter.sendMail(mailOptions)
-
   if (!response?.messageId) {
     throw new ApiError(
       HttpStatusCode.ServiceUnavailable,
       'Unable to send email'
     )
-  } else {
-    return { ok: true }
   }
+
+  return { ok: true }
 }

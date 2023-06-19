@@ -7,7 +7,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import handler from '@/pages/api/auth/AuthorizeWithCredentials'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
+import { createRequest } from 'node-mocks-http'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
@@ -18,7 +18,10 @@ import { AES } from 'crypto-js'
 describe('authorizeWithCredentials', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
+  const aesKey = process.env.AES_KEY || ''
+
   let mongoServer: MongoMemoryServer
+  let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
     mongoServer = await MongoMemoryServer.create()
@@ -39,7 +42,20 @@ describe('authorizeWithCredentials', () => {
   })
 
   beforeEach(async () => {
-    process.env = { ...OLD_ENV } // Make a copy
+    // Make a copy of original process.env
+    process.env = { ...OLD_ENV }
+
+    // Set up mock req and res objects
+    req = createRequest({
+      method: 'GET',
+    })
+
+    res = {
+      status: jest.fn().mockReturnThis(),
+      json: jest.fn(),
+    } as unknown as jest.Mocked<NextApiResponse>
+
+    // Reset MonboDB test User
     await User.findOneAndUpdate(
       { email: 'test@example.com' },
       {
@@ -53,27 +69,17 @@ describe('authorizeWithCredentials', () => {
   })
 
   afterAll(async () => {
-    process.env = OLD_ENV // Restore old environment
+    // Restore old environment
+    process.env = OLD_ENV
+
+    // Disconnect from DB
     await mongoose.disconnect()
     await mongoServer.stop()
   })
 
-  // PRE-TEST SETUP
-  const mockRequestResponse = (
-    method: RequestMethod = 'GET'
-  ): { req: NextApiRequest; res: NextApiResponse } => {
-    const req = createRequest({
-      method: method,
-    })
-    const res = createResponse()
-
-    return { req, res }
-  }
-
   // PERFORM TESTS
   it('should authorize test user without any errors', async () => {
-    // Set Context
-    const aesKey = process.env.AES_KEY || ''
+    // Construct test credentials
     const validCredentials = true
     const symEncryptCredentials = {
       symEncryptEmail: AES.encrypt('test@example.com', aesKey).toString(),
@@ -81,26 +87,19 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'successfully authorized user' })
+    )
   })
 
   it('should fail with error when missing credentials', async () => {
-    // Set Context
-    const aesKey = process.env.AES_KEY || ''
+    // Construct test credentials
     const validCredentials = false // key test item
     const symEncryptCredentials = {
       symEncryptEmail: '',
@@ -108,17 +107,8 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
@@ -126,8 +116,7 @@ describe('authorizeWithCredentials', () => {
   })
 
   it('should fail with error when no user matches email provided', async () => {
-    // Set Context
-    const aesKey = process.env.AES_KEY || ''
+    // Construct test credentials
     const validCredentials = true
     const symEncryptCredentials = {
       symEncryptEmail: AES.encrypt(
@@ -138,21 +127,15 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Invalid credentials' })
+    )
   })
 
   it('should fail with error when email is not verified', async () => {
@@ -164,7 +147,6 @@ describe('authorizeWithCredentials', () => {
     ) // key test item
 
     // Set Context
-    const aesKey = process.env.AES_KEY || ''
     const validCredentials = true
     const symEncryptCredentials = {
       symEncryptEmail: AES.encrypt('test@example.com', aesKey).toString(),
@@ -172,26 +154,22 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    const req = mockRequestResponse().req
+    // const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: 'Email is not verified',
+      })
+    )
   })
 
   it('should fail with error when password is not correct', async () => {
     // Set Context
-    const aesKey = process.env.AES_KEY || ''
     const validCredentials = true
     const symEncryptCredentials = {
       symEncryptEmail: AES.encrypt('test@example.com', aesKey).toString(),
@@ -199,20 +177,14 @@ describe('authorizeWithCredentials', () => {
     }
 
     // Configure Mocks
-    const req = mockRequestResponse().req
     req.method = 'POST'
     req.body = { validCredentials, symEncryptCredentials }
-    const res = {
-      status: jest.fn().mockImplementation((statusCode) => {
-        return {
-          statusCode: statusCode,
-          json: jest.fn(),
-        }
-      }),
-    }
 
     // @ts-ignore
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({ message: 'Invalid credentials' })
+    )
   })
 })

@@ -52,7 +52,7 @@ const handler = async (
     // Send successful response
     return res.status(HttpStatusCode.Created).json({
       ok: true,
-      msg: 'confirmation email sent',
+      message: 'confirmation email sent',
     })
   }
 

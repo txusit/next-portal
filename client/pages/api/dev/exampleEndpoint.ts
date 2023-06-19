@@ -32,7 +32,7 @@ const handler = async (
 
     res
       .status(HttpStatusCode.Accepted)
-      .send({ ok: true, msg: 'example endpoint response', data: result })
+      .json({ ok: true, message: 'example endpoint response', data: result })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
