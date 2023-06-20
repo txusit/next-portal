@@ -17,6 +17,14 @@ const handler = async (
 ) => {
   const sendPasswordResetEmail = async () => {
     const { asymEncryptEmail } = req.body
+    if (!asymEncryptEmail) {
+      res.status(HttpStatusCode.BadRequest).json({
+        ok: true,
+        message:
+          'Unable to send confirmation email because of missing or invalid asymEncryptEmail',
+      })
+    }
+
     const email = decryptData(asymEncryptEmail)
 
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
@@ -48,7 +56,8 @@ const handler = async (
 
     res.status(HttpStatusCode.Accepted).json({
       ok: true,
-      message: 'If this email exists address in our database, a recovery email has been sent to it',
+      message:
+        'If this email exists address in our database, a recovery email has been sent to it',
     })
   }
 
