@@ -12,6 +12,11 @@ const config = {
   coveragePathIgnorePatterns: ['\\\\node_modules\\\\'],
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  // "@/*": ["./*"]
+  '@App/*': ['src/*'],
+  moduleNameMapper: {
+    '^@/(.*)$': ['<rootDir>/$1'],
+  },
   testEnvironment: 'jest-environment-jsdom',
 }
 

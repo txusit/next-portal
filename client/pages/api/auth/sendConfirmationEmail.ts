@@ -5,11 +5,11 @@ import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import { HttpStatusCode } from 'axios'
-import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 import { ApiError } from 'next/dist/server/api-utils'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import { ResponseData } from '@/types'
 import { decryptData } from '@/helpers/encryptionHelpers'
+import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 
 const handler = async (
   req: NextApiRequest,
@@ -18,13 +18,14 @@ const handler = async (
   const sendConfirmationEmail = async () => {
     // Parse request body
     const { asymEncryptEmail } = req.body
-    const email = decryptData(asymEncryptEmail)
-
-    if (!email)
+    if (!asymEncryptEmail)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to send confirmation email because of missing or invalid email'
+        'Unable to send confirmation email because of missing or invalid asymEncryptEmail'
       )
+
+    // Decrypt Email
+    const email = decryptData(asymEncryptEmail)
 
     // Find user that matches email
     const user = await User.findOne({
@@ -45,12 +46,12 @@ const handler = async (
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
-        'Unable to send confirmation email'
+        'Unable to generate token and send confirmation email'
       )
     }
 
     // Send successful response
-    return res.status(HttpStatusCode.Created).json({
+    return res.status(HttpStatusCode.Accepted).json({
       ok: true,
       message: 'confirmation email sent',
     })
