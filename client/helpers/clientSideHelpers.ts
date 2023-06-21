@@ -1,5 +1,6 @@
 import { LoginUserParams } from '@/types'
 import { InputError } from '@/types/error'
+import axios from 'axios'
 import { signIn } from 'next-auth/react'
 
 export const getErrorMsg = (key: string, errors: InputError[]) => {
@@ -22,4 +23,8 @@ export const loginUser = async ({
   })
 
   return res
+}
+
+export const getEnv = async () => {
+  axios.get('')
 }

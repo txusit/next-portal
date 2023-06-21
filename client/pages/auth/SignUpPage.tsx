@@ -2,18 +2,21 @@ import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
-import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
+import { getErrorMsg } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import Link from 'next/link'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
-export const SignUpPage = () => {
+export const SignUpPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [data, setData] = useState({
     fullName: '',
     email: '',
     password: '',
     confirmPassword: '',
   })
-
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
   const [submitError, setSubmitError] = useState<string>('')
   const [loading, setLoading] = useState(false)
@@ -51,21 +54,18 @@ export const SignUpPage = () => {
     event.preventDefault()
 
     const isValid = validateData()
-
     if (isValid) {
-      // sign up
-
       // Encrypt sensitive data asymmetrically
       const asymEncryptData = {
-        asymEncryptFullName: encryptData(data.fullName),
-        asymEncryptEmail: encryptData(data.email),
-        asymEncryptPassword: encryptData(data.password),
+        asymEncryptFullName: encryptData(data.fullName, publicEnv),
+        asymEncryptEmail: encryptData(data.email, publicEnv),
+        asymEncryptPassword: encryptData(data.password, publicEnv),
       }
 
       try {
         setLoading(true)
         const apiRes = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
+          `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
           asymEncryptData
         )
 
@@ -77,6 +77,7 @@ export const SignUpPage = () => {
           setDisplayResendOption(true)
         }
       } catch (error) {
+        console.log('entered error catch from signup api endpoint')
         if (error instanceof AxiosError) {
           const errorMsg = error.response?.data?.error
           setSubmitError(errorMsg)
@@ -91,9 +92,9 @@ export const SignUpPage = () => {
     try {
       setMessage('Sending confirmation mail')
       const result = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
+        `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
         {
-          asymEncryptEmail: encryptData(data.email),
+          asymEncryptEmail: encryptData(data.email, publicEnv),
         }
       )
 
@@ -181,3 +182,5 @@ export const SignUpPage = () => {
 }
 
 export default SignUpPage
+
+export { getServerSideProps }

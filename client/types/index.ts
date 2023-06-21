@@ -28,3 +28,5 @@ export type ResponseData = {
   message?: string
   data?: any
 }
+
+export type PublicEnv = { [key: string]: string }

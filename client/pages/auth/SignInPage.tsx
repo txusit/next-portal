@@ -4,9 +4,12 @@ import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { FormEventHandler, useState } from 'react'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
-interface Props {}
-const SignInPage: NextPage = (props): JSX.Element => {
+const SignInPage: NextPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
   const [userInfo, setUserInfo] = useState({ email: '', password: '' })
   const [loading, setLoading] = useState(false)
   const [submitError, setSubmitError] = useState<string>('')
@@ -17,8 +20,8 @@ const SignInPage: NextPage = (props): JSX.Element => {
     try {
       setLoading(true)
       // Asymmetrically encrypt credentials
-      const asymEncryptEmail = encryptData(userInfo.email)
-      const asymEncryptPassword = encryptData(userInfo.password)
+      const asymEncryptEmail = encryptData(userInfo.email, publicEnv)
+      const asymEncryptPassword = encryptData(userInfo.password, publicEnv)
 
       // Attempt Login
       const loginRes = await loginUser({
@@ -69,3 +72,5 @@ const SignInPage: NextPage = (props): JSX.Element => {
   )
 }
 export default SignInPage
+
+export { getServerSideProps }

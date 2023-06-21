@@ -1,10 +1,12 @@
 import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import React, { FormEventHandler, useState } from 'react'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
-type Props = {}
-
-const ForgotPasswordPage = (props: Props) => {
+const ForgotPasswordPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -13,10 +15,10 @@ const ForgotPasswordPage = (props: Props) => {
       setMessage('Sending password reset email')
 
       // Asymmetrically encrypt email
-      const asymEncryptEmail = encryptData(email)
+      const asymEncryptEmail = encryptData(email, publicEnv)
 
       await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendPasswordResetEmail`,
+        `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendPasswordResetEmail`,
         {
           asymEncryptEmail,
         }
@@ -49,3 +51,5 @@ const ForgotPasswordPage = (props: Props) => {
 }
 
 export default ForgotPasswordPage
+
+export { getServerSideProps }

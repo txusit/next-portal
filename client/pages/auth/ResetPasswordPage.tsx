@@ -2,9 +2,12 @@ import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
-type Props = {}
-const ResetPasswordPage = (props: Props) => {
+const ResetPasswordPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [data, setData] = useState({
     password: '',
     confirmPassword: '',
@@ -21,10 +24,10 @@ const ResetPasswordPage = (props: Props) => {
     } else {
       try {
         // Asymmetrically encrypt password
-        const asymEncryptPassword = encryptData(data.password)
+        const asymEncryptPassword = encryptData(data.password, publicEnv)
 
         await axios.patch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/ResetPassword`,
+          `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/ResetPassword`,
           {
             asymEncryptPassword,
             token: token,
@@ -70,3 +73,5 @@ const ResetPasswordPage = (props: Props) => {
 }
 
 export default ResetPasswordPage
+
+export { getServerSideProps }
