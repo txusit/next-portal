@@ -14,7 +14,7 @@ import User from '@/models/User'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 
-// Mock method that sends emails
+// Set up module mocks
 jest.mock('@/helpers/serverSideHelpers', () => {
   return {
     generateTokenAndSendActionEmail: jest.fn().mockImplementation(function () {
@@ -23,14 +23,15 @@ jest.mock('@/helpers/serverSideHelpers', () => {
   }
 })
 
-// TODO: Coppied from sendconfirmationemail. no changes made to test
 describe('sendPasswordResetEmail', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
   let mongoServer: MongoMemoryServer
-  let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
+  let req: jest.Mocked<NextApiRequest>
+  let res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
+    // Set up a test mongoDB server for these tests
     mongoServer = await MongoMemoryServer.create()
     const mongoUri = mongoServer.getUri()
     await mongoose.connect(mongoUri, {
@@ -86,7 +87,6 @@ describe('sendPasswordResetEmail', () => {
     await mongoServer.stop()
   })
 
-  // PERFORM TESTS
   it('should send password reset email without errors', async () => {
     // Encrypt email asymmetrically
     const asymEncryptEmail = encryptData('test@example.com')
@@ -142,6 +142,7 @@ describe('sendPasswordResetEmail', () => {
   })
 
   it('should fail with error when user email is not confirmed', async () => {
+    // Modify user document
     await User.findOneAndUpdate(
       { email: 'test@example.com' },
       {

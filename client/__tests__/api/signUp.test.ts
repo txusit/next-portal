@@ -15,6 +15,7 @@ import { encryptData } from '@/helpers/encryptionHelpers'
 import { compare } from 'bcryptjs'
 import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
 
+// Set up module mocks
 jest.mock('@/helpers/serverSideHelpers', () => {
   return {
     generateTokenAndSendActionEmail: jest.fn().mockImplementation(function () {
@@ -30,6 +31,7 @@ describe('confirmEmail', () => {
   let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
+    // Set up a test mongoDB server for these tests
     mongoServer = await MongoMemoryServer.create()
     const mongoUri = mongoServer.getUri()
     await mongoose.connect(mongoUri, {
@@ -46,7 +48,6 @@ describe('confirmEmail', () => {
     req = createRequest({
       method: 'GET',
     })
-
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -67,7 +68,7 @@ describe('confirmEmail', () => {
 
   // PERFORM TESTS
   it('should sign up user without errors', async () => {
-    // Construct token and encrypt password asymmetrically
+    // encrypt user info asymmetrically
     const asymEncryptFullName = encryptData('test user')
     const asymEncryptEmail = encryptData('test@example.com')
     const asymEncryptPassword = encryptData('password123')
@@ -109,6 +110,7 @@ describe('confirmEmail', () => {
   })
 
   it('should fail with error when user information is invalid', async () => {
+    // Construct encrypt invalid user info asymmetrically
     const asymEncryptFullName = encryptData('')
     const asymEncryptEmail = encryptData('')
     const asymEncryptPassword = encryptData('')
@@ -128,6 +130,7 @@ describe('confirmEmail', () => {
   })
 
   it('should fail with error when user already exists', async () => {
+    // Modify user document
     const testUser = new User({
       fullName: 'test user',
       email: 'test@example.com',
@@ -178,11 +181,12 @@ describe('confirmEmail', () => {
   })
 
   it('should fail with error when User.create throws error', async () => {
+    // Mock module function
     const mockCreate = jest
       .spyOn(User, 'create')
       .mockImplementationOnce(() => Promise.reject('fail create'))
 
-    // Construct token and encrypt password asymmetrically
+    // Encrypt user info asymmetrically
     const asymEncryptFullName = encryptData('test user')
     const asymEncryptEmail = encryptData('test@example.com')
     const asymEncryptPassword = encryptData('password123')
@@ -208,10 +212,6 @@ describe('confirmEmail', () => {
     mockSendEmail.mockReturnValueOnce({
       ok: false,
     })
-
-    // jest
-    //   .spyOn(User, 'create')
-    //   .mockImplementationOnce(() => Promise.reject('fail create'))
 
     // Construct token and encrypt password asymmetrically
     const asymEncryptFullName = encryptData('test user')

@@ -16,10 +16,13 @@ import * as jwt from 'jsonwebtoken'
 describe('confirmEmail', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
+
   let mongoServer: MongoMemoryServer
-  let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
+  let req: jest.Mocked<NextApiRequest>
+  let res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
+    // Set up a test mongoDB server for these tests
     mongoServer = await MongoMemoryServer.create()
     const mongoUri = mongoServer.getUri()
     await mongoose.connect(mongoUri, {
@@ -45,7 +48,6 @@ describe('confirmEmail', () => {
     req = createRequest({
       method: 'GET',
     })
-
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -73,7 +75,6 @@ describe('confirmEmail', () => {
     await mongoServer.stop()
   })
 
-  // PERFORM TESTS
   it('should confirm email without errors', async () => {
     // Construct token
     const user = await User.findOne({ email: 'test@example.com' })

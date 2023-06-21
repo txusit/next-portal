@@ -14,16 +14,17 @@ import User from '@/models/User'
 import { AES } from 'crypto-js'
 
 // Test Type: Integration Tests
-// Integrating various middlewares with authorizeWithCredentials main handler
 describe('authorizeWithCredentials', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
   const aesKey = process.env.AES_KEY || ''
 
   let mongoServer: MongoMemoryServer
-  let req: jest.Mocked<NextApiRequest>, res: jest.Mocked<NextApiResponse>
+  let req: jest.Mocked<NextApiRequest>
+  let res: jest.Mocked<NextApiResponse>
 
   beforeAll(async () => {
+    // Set up a test mongoDB server for these tests
     mongoServer = await MongoMemoryServer.create()
     const mongoUri = mongoServer.getUri()
     await mongoose.connect(mongoUri, {
@@ -49,7 +50,6 @@ describe('authorizeWithCredentials', () => {
     req = createRequest({
       method: 'GET',
     })
-
     res = {
       status: jest.fn().mockReturnThis(),
       json: jest.fn(),
@@ -77,7 +77,6 @@ describe('authorizeWithCredentials', () => {
     await mongoServer.stop()
   })
 
-  // PERFORM TESTS
   it('should authorize test user without any errors', async () => {
     // Construct test credentials
     const validCredentials = true
