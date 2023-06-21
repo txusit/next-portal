@@ -17,6 +17,12 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Parse request body
     const { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } =
       req.body
+    if (!asymEncryptFullName || !asymEncryptEmail || !asymEncryptPassword) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because of missing user information'
+      )
+    }
 
     // Decrypt asymmetrically encrypted data
     const fullName = decryptData(asymEncryptFullName)
@@ -26,7 +32,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!fullName || !email || !password)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to sign up because of missing or invalid user information'
+        'Unable to sign up because of invalid user information'
       )
 
     // Check for existing user
@@ -48,20 +54,28 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const hashedPassword = await hash(password, 12)
 
     // Create user and process any errors
-    let newUser = await User.create({
-      fullName,
-      email,
-      password: hashedPassword,
-      isConfirmed: false,
-      creationTime: new Date(),
-    })
+    let newUser
+    try {
+      newUser = await User.create({
+        fullName,
+        email,
+        password: hashedPassword,
+        isConfirmed: false,
+        creationTime: new Date(),
+      })
+    } catch (error) {
+      throw new ApiError(
+        HttpStatusCode.InternalServerError,
+        'Unable to sign up because error occured during User.create'
+      )
+    }
 
     // TODO: failed to create user error
 
     // Type check newUser and send confirmation email with verification token
     newUser = newUser as TUser
     const result = await generateTokenAndSendActionEmail(
-      newUser._id,
+      newUser._id || '',
       newUser.email,
       'ConfirmEmailPage'
     )
@@ -75,6 +89,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     // Send successful response
     return res.status(HttpStatusCode.Created).json({
       ok: true,
+      message: 'User successfully created',
     })
   }
 
