@@ -11,6 +11,7 @@ export const encryptData = (rawData: string): string => {
 }
 
 export const decryptData = (encryptedData: string): string => {
+  console.log(`DECRYPTION_KEY: ${process.env.DECRYPTION_KEY}`)
   const privateKey = process.env
     .DECRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')
