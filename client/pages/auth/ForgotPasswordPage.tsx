@@ -31,7 +31,7 @@ const ForgotPasswordPage = (props: Props) => {
     <div>
       <form onSubmit={handleSubmit}>
         <h1>Forgot Password</h1>
-        <p>Enter your email to reset your account's password</p>
+        <p>Enter your email to reset your account&#39;s password</p>
         <input
           value={email}
           onChange={({ target }) => {
