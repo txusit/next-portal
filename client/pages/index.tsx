@@ -25,9 +25,9 @@ export default function Home() {
           <Link href='/profile'>profile</Link>
         ) : (
           <div>
-            <Link href='/auth/signin'>Sign In</Link>
+            <Link href='/auth/SignInPage'>Sign In</Link>
             <span> | </span>
-            <Link href='/auth/signup'>Sign Up</Link>
+            <Link href='/auth/SignUpPage'>Sign Up</Link>
           </div>
         )}
       </main>

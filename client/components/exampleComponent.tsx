@@ -2,7 +2,8 @@ import React from 'react'
 
 type Props = {}
 
-const Home = (props: Props) => {
+// Component to for example jest test
+const Example = (props: Props) => {
   return (
     <div>
       <h1>welcome to next.js</h1>
@@ -10,4 +11,4 @@ const Home = (props: Props) => {
   )
 }
 
-export default Home
+export default Example

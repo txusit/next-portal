@@ -8,9 +8,15 @@ const createJestConfig = nextJest({
 // Add any custom config to be passed to Jest
 /** @type {import('jest').Config} */
 const config = {
+  collectCoverage: true,
+  coveragePathIgnorePatterns: ['\\\\node_modules\\\\'],
   // Add more setup options before each test is run
   // setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
-
+  // "@/*": ["./*"]
+  '@App/*': ['src/*'],
+  moduleNameMapper: {
+    '^@/(.*)$': ['<rootDir>/$1'],
+  },
   testEnvironment: 'jest-environment-jsdom',
 }
 

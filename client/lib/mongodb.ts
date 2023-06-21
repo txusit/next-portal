@@ -8,7 +8,9 @@ if (!MONGODB_URI) {
 
 export const connectToMongoDB = async () => {
   try {
-    const { connection } = await mongoose.connect(MONGODB_URI)
+    const { connection } = await mongoose.connect(MONGODB_URI, {
+      dbName: 'next-portal',
+    })
 
     if (connection.readyState === 1) {
       return Promise.resolve(true)

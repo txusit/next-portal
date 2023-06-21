@@ -1,59 +1,106 @@
-import { connectToMongoDB } from '@/lib/mongodb'
-import User from '@/models/user'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
-import mongoose from 'mongoose'
+import User from '@/models/User'
+import { User as TUser } from '@/types'
+import withMiddleware from '@/middleware/withMiddleware'
+import withMethodsGuard from '@/middleware/withMethodsGuard'
+import withMongoDBConnection from '@/middleware/withMongoDBConnection'
+import withExceptionFilter from '@/middleware/withExceptionFilter'
+import { generateTokenAndSendActionEmail } from '@/helpers/serverSideHelpers'
+import { HttpStatusCode } from 'axios'
+import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import { ApiError } from 'next/dist/server/api-utils'
+import { decryptData } from '@/helpers/encryptionHelpers'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  connectToMongoDB().catch((err) => res.json(err))
+  const signUp = async () => {
+    // Parse request body
+    const { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } =
+      req.body
+    if (!asymEncryptFullName || !asymEncryptEmail || !asymEncryptPassword) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because of missing user information'
+      )
+    }
 
-  if (req.method === 'POST') {
-    if (!req.body) return res.status(400).json({ error: 'Data is missing' })
+    // Decrypt asymmetrically encrypted data
+    const fullName = decryptData(asymEncryptFullName)
+    const email = decryptData(asymEncryptEmail)
+    const password = decryptData(asymEncryptPassword)
 
-    const { fullName, email, password } = req.body
+    if (!fullName || !email || !password)
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because of invalid user information'
+      )
 
     // Check for existing user
     const userExists = await User.findOne({ email })
     if (userExists) {
-      return res.status(409).json({ error: 'User already exists' })
+      throw new ApiError(
+        HttpStatusCode.Conflict,
+        'Unable to sign up because user already exists'
+      )
     }
 
     // Check for valid password and hash it
     if (password.length < 6) {
-      return res
-        .status(409)
-        .json({ error: 'Password should be 6 characters long' })
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to sign up because password should be 6 characters long'
+      )
     }
     const hashedPassword = await hash(password, 12)
 
     // Create user and process any errors
-    User.create({
-      fullName,
-      email,
-      password: hashedPassword,
+    let newUser
+    try {
+      newUser = await User.create({
+        fullName,
+        email,
+        password: hashedPassword,
+        isConfirmed: false,
+        creationTime: new Date(),
+      })
+    } catch (error) {
+      throw new ApiError(
+        HttpStatusCode.InternalServerError,
+        'Unable to sign up because error occured during User.create'
+      )
+    }
+
+    // TODO: failed to create user error
+
+    // Type check newUser and send confirmation email with verification token
+    newUser = newUser as TUser
+    const result = await generateTokenAndSendActionEmail(
+      newUser._id || '',
+      newUser.email,
+      'ConfirmEmailPage'
+    )
+    if (!result.ok) {
+      throw new ApiError(
+        HttpStatusCode.ServiceUnavailable,
+        'Unable to send confirmation email'
+      )
+    }
+
+    // Send successful response
+    return res.status(HttpStatusCode.Created).json({
+      ok: true,
+      message: 'User successfully created',
     })
-      .then((newUser) => {
-        return res.status(201).json({
-          success: true,
-          newUser,
-        })
-      })
-      .catch((error) => {
-        if (error instanceof mongoose.Error.ValidationError) {
-          // Mongoose validation error occurred
-          // Put all errors into json message
-          const errors = Object.values(error.errors).map(
-            (err: any) => err.message
-          )
-          return res.status(409).json({ error: errors.join(', ') })
-        } else {
-          // Other error occurred
-          return res.status(500).json({ error: 'Server error' })
-        }
-      })
-  } else {
-    res.status(405).json({ error: 'Method Not Allowed' })
   }
+
+  const middlewareLoadedHandler = withMiddleware(
+    withMethodsGuard(['POST']),
+    withRequestBodyGuard(),
+    withMongoDBConnection(),
+    signUp
+  )
+
+  return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
 export default handler

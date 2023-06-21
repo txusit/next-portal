@@ -1,2 +1,3 @@
 .DS_Store
-test_database
+test_database/db
+test_database/logs

@@ -1,9 +1,9 @@
-import { connectToMongoDB } from '@/lib/mongodb'
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import User from '@/models/user'
-import { compare } from 'bcryptjs'
-import { IUser } from '@/types'
+import { ResponseData, User as TUser } from '@/types'
+import axios from 'axios'
+import { AES } from 'crypto-js'
+import { decryptData } from '@/helpers/encryptionHelpers'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers
@@ -13,38 +13,54 @@ export const authOptions: NextAuthOptions = {
       type: 'credentials',
       name: 'Credentials',
       credentials: {
-        email: { label: 'Email', type: 'text' },
-        password: { label: 'Password', type: 'password' },
+        asymEncryptEmail: { label: 'Email', type: 'text' },
+        asymEncryptPassword: { label: 'Password', type: 'password' },
       },
 
       async authorize(credentials) {
-        await connectToMongoDB().catch((err) => {
-          throw new Error(err)
-        })
+        // Check if credentials exists
+        const validCredentials = credentials ? true : false
 
-        const user = await User.findOne({
-          email: credentials?.email,
-        }).select('+password')
-
-        if (!user) {
-          throw new Error('Invalid credentials')
+        // filler credentials added to delay error throwing to authorizeWithCredentials endpoint
+        const symEncryptCredentials = {
+          symEncryptEmail: '',
+          symEncryptPassword: '',
         }
 
-        const isPasswordCorrect = await compare(
-          credentials!.password,
-          user.password
+        // Replace fillers with actual credentials if available
+        if (credentials) {
+          // Recieve and decrypt asymmetrically encrypted credentials from client
+          const email = decryptData(credentials.asymEncryptEmail)
+          const password = decryptData(credentials.asymEncryptPassword)
+
+          // Encrypt credentials symmetrically and replace filler values
+          const aesKey: string = process.env.AES_KEY as string
+          symEncryptCredentials.symEncryptEmail = AES.encrypt(
+            email,
+            aesKey
+          ).toString()
+          symEncryptCredentials.symEncryptPassword = AES.encrypt(
+            password,
+            aesKey
+          ).toString()
+        }
+
+        // Perform authorization logic and get 'user' from result
+        let result = await axios.post<ResponseData>(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/AuthorizeWithCredentials`,
+          {
+            validCredentials,
+            symEncryptCredentials,
+          }
         )
-
-        if (!isPasswordCorrect) {
-          throw new Error('Invalid credentials')
-        }
+        const user = result.data.data
 
         return user
       },
     }),
   ],
   pages: {
-    signIn: '/auth/signin',
+    signIn: '/auth/SignInPage',
   },
   session: {
     strategy: 'jwt',
@@ -59,7 +75,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: async ({ session, token }) => {
-      const user = token.user as IUser
+      const user = token.user as TUser
       session.user = user
 
       return session

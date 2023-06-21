@@ -1,10 +1,12 @@
+import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
 import axios, { AxiosError } from 'axios'
-import { getErrorMsg, loginUser } from '@/helpers'
+import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
+import { encryptData } from '@/helpers/encryptionHelpers'
+import Link from 'next/link'
 
-const SignupForm = () => {
+export const SignUpPage = () => {
   const [data, setData] = useState({
     fullName: '',
     email: '',
@@ -15,6 +17,8 @@ const SignupForm = () => {
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
   const [submitError, setSubmitError] = useState<string>('')
   const [loading, setLoading] = useState(false)
+  const [displayResendOption, setDisplayResendOption] = useState(false)
+  const [message, setMessage] = useState('')
   const router = useRouter()
 
   // Check if data fields match requirements
@@ -43,7 +47,6 @@ const SignupForm = () => {
     }
   }
 
-  // Handle Signup on Form Submit
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
@@ -52,28 +55,28 @@ const SignupForm = () => {
     if (isValid) {
       // sign up
 
+      // Encrypt sensitive data asymmetrically
+      const asymEncryptData = {
+        asymEncryptFullName: encryptData(data.fullName),
+        asymEncryptEmail: encryptData(data.email),
+        asymEncryptPassword: encryptData(data.password),
+      }
+
       try {
         setLoading(true)
         const apiRes = await axios.post(
-          'http://localhost:3000/api/auth/signup',
-          data
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
+          asymEncryptData
         )
 
-        if (apiRes?.data?.success) {
-          // save data in session using next-auth
+        if (apiRes?.data?.ok) {
+          setMessage(
+            'A confirmation email has been sent to the address specified. Please check your inbox.'
+          )
 
-          const loginRes = await loginUser({
-            email: data.email,
-            password: data.password,
-          })
-
-          if (loginRes && !loginRes.ok) {
-            setSubmitError(loginRes.error || '')
-          } else {
-            router.push('/')
-          }
+          setDisplayResendOption(true)
         }
-      } catch (error: unknown) {
+      } catch (error) {
         if (error instanceof AxiosError) {
           const errorMsg = error.response?.data?.error
           setSubmitError(errorMsg)
@@ -81,6 +84,24 @@ const SignupForm = () => {
       }
 
       setLoading(false)
+    }
+  }
+
+  const sendMail = async () => {
+    try {
+      setMessage('Sending confirmation mail')
+      const result = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
+        {
+          asymEncryptEmail: encryptData(data.email),
+        }
+      )
+
+      setMessage('Confirmation sent')
+    } catch (error) {
+      console.log(error)
+      // handle the error
+      setMessage('Unable to send confirmation email')
     }
   }
 
@@ -93,6 +114,7 @@ const SignupForm = () => {
 
   return (
     <>
+      <h1>Create an Account</h1>
       <form onSubmit={handleSubmit}>
         <input
           type='text'
@@ -135,17 +157,27 @@ const SignupForm = () => {
         <button title={'Sign up'} type='submit' disabled={loading}>
           Sign Up
         </button>
-
-        {submitError && <p>{submitError}</p>}
-
-        {/* <InfoTextContainer>
-          <InfoText>Already have account?</InfoText>
-
-          <Link href={'/login'}>Login</Link>
-        </InfoTextContainer> */}
       </form>
+
+      <div>
+        {/* TODO Add 30 second cooldown timer */}
+        {displayResendOption && (
+          <button onClick={sendMail}>Resend Confirmation Email</button>
+        )}
+      </div>
+      {submitError && <p>{submitError}</p>}
+      {message && <p>{message}</p>}
+
+      <br />
+      <br />
+      <br />
+      <div>
+        <h2>Already have account?</h2>
+
+        <Link href='/auth/SignInPage'>Sign In</Link>
+      </div>
     </>
   )
 }
 
-export default SignupForm
+export default SignUpPage

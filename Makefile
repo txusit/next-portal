@@ -1,5 +1,5 @@
 # Default script that gets run when only 'make' is run
-.DEFAULT_GOAL := clean-full-test
+.DEFAULT_GOAL := clean-frontend-db
 
 
 # Cleans up docker containers, volumes, and networks in project (fresh start)
@@ -49,7 +49,11 @@ frontend-shell:
 backend-shell:
 	docker exec -t -i next_portal_backend_container /bin/bash
 
+# Open Jest Coverage Report
+open-jest-report:
+	open ./client/coverage/lcov-report/index.html
+
 
 # Test Deploy
 test-deploy:
-	touch test_deploy && git add test_deploy && git commit -m "testing deployment" && git push && rm test_deploy
+	touch test_deploy && echo "Unique Text: $$(uuidgen)" > test_deploy && git add test_deploy && git commit -m "testing deployment" && git push && rm test_deploy
