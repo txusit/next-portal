@@ -16,6 +16,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendPasswordResetEmail = async () => {
+    // Unpack request body
     const { asymEncryptEmail } = req.body
     if (!asymEncryptEmail) {
       res.status(HttpStatusCode.BadRequest).json({
@@ -25,8 +26,8 @@ const handler = async (
       })
     }
 
+    // Find user with matching email
     const email = decryptData(asymEncryptEmail)
-
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
     if (!user) {
       res.status(HttpStatusCode.Accepted).json({
@@ -42,6 +43,7 @@ const handler = async (
       })
     }
 
+    // Send email with password reset link
     const result = await generateTokenAndSendActionEmail(
       user._id,
       email,
@@ -54,6 +56,7 @@ const handler = async (
       )
     }
 
+    // Send back successful response
     res.status(HttpStatusCode.Accepted).json({
       ok: true,
       message:

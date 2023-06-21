@@ -15,8 +15,7 @@ const withMiddleware = (...middlewares: Middleware[]) => {
         middleware: Middleware,
         innerMiddleware?: Maybe<Middleware>
       ) => {
-        // return early when the request has
-        // been ended by a previous middleware
+        // return early when the request has been ended by a previous middleware
         if (res.headersSent) {
           throw new ApiError(
             HttpStatusCode.InternalServerError,
@@ -53,7 +52,7 @@ const withMiddleware = (...middlewares: Middleware[]) => {
         await evaluateHandler(middleware, nextMiddleware)
       }
     } catch (error) {
-      // Throw any errors for the exception filter to catch (if wrapped)
+      // Throw any errors for the exception filter to catch (if wrapped in it)
       throw error
     }
   }
