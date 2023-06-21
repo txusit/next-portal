@@ -1,6 +1,11 @@
+import { getLogger } from '@/logging/log-util'
 import { publicEncrypt, privateDecrypt } from 'crypto'
 
+const logger = getLogger()
+
 export const encryptData = (rawData: string): string => {
+  logger.info(process.env)
+  logger.info(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
   const publicKey = process.env
     .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')
@@ -11,7 +16,6 @@ export const encryptData = (rawData: string): string => {
 }
 
 export const decryptData = (encryptedData: string): string => {
-  console.log(`DECRYPTION_KEY: ${process.env.DECRYPTION_KEY}`)
   const privateKey = process.env
     .DECRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')

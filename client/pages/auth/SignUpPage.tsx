@@ -7,6 +7,8 @@ import { encryptData } from '@/helpers/encryptionHelpers'
 import Link from 'next/link'
 
 export const SignUpPage = () => {
+  console.log(process.env)
+
   const [data, setData] = useState({
     fullName: '',
     email: '',
