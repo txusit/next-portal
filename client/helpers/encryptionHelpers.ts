@@ -1,4 +1,6 @@
+import { HttpStatusCode } from 'axios'
 import { publicEncrypt, privateDecrypt } from 'crypto'
+import { ApiError } from 'next/dist/server/api-utils'
 
 export const encryptData = (rawData: string): string => {
   console.log(`inside encrypt: ${process.env.NEXT_PUBLIC_ENCRYPTION_KEY}`)
@@ -13,7 +15,16 @@ export const encryptData = (rawData: string): string => {
 
   console.log(`buffer complete: ${buffer}`)
 
-  const encryptedData = publicEncrypt(publicKey, buffer)
+  let encryptedData
+  try {
+    encryptedData = publicEncrypt(publicKey, buffer)
+  } catch (error) {
+    const caughtError = error as Error
+    throw new ApiError(
+      HttpStatusCode.InternalServerError,
+      `public encrypt data failed: ${caughtError.message}`
+    )
+  }
   console.log(`post encryption in encryptionhelper`)
 
   console.log('pre hex convert')
