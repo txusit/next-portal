@@ -1,8 +1,8 @@
 import { HttpStatusCode } from 'axios'
-import { publicEncrypt, privateDecrypt } from 'crypto'
+import crypto, { publicEncrypt, privateDecrypt } from 'crypto'
 import { ApiError } from 'next/dist/server/api-utils'
 
-export const encryptData = async (rawData: string): Promise<string> => {
+export const encryptData = (rawData: string): string => {
   console.log(`inside encrypt: ${process.env.NEXT_PUBLIC_ENCRYPTION_KEY}`)
   const publicKey = process.env
     .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
@@ -18,7 +18,14 @@ export const encryptData = async (rawData: string): Promise<string> => {
   let encryptedData
   try {
     console.log(`attempting encryption`)
-    encryptedData = await publicEncrypt(publicKey, buffer)
+    encryptedData = publicEncrypt(
+      {
+        key: publicKey,
+        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        oaepHash: 'sha256',
+      },
+      buffer
+    )
   } catch (error) {
     const caughtError = error as Error
     throw new ApiError(
