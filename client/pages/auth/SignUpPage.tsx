@@ -9,6 +9,7 @@ import Link from 'next/link'
 export const SignUpPage = () => {
   console.log(process.env)
   console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
+  console.log(process.env['NEXT_PUBLIC_ENCRYPTION_KEY'])
 
   const [data, setData] = useState({
     fullName: '',
