@@ -6,8 +6,13 @@ export const encryptData = (rawData: string): string => {
     .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')
 
-  const encryptedData = publicEncrypt(publicKey, Buffer.from(rawData))
+  console.log(`parsed publicKey: ${publicKey}`)
+  console.log(`raw data: ${rawData}`)
 
+  const encryptedData = publicEncrypt(publicKey, Buffer.from(rawData))
+  console.log(`post encryption in encryptionhelper`)
+
+  console.log('pre hex convert')
   return encryptedData.toString('hex')
 }
 
