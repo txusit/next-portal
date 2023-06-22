@@ -11,7 +11,10 @@ export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   process.env = publicEnv
-  console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
+  console.log(
+    'Encryption key formatted: ',
+    process.env.NEXT_PUBLIC_ENCRYPTION_KEY!.replace(/\\n/g, '\n')
+  )
 
   const [data, setData] = useState({
     fullName: '',
@@ -54,10 +57,8 @@ export const SignUpPage = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    console.log('handleSubmit entered')
 
     const isValid = validateData()
-
     if (isValid) {
       console.log('encrypting')
       console.log(data.fullName)
@@ -102,7 +103,6 @@ export const SignUpPage = ({
 
   const sendMail = async () => {
     try {
-      console.log('pre sendconfirmationemail api endpoint')
       setMessage('Sending confirmation mail')
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
@@ -110,11 +110,9 @@ export const SignUpPage = ({
           asymEncryptEmail: encryptData(data.email),
         }
       )
-      console.log('post sendconfirmationemail api endpoint')
 
       setMessage('Confirmation sent')
     } catch (error) {
-      console.log('catch errors in sendconfirmationemail api endpoint')
       console.log(error)
       // handle the error
       setMessage('Unable to send confirmation email')
