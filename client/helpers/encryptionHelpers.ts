@@ -11,7 +11,8 @@ export const encryptData = (rawData: string): string => {
   console.log(`parsed publicKey: ${publicKey}`)
   console.log(`raw data: ${rawData}`)
 
-  const buffer = Buffer.from(rawData)
+  // const buffer = Buffer.from(rawData)
+  const buffer = Buffer.from('rawData')
 
   console.log(`buffer complete: ${buffer}`)
 
