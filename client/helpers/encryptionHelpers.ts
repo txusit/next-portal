@@ -17,6 +17,7 @@ export const encryptData = (rawData: string): string => {
 
   let encryptedData
   try {
+    console.log(`attempting encryption`)
     encryptedData = publicEncrypt(publicKey, buffer)
   } catch (error) {
     const caughtError = error as Error
