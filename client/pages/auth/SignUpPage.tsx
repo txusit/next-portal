@@ -60,6 +60,9 @@ export const SignUpPage = ({
 
     if (isValid) {
       console.log('encrypting')
+      console.log(data.fullName)
+      console.log(data.email)
+      console.log(data.password)
       // Encrypt sensitive data asymmetrically
       const asymEncryptData = {
         asymEncryptFullName: encryptData(data.fullName),
