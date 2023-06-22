@@ -44,12 +44,20 @@ const handler = async (
 
     const encrypted = encryptData('testing')
     console.log('encrypted:', encrypted)
-    const decrypted = decryptData(encrypted)
-    console.log('decrypted:', decrypted)
+    // const decrypted = decryptData(encrypted)
+    // console.log('decrypted:', decrypted)
 
-    res
-      .status(HttpStatusCode.Accepted)
-      .json({ ok: true, message: 'example endpoint response', data: decrypted })
+    // const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
+
+    // let keyBase64 = Buffer.from(key).toString('base64')
+
+    // let keyDecoded = Buffer.from(key).toString('utf8')
+
+    res.status(HttpStatusCode.Accepted).json({
+      ok: true,
+      message: 'Testing Encryption Key',
+      data: {},
+    })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

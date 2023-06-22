@@ -3,10 +3,13 @@ import crypto, { publicEncrypt, privateDecrypt } from 'crypto'
 import { ApiError } from 'next/dist/server/api-utils'
 
 export const encryptData = (rawData: string): string => {
-  const publicKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY!.replace(
-    /\\n/g,
-    '\n'
-  )
+  let publicKeyBase64 = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
+
+  let publicKey = Buffer.from(publicKeyBase64, 'base64')
+    .toString('utf8')
+    .replace(/\\n/g, '\n')
+  console.log('$$$$$ publicKey:', publicKey)
+
   console.log(`inside encrypt: ${publicKey}`)
 
   console.log(`parsed publicKey: ${publicKey}`)

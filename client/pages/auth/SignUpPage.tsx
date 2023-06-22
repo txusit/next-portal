@@ -11,10 +11,12 @@ export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   process.env = publicEnv
-  console.log(
-    'Encryption key formatted: ',
-    process.env.NEXT_PUBLIC_ENCRYPTION_KEY!.replace(/\\n/g, '\n')
-  )
+  let publicKeyBase64 = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
+
+  let publicKey = Buffer.from(publicKeyBase64, 'base64')
+    .toString('utf8')
+    .replace(/\\n/g, '\n')
+  console.log('Encryption key formatted: ', publicKey)
 
   const [data, setData] = useState({
     fullName: '',
