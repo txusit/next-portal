@@ -1,11 +1,8 @@
-import { getLogger } from '@/logging/log-util'
 import { publicEncrypt, privateDecrypt } from 'crypto'
 
-const logger = getLogger()
-
 export const encryptData = (rawData: string): string => {
-  logger.info(process.env)
-  logger.info(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
+  console.log(process.env)
+  console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
   const publicKey = process.env
     .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')
