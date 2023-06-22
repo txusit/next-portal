@@ -1,3 +1,4 @@
+import { decryptData, encryptData } from '@/helpers/encryptionHelpers'
 import withExceptionFilter from '@/middleware/withExceptionFilter'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'
@@ -22,28 +23,33 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    const { publicKey, privateKey } = generateKeyPairSync('rsa', {
-      // The standard secure default length for RSA keys is 2048 bits
-      modulusLength: 2048,
-    })
+    // const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+    //   // The standard secure default length for RSA keys is 2048 bits
+    //   modulusLength: 2048,
+    // })
 
-    const data = {
-      publicKey: publicKey.export({
-        type: 'pkcs1',
-        format: 'pem',
-      }),
+    // const data = {
+    //   publicKey: publicKey.export({
+    //     type: 'pkcs1',
+    //     format: 'pem',
+    //   }),
 
-      privateKey: privateKey.export({
-        type: 'pkcs1',
-        format: 'pem',
-      }),
-    }
+    //   privateKey: privateKey.export({
+    //     type: 'pkcs1',
+    //     format: 'pem',
+    //   }),
+    // }
 
-    console.log(data)
+    // console.log(data)
+
+    const encrypted = encryptData('testing')
+    console.log('encrypted:', encrypted)
+    const decrypted = decryptData(encrypted)
+    console.log('decrypted:', decrypted)
 
     res
       .status(HttpStatusCode.Accepted)
-      .json({ ok: true, message: 'example endpoint response', data })
+      .json({ ok: true, message: 'example endpoint response', data: decrypted })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

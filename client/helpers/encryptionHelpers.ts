@@ -19,14 +19,7 @@ export const encryptData = (rawData: string): string => {
   let encryptedData
   try {
     console.log(`attempting encryption`)
-    encryptedData = publicEncrypt(
-      {
-        key: 'publicKey',
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-        oaepHash: 'sha256',
-      },
-      buffer
-    )
+    encryptedData = publicEncrypt('filler', buffer)
   } catch (error) {
     const caughtError = error as Error
     throw new ApiError(
