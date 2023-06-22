@@ -10,7 +10,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  console.log(publicEnv)
   process.env = publicEnv
+  console.log(process.env)
 
   const [data, setData] = useState({
     fullName: '',
@@ -191,6 +193,8 @@ type PublicEnv = {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  console.log(process.env)
+
   // Filter process.env for client-exposed variables
   const packagedEnv = { ...process.env }
 
