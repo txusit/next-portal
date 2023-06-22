@@ -64,9 +64,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         creationTime: new Date(),
       })
     } catch (error) {
+      const caughtError = error as Error
       throw new ApiError(
         HttpStatusCode.InternalServerError,
-        'Unable to sign up because error occured during User.create'
+        `Unable to sign up because error occured during User.create: ${caughtError.message}`
       )
     }
 

@@ -4,7 +4,7 @@ import withMiddleware from '@/middleware/withMiddleware'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
 import User from '@/models/User'
-import { ResponseData } from '@/types'
+import { PublicEnv, ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -21,7 +21,7 @@ const handler = async (
   const handlerMainFunction = async () => {
     const packagedEnv = { ...process.env }
 
-    let publicEnv: { [key: string]: string } = {}
+    let publicEnv: PublicEnv = {}
     for (let envVar in packagedEnv) {
       envVar = envVar as string
 

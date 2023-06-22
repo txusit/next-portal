@@ -10,14 +10,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  process.env = publicEnv
-  let publicKeyBase64 = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
-
-  let publicKey = Buffer.from(publicKeyBase64, 'base64')
-    .toString('utf8')
-    .replace(/\\n/g, '\n')
-  console.log('Encryption key formatted: ', publicKey)
-
   const [data, setData] = useState({
     fullName: '',
     email: '',
@@ -62,15 +54,11 @@ export const SignUpPage = ({
 
     const isValid = validateData()
     if (isValid) {
-      console.log('encrypting')
-      console.log(data.fullName)
-      console.log(data.email)
-      console.log(data.password)
       // Encrypt sensitive data asymmetrically
       const asymEncryptData = {
-        asymEncryptFullName: encryptData(data.fullName),
-        asymEncryptEmail: encryptData(data.email),
-        asymEncryptPassword: encryptData(data.password),
+        asymEncryptFullName: encryptData(data.fullName, publicEnv),
+        asymEncryptEmail: encryptData(data.email, publicEnv),
+        asymEncryptPassword: encryptData(data.password, publicEnv),
       }
       console.log('encryption done')
 
@@ -78,7 +66,7 @@ export const SignUpPage = ({
         console.log('pre signup apiendpoint')
         setLoading(true)
         const apiRes = await axios.post(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
+          `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
           asymEncryptData
         )
         console.log('post signup apiendpoint')
@@ -107,9 +95,9 @@ export const SignUpPage = ({
     try {
       setMessage('Sending confirmation mail')
       const result = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
+        `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
         {
-          asymEncryptEmail: encryptData(data.email),
+          asymEncryptEmail: encryptData(data.email, publicEnv),
         }
       )
 
@@ -203,8 +191,6 @@ type PublicEnv = {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-  console.log(process.env)
-
   // Filter process.env for client-exposed variables
   const packagedEnv = { ...process.env }
 

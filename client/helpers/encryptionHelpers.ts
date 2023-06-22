@@ -1,29 +1,22 @@
+import { PublicEnv } from '@/types'
 import { HttpStatusCode } from 'axios'
 import crypto, { publicEncrypt, privateDecrypt } from 'crypto'
 import { ApiError } from 'next/dist/server/api-utils'
 
-export const encryptData = (rawData: string): string => {
-  let publicKeyBase64 = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
-
+export const encryptData = (
+  rawData: string,
+  publicEnv: PublicEnv = {}
+): string => {
+  let publicKeyBase64 =
+    process.env.NEXT_PUBLIC_ENCRYPTION_KEY ||
+    publicEnv.NEXT_PUBLIC_ENCRYPTION_KEY
   let publicKey = Buffer.from(publicKeyBase64, 'base64')
     .toString('utf8')
     .replace(/\\n/g, '\n')
-  console.log('$$$$$ publicKey:', publicKey)
-
-  console.log(`inside encrypt: ${publicKey}`)
-
-  console.log(`parsed publicKey: ${publicKey}`)
-  console.log(`raw data: ${rawData}`)
-
-  const buffer = Buffer.from(rawData)
-  // const buffer = Buffer.from('rawData')
-
-  console.log(`buffer complete: ${buffer}`)
 
   let encryptedData
   try {
-    console.log(`attempting encryption`)
-    encryptedData = publicEncrypt(publicKey, buffer)
+    encryptedData = publicEncrypt(publicKey, Buffer.from(rawData))
   } catch (error) {
     const caughtError = error as Error
     throw new ApiError(
@@ -31,18 +24,27 @@ export const encryptData = (rawData: string): string => {
       `public encrypt data failed: ${caughtError.message}`
     )
   }
-  console.log(`post encryption in encryptionhelper`)
 
-  console.log('pre hex convert')
   return encryptedData.toString('hex')
 }
 
 export const decryptData = (encryptedData: string): string => {
-  const privateKey = process.env.DECRYPTION_KEY!.replace(/\\n/g, '\n')
-  const encryptedDataBuffer = Buffer.from(encryptedData, 'hex')
+  let privateKeyBase64 = process.env.DECRYPTION_KEY || ''
+  let privateKey = Buffer.from(privateKeyBase64, 'base64')
+    .toString('utf8')
+    .replace(/\\n/g, '\n')
 
-  const decryptedData = privateDecrypt(privateKey, encryptedDataBuffer)
-
+  let decryptedData
+  try {
+    const encryptedDataBuffer = Buffer.from(encryptedData, 'hex')
+    decryptedData = privateDecrypt(privateKey, encryptedDataBuffer)
+  } catch (error) {
+    const caughtError = error as Error
+    throw new ApiError(
+      HttpStatusCode.InternalServerError,
+      `private encrypt data failed: ${caughtError.message}`
+    )
+  }
   return decryptedData.toString('utf-8')
 }
 

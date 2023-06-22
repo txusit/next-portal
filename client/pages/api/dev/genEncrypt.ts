@@ -42,21 +42,21 @@ const handler = async (
 
     // console.log(data)
 
-    const encrypted = encryptData('testing')
-    console.log('encrypted:', encrypted)
+    // const encrypted = encryptData('testing')
+    // console.log('encrypted:', encrypted)
     // const decrypted = decryptData(encrypted)
     // console.log('decrypted:', decrypted)
 
-    // const key = process.env.NEXT_PUBLIC_ENCRYPTION_KEY || ''
+    const key = process.env.DECRYPTION_KEY || ''
 
-    // let keyBase64 = Buffer.from(key).toString('base64')
+    let keyBase64 = Buffer.from(key).toString('base64')
 
     // let keyDecoded = Buffer.from(key).toString('utf8')
 
     res.status(HttpStatusCode.Accepted).json({
       ok: true,
       message: 'Testing Encryption Key',
-      data: {},
+      data: { keyBase64 },
     })
   }
 
