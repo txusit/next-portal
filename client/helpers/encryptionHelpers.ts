@@ -9,7 +9,11 @@ export const encryptData = (rawData: string): string => {
   console.log(`parsed publicKey: ${publicKey}`)
   console.log(`raw data: ${rawData}`)
 
-  const encryptedData = publicEncrypt(publicKey, Buffer.from(rawData))
+  const buffer = Buffer.from(rawData)
+
+  console.log(`buffer complete: ${buffer}`)
+
+  const encryptedData = publicEncrypt(publicKey, buffer)
   console.log(`post encryption in encryptionhelper`)
 
   console.log('pre hex convert')
