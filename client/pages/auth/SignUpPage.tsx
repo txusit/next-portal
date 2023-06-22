@@ -10,11 +10,8 @@ import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  console.log(publicEnv)
   process.env = publicEnv
-  console.log(process.env)
   console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
-  console.log(process.env['NEXT_PUBLIC_ENCRYPTION_KEY'])
 
   const [data, setData] = useState({
     fullName: '',
@@ -57,34 +54,39 @@ export const SignUpPage = ({
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    console.log('handleSubmit entered')
 
     const isValid = validateData()
 
     if (isValid) {
-      // sign up
-
+      console.log('encrypting')
       // Encrypt sensitive data asymmetrically
       const asymEncryptData = {
         asymEncryptFullName: encryptData(data.fullName),
         asymEncryptEmail: encryptData(data.email),
         asymEncryptPassword: encryptData(data.password),
       }
+      console.log('encryption done')
 
       try {
+        console.log('pre signup apiendpoint')
         setLoading(true)
         const apiRes = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
           asymEncryptData
         )
+        console.log('post signup apiendpoint')
 
         if (apiRes?.data?.ok) {
           setMessage(
             'A confirmation email has been sent to the address specified. Please check your inbox.'
           )
+          console.log('set message based on signup endpoint results')
 
           setDisplayResendOption(true)
         }
       } catch (error) {
+        console.log('entered error catch from signup api endpoint')
         if (error instanceof AxiosError) {
           const errorMsg = error.response?.data?.error
           setSubmitError(errorMsg)
@@ -97,6 +99,7 @@ export const SignUpPage = ({
 
   const sendMail = async () => {
     try {
+      console.log('pre sendconfirmationemail api endpoint')
       setMessage('Sending confirmation mail')
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
@@ -104,9 +107,11 @@ export const SignUpPage = ({
           asymEncryptEmail: encryptData(data.email),
         }
       )
+      console.log('post sendconfirmationemail api endpoint')
 
       setMessage('Confirmation sent')
     } catch (error) {
+      console.log('catch errors in sendconfirmationemail api endpoint')
       console.log(error)
       // handle the error
       setMessage('Unable to send confirmation email')
