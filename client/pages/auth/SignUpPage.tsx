@@ -13,6 +13,7 @@ export const SignUpPage = ({
   console.log(publicEnv)
   process.env = publicEnv
   console.log(process.env)
+  console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
 
   const [data, setData] = useState({
     fullName: '',
