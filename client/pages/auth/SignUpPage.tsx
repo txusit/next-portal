@@ -5,11 +5,12 @@ import axios, { AxiosError } from 'axios'
 import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import Link from 'next/link'
+import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
 
-export const SignUpPage = () => {
-  console.log(process.env)
-  console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
-  console.log(process.env['NEXT_PUBLIC_ENCRYPTION_KEY'])
+export const SignUpPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  process.env = publicEnv
 
   const [data, setData] = useState({
     fullName: '',
@@ -17,7 +18,6 @@ export const SignUpPage = () => {
     password: '',
     confirmPassword: '',
   })
-
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
   const [submitError, setSubmitError] = useState<string>('')
   const [loading, setLoading] = useState(false)
@@ -185,3 +185,28 @@ export const SignUpPage = () => {
 }
 
 export default SignUpPage
+
+type PublicEnv = {
+  [key: string]: string
+}
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  // Filter process.env for client-exposed variables
+  const packagedEnv = { ...process.env }
+
+  let publicEnv: PublicEnv = {}
+  for (let envVar in packagedEnv) {
+    envVar = envVar as string
+
+    if (envVar.includes('NEXT_PUBLIC_')) {
+      publicEnv[envVar] = process.env[envVar] || ''
+    }
+  }
+
+  // Return the client-exposed env variables
+  return {
+    props: {
+      publicEnv,
+    },
+  }
+}

@@ -1,8 +1,6 @@
 import { publicEncrypt, privateDecrypt } from 'crypto'
 
 export const encryptData = (rawData: string): string => {
-  console.log(process.env)
-  console.log(process.env.NEXT_PUBLIC_ENCRYPTION_KEY)
   const publicKey = process.env
     .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
     .join('\n')
