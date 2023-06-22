@@ -4,22 +4,23 @@ import { ApiError } from 'next/dist/server/api-utils'
 
 export const encryptData = (rawData: string): string => {
   console.log(`inside encrypt: ${process.env.NEXT_PUBLIC_ENCRYPTION_KEY}`)
-  const publicKey = process.env
-    .NEXT_PUBLIC_ENCRYPTION_KEY!.split(String.raw`\n`)
-    .join('\n')
+  const publicKey = process.env.NEXT_PUBLIC_ENCRYPTION_KEY!.replace(
+    /\\n/g,
+    '\n'
+  )
 
   console.log(`parsed publicKey: ${publicKey}`)
   console.log(`raw data: ${rawData}`)
 
-  // const buffer = Buffer.from(rawData)
-  const buffer = Buffer.from('rawData')
+  const buffer = Buffer.from(rawData)
+  // const buffer = Buffer.from('rawData')
 
   console.log(`buffer complete: ${buffer}`)
 
   let encryptedData
   try {
     console.log(`attempting encryption`)
-    encryptedData = publicEncrypt('filler', buffer)
+    encryptedData = publicEncrypt(publicKey, buffer)
   } catch (error) {
     const caughtError = error as Error
     throw new ApiError(
@@ -34,9 +35,7 @@ export const encryptData = (rawData: string): string => {
 }
 
 export const decryptData = (encryptedData: string): string => {
-  const privateKey = process.env
-    .DECRYPTION_KEY!.split(String.raw`\n`)
-    .join('\n')
+  const privateKey = process.env.DECRYPTION_KEY!.replace(/\\n/g, '\n')
   const encryptedDataBuffer = Buffer.from(encryptedData, 'hex')
 
   const decryptedData = privateDecrypt(privateKey, encryptedDataBuffer)
