@@ -20,7 +20,7 @@ export const encryptData = (rawData: string): string => {
     console.log(`attempting encryption`)
     encryptedData = publicEncrypt(
       {
-        key: publicKey,
+        key: 'publicKey',
         padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
         oaepHash: 'sha256',
       },
