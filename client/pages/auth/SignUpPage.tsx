@@ -65,9 +65,9 @@ export const SignUpPage = ({
       console.log(data.password)
       // Encrypt sensitive data asymmetrically
       const asymEncryptData = {
-        asymEncryptFullName: encryptData(data.fullName),
-        asymEncryptEmail: encryptData(data.email),
-        asymEncryptPassword: encryptData(data.password),
+        asymEncryptFullName: await encryptData(data.fullName),
+        asymEncryptEmail: await encryptData(data.email),
+        asymEncryptPassword: await encryptData(data.password),
       }
       console.log('encryption done')
 
@@ -107,7 +107,7 @@ export const SignUpPage = ({
       const result = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
         {
-          asymEncryptEmail: encryptData(data.email),
+          asymEncryptEmail: await encryptData(data.email),
         }
       )
       console.log('post sendconfirmationemail api endpoint')
