@@ -24,7 +24,7 @@ const ResetPasswordPage = ({
     } else {
       try {
         // Asymmetrically encrypt password
-        const asymEncryptPassword = encryptData(data.password)
+        const asymEncryptPassword = encryptData(data.password, publicEnv)
 
         await axios.patch(
           `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/ResetPassword`,

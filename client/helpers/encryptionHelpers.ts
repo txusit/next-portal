@@ -7,6 +7,15 @@ export const encryptData = (
   rawData: string,
   publicEnv: PublicEnv = {}
 ): string => {
+  if (
+    !process.env.NEXT_PUBLIC_ENCRYPTION_KEY &&
+    !publicEnv.NEXT_PUBLIC_ENCRYPTION_KEY
+  ) {
+    throw new ApiError(
+      HttpStatusCode.InternalServerError,
+      `public encrypt data failed. Missing Public Encryption Key`
+    )
+  }
   let publicKeyBase64 =
     process.env.NEXT_PUBLIC_ENCRYPTION_KEY ||
     publicEnv.NEXT_PUBLIC_ENCRYPTION_KEY
