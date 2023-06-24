@@ -12,10 +12,11 @@ const ResetPasswordPage = ({
     password: '',
     confirmPassword: '',
   })
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
   const [submitError, setSubmitError] = useState('')
   const router = useRouter()
   let { token } = router.query
+
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     if (data.password != data.confirmPassword) {
@@ -45,7 +46,7 @@ const ResetPasswordPage = ({
     setData({ ...data, [event.target.name]: event.target.value })
   }
   return (
-    <div>
+    <React.Fragment>
       <form onSubmit={handleSubmit}>
         <h1>New Password</h1>
         <input
@@ -66,9 +67,9 @@ const ResetPasswordPage = ({
         />
         <input value='Reset Password' type='submit' />
       </form>
-      {message}
-      {submitError}
-    </div>
+      {message && <p>{message}</p>}
+      {submitError && <p>{submitError}</p>}
+    </React.Fragment>
   )
 }
 

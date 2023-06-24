@@ -1,3 +1,4 @@
+import React from 'react'
 import { loginUser } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import { AxiosError } from 'axios'
@@ -41,34 +42,40 @@ const SignInPage: NextPage = ({
       if (error instanceof AxiosError) {
         const errorMsg = error.response?.data?.error
         setSubmitError(errorMsg)
+      } else {
+        const caughtError = error as Error
+        console.log('Unable to sign in: ', caughtError.message)
+        setSubmitError(caughtError.message)
       }
     }
   }
 
   return (
-    <div className='sign-in-form'>
-      <form onSubmit={handleSubmit}>
-        <h1>Login</h1>
-        <input
-          value={userInfo.email}
-          onChange={({ target }) =>
-            setUserInfo({ ...userInfo, email: target.value })
-          }
-          type='email'
-          placeholder='john@email.com'
-        />
-        <input
-          value={userInfo.password}
-          onChange={({ target }) =>
-            setUserInfo({ ...userInfo, password: target.value })
-          }
-          type='password'
-          placeholder='****'
-        />
-        <input type='submit' value='login' />
-        {submitError && <p>{submitError}</p>}
-      </form>
-    </div>
+    <React.Fragment>
+      <div className='sign-in-form'>
+        <form onSubmit={handleSubmit}>
+          <h1>Login</h1>
+          <input
+            value={userInfo.email}
+            onChange={({ target }) =>
+              setUserInfo({ ...userInfo, email: target.value })
+            }
+            type='email'
+            placeholder='john@email.com'
+          />
+          <input
+            value={userInfo.password}
+            onChange={({ target }) =>
+              setUserInfo({ ...userInfo, password: target.value })
+            }
+            type='password'
+            placeholder='****'
+          />
+          <input type='submit' value='login' />
+          {submitError && <p>{submitError}</p>}
+        </form>
+      </div>
+    </React.Fragment>
   )
 }
 export default SignInPage

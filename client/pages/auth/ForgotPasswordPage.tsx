@@ -8,7 +8,8 @@ const ForgotPasswordPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [email, setEmail] = useState('')
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
+  const [submitError, setSubmitError] = useState<string>('')
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     try {
@@ -25,12 +26,14 @@ const ForgotPasswordPage = ({
       )
       setMessage('Password reset email sent')
     } catch (error) {
+      const caughtError = error as Error
       console.log(error)
       setMessage('Unable to send password reset email')
+      setSubmitError(caughtError.message)
     }
   }
   return (
-    <div>
+    <React.Fragment>
       <form onSubmit={handleSubmit}>
         <h1>Forgot Password</h1>
         <p>Enter your email to reset your account&#39;s password</p>
@@ -45,8 +48,9 @@ const ForgotPasswordPage = ({
         />
         <input value='Recover Password' type='submit' />
       </form>
-      {message}
-    </div>
+      {message && <p>{message}</p>}
+      {submitError && <p>{submitError}</p>}
+    </React.Fragment>
   )
 }
 

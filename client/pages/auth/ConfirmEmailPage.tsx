@@ -8,12 +8,11 @@ import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 const ConfirmEmailPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
   const [submitError, setSubmitError] = useState<string>('')
 
   // Get token from URL Params
   const router = useRouter()
-
   let { token } = router.query
 
   useEffect(() => {
@@ -53,11 +52,11 @@ const ConfirmEmailPage = ({
   }, [token])
 
   return (
-    <div>
+    <React.Fragment>
       <h1>Account Verification</h1>
-      <p>{message}</p>
+      {message && <p>{message}</p>}
       {submitError && <p>{submitError}</p>}
-    </div>
+    </React.Fragment>
   )
 }
 

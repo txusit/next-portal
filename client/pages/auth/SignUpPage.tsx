@@ -18,10 +18,10 @@ export const SignUpPage = ({
     confirmPassword: '',
   })
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
-  const [submitError, setSubmitError] = useState<string>('')
   const [loading, setLoading] = useState(false)
   const [displayResendOption, setDisplayResendOption] = useState(false)
-  const [message, setMessage] = useState('')
+  const [message, setMessage] = useState<string>('')
+  const [submitError, setSubmitError] = useState<string>('')
   const router = useRouter()
 
   // Check if data fields match requirements
@@ -114,7 +114,7 @@ export const SignUpPage = ({
   }
 
   return (
-    <>
+    <React.Fragment>
       <h1>Create an Account</h1>
       <form onSubmit={handleSubmit}>
         <input
@@ -166,8 +166,8 @@ export const SignUpPage = ({
           <button onClick={sendMail}>Resend Confirmation Email</button>
         )}
       </div>
-      {submitError && <p>{submitError}</p>}
       {message && <p>{message}</p>}
+      {submitError && <p>{submitError}</p>}
 
       <br />
       <br />
@@ -177,7 +177,7 @@ export const SignUpPage = ({
 
         <Link href='/auth/SignInPage'>Sign In</Link>
       </div>
-    </>
+    </React.Fragment>
   )
 }
 
