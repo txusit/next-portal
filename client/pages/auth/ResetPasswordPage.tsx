@@ -3,11 +3,11 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
 const ResetPasswordPage = ({
   publicEnv,
-}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [data, setData] = useState({
     password: '',
     confirmPassword: '',
@@ -74,4 +74,4 @@ const ResetPasswordPage = ({
 
 export default ResetPasswordPage
 
-export { getPublicEnv }
+export { getServerSideProps }

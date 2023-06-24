@@ -6,11 +6,11 @@ import { getErrorMsg } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import Link from 'next/link'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
 export const SignUpPage = ({
   publicEnv,
-}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [data, setData] = useState({
     fullName: '',
     email: '',
@@ -61,22 +61,18 @@ export const SignUpPage = ({
         asymEncryptEmail: encryptData(data.email, publicEnv),
         asymEncryptPassword: encryptData(data.password, publicEnv),
       }
-      console.log('encryption done')
 
       try {
-        console.log('pre signup apiendpoint')
         setLoading(true)
         const apiRes = await axios.post(
           `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
           asymEncryptData
         )
-        console.log('post signup apiendpoint')
 
         if (apiRes?.data?.ok) {
           setMessage(
             'A confirmation email has been sent to the address specified. Please check your inbox.'
           )
-          console.log('set message based on signup endpoint results')
 
           setDisplayResendOption(true)
         }
@@ -187,4 +183,4 @@ export const SignUpPage = ({
 
 export default SignUpPage
 
-export { getPublicEnv }
+export { getServerSideProps }

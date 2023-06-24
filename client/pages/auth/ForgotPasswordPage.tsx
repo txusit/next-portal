@@ -2,11 +2,11 @@ import { encryptData } from '@/helpers/encryptionHelpers'
 import axios from 'axios'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
 const ForgotPasswordPage = ({
   publicEnv,
-}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [email, setEmail] = useState('')
   const [message, setMessage] = useState('')
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
@@ -52,4 +52,4 @@ const ForgotPasswordPage = ({
 
 export default ForgotPasswordPage
 
-export { getPublicEnv }
+export { getServerSideProps }

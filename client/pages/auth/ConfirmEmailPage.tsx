@@ -3,11 +3,11 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import { loginUser } from '@/helpers/clientSideHelpers'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 
 const ConfirmEmailPage = ({
   publicEnv,
-}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [message, setMessage] = useState('')
   const [submitError, setSubmitError] = useState<string>('')
 
@@ -63,4 +63,4 @@ const ConfirmEmailPage = ({
 
 export default ConfirmEmailPage
 
-export { getPublicEnv }
+export { getServerSideProps }
