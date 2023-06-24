@@ -2,14 +2,15 @@ import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
-import { getErrorMsg, loginUser } from '@/helpers/clientSideHelpers'
+import { getErrorMsg } from '@/helpers/clientSideHelpers'
 import { encryptData } from '@/helpers/encryptionHelpers'
 import Link from 'next/link'
-import { GetServerSideProps, InferGetServerSidePropsType } from 'next'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
 
 export const SignUpPage = ({
   publicEnv,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
   const [data, setData] = useState({
     fullName: '',
     email: '',
@@ -186,27 +187,4 @@ export const SignUpPage = ({
 
 export default SignUpPage
 
-type PublicEnv = {
-  [key: string]: string
-}
-
-export const getServerSideProps: GetServerSideProps = async () => {
-  // Filter process.env for client-exposed variables
-  const packagedEnv = { ...process.env }
-
-  let publicEnv: PublicEnv = {}
-  for (let envVar in packagedEnv) {
-    envVar = envVar as string
-
-    if (envVar.includes('NEXT_PUBLIC_')) {
-      publicEnv[envVar] = process.env[envVar] || ''
-    }
-  }
-
-  // Return the client-exposed env variables
-  return {
-    props: {
-      publicEnv,
-    },
-  }
-}
+export { getPublicEnv }

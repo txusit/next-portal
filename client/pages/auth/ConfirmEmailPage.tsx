@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
-import axios, { HttpStatusCode } from 'axios'
+import axios from 'axios'
 import { loginUser } from '@/helpers/clientSideHelpers'
-import { ApiError } from 'next/dist/server/api-utils'
+import { InferGetServerSidePropsType } from 'next'
+import { getServerSideProps as getPublicEnv } from '@/helpers/commonGetServerSideProps'
 
-type Props = {}
-
-const ConfirmEmailPage = (props: Props) => {
+const ConfirmEmailPage = ({
+  publicEnv,
+}: InferGetServerSidePropsType<typeof getPublicEnv>) => {
   const [message, setMessage] = useState('')
   const [submitError, setSubmitError] = useState<string>('')
 
@@ -22,7 +23,7 @@ const ConfirmEmailPage = (props: Props) => {
           // Pass token to confirmEmail endpoint to handle email verification logic
           setMessage('Confirming email...')
           const response = await axios.patch(
-            `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/ConfirmEmail`,
+            `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/ConfirmEmail`,
             {
               token: token,
             }
@@ -61,3 +62,5 @@ const ConfirmEmailPage = (props: Props) => {
 }
 
 export default ConfirmEmailPage
+
+export { getPublicEnv }
