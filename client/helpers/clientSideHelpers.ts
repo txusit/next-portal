@@ -24,7 +24,3 @@ export const loginUser = async ({
 
   return res
 }
-
-export const getEnv = async () => {
-  axios.get('')
-}

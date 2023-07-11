@@ -25,6 +25,10 @@ const UserSchema = new Schema({
     type: Boolean,
     required: [true, 'isConfirmed is not set'],
   },
+  membership: {
+    type: String,
+    required: [true, 'membership is not set'],
+  },
   creationTime: {
     type: Date,
     required: [true, 'Account creation date is not set '],
