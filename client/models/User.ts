@@ -33,6 +33,10 @@ const UserSchema = new Schema({
     type: Date,
     required: [true, 'Account creation date is not set '],
   },
+  attendedMeetingIds: {
+    type: [String],
+    required: [true, 'Meetings attended record is not set'],
+  },
 })
 
 // Return existing model or create a new one
