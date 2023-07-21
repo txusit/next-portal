@@ -5,10 +5,6 @@ import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
 import { InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
 
-if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-  throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is undefined')
-}
-
 // Restrict this page to only sessions that the following user fields
 // user != undefined
 // isConfirmed = true
@@ -16,6 +12,10 @@ if (!process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
 export const PreviewPage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+  if (!publicEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
+    throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is undefined')
+  }
+
   const { data: session, status } = useSession()
 
   const [loading, setLoading] = useState(true)
