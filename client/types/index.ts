@@ -1,3 +1,4 @@
+import mongoose from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
 
@@ -8,8 +9,17 @@ export type User = {
   isConfirmed: boolean
   membership: string
   creationTime: Date
+  attendedMeetingIds: string[]
 
   // TODO: add additional fields like: EID, graduation year, college, role, etc
+}
+
+export type Meeting = {
+  _id?: string
+  userIds: string[]
+  meetingDate: Date
+  creationTime: Date
+  isActive: Boolean
 }
 
 export type JwtEmailToken = {

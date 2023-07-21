@@ -16,6 +16,7 @@ export const SignUpPage = ({
     email: '',
     password: '',
     confirmPassword: '',
+    attendedMeetingIds: [],
   })
   const [validationErrors, setValidationErrors] = useState<InputError[]>([])
   const [loading, setLoading] = useState(false)
@@ -66,12 +67,12 @@ export const SignUpPage = ({
         setLoading(true)
         const apiRes = await axios.post(
           `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
-          asymEncryptData
+          asymEncryptData,
         )
 
         if (apiRes?.data?.ok) {
           setMessage(
-            'A confirmation email has been sent to the address specified. Please check your inbox.'
+            'A confirmation email has been sent to the address specified. Please check your inbox.',
           )
 
           setDisplayResendOption(true)
@@ -95,7 +96,7 @@ export const SignUpPage = ({
         `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
         {
           asymEncryptEmail: encryptData(data.email, publicEnv),
-        }
+        },
       )
 
       setMessage('Confirmation sent')
@@ -118,44 +119,44 @@ export const SignUpPage = ({
       <h1>Create an Account</h1>
       <form onSubmit={handleSubmit}>
         <input
-          type='text'
+          type="text"
           placeholder={'Full Name'}
           value={data.fullName}
-          name='fullName'
+          name="fullName"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('fullName', validationErrors)}</p>
 
         <input
-          type='email'
+          type="email"
           placeholder={'Email'}
           value={data.email}
-          name='email'
+          name="email"
           onChange={handleInputChange}
           required
         />
         <input
-          type='password'
+          type="password"
           placeholder={'Password'}
           value={data.password}
-          name='password'
+          name="password"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('password', validationErrors)}</p>
 
         <input
-          type='password'
+          type="password"
           placeholder={'Confirm Password'}
           value={data.confirmPassword}
-          name='confirmPassword'
+          name="confirmPassword"
           onChange={handleInputChange}
           required
         />
         <p>{getErrorMsg('confirmPassword', validationErrors)}</p>
 
-        <button title={'Sign up'} type='submit' disabled={loading}>
+        <button title={'Sign up'} type="submit" disabled={loading}>
           Sign Up
         </button>
       </form>
@@ -175,7 +176,7 @@ export const SignUpPage = ({
       <div>
         <h2>Already have account?</h2>
 
-        <Link href='/auth/SignInPage'>Sign In</Link>
+        <Link href="/auth/SignInPage">Sign In</Link>
       </div>
     </React.Fragment>
   )

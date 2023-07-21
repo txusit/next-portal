@@ -3,8 +3,9 @@ import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import Meeting from '@/models/Meeting'
 import User from '@/models/User'
-import { ResponseData } from '@/types'
+import { Meeting as TMeeting, ResponseData, User as TUser } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -22,17 +23,36 @@ const handler = async (
 ) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
-    const result = await User.find()
-
+    const { userEmail } = req.body
+    const meeting: TMeeting | null = await Meeting.findOne({
+      isActive: true,
+    })
+    const user: TUser | null = await User.findOne({
+      email: userEmail,
+    })
+    if (!meeting) {
+      throw new ApiError(
+        HttpStatusCode.NotFound,
+        'Unable to find active meeting',
+      )
+    }
+    if (!user) {
+      throw new ApiError(
+        HttpStatusCode.NotFound,
+        `Unable to find the user with email ${userEmail}`,
+      )
+    }
+    const usersAttending = meeting.userIds
+    const isMeetingAttended = usersAttending.includes(user._id!)
     res
       .status(HttpStatusCode.Accepted)
-      .json({ ok: true, message: 'example endpoint response', data: result })
+      .json({ ok: true, data: isMeetingAttended })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
-    withMethodsGuard(['GET']),
-    // withRequestBodyGuard(),
+    withMethodsGuard(['POST']),
+    withRequestBodyGuard(),
     withMongoDBConnection(),
     handlerMainFunction,
   )
