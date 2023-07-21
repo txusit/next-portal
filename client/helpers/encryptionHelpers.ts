@@ -1,6 +1,6 @@
 import { PublicEnv } from '@/types'
 import { HttpStatusCode } from 'axios'
-import crypto, { publicEncrypt, privateDecrypt } from 'crypto'
+import { publicEncrypt, privateDecrypt } from 'crypto'
 import { ApiError } from 'next/dist/server/api-utils'
 
 export const encryptData = (

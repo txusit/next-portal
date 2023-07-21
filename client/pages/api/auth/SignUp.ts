@@ -61,6 +61,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         email,
         password: hashedPassword,
         isConfirmed: false,
+        membership: 'none',
         creationTime: new Date(),
       })
     } catch (error) {

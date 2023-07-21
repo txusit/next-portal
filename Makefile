@@ -5,6 +5,7 @@
 # Cleans up docker containers, volumes, and networks in project (fresh start)
 clean:
 	docker-compose down -v
+	docker image prune -f
 
 # Frontend, Backend, and Database
 clean-full-test: clean
