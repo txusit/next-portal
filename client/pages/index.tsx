@@ -19,6 +19,30 @@ const HomePage = () => {
       <main className={styles.main}>
         <p>Homepage</p>
 
+        <div>
+          <Link href='/meeting'>Sign into meeting</Link>
+          <br />
+          <br />
+
+          <Link href='/meeting/AddMeeting'>Add meeting</Link>
+          <br />
+          <br />
+
+          <Link href='/membershipPaymentPage'>membership payment page</Link>
+          <br />
+          <br />
+
+          <Link href='/pitch/votePage'>Vote for pitch</Link>
+          <br />
+          <br />
+
+          <Link href='/pitch/addPitchPage'>add pitch</Link>
+          <br />
+          <br />
+
+          <Link href='stock/addStockPage'>add stock</Link>
+        </div>
+
         {session ? (
           <Link href='/profile'>profile</Link>
         ) : (

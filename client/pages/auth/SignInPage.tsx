@@ -7,6 +7,7 @@ import { useRouter } from 'next/router'
 import { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import Link from 'next/link'
 
 const SignInPage: NextPage = ({
   publicEnv,
@@ -72,6 +73,7 @@ const SignInPage: NextPage = ({
             placeholder='****'
           />
           <input type='submit' value='login' />
+          <Link href='/ForgotPasswordPage'>Forgot Password</Link>
           {submitError && <p>{submitError}</p>}
         </form>
       </div>

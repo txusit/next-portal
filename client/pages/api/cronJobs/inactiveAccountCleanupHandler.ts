@@ -9,9 +9,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const inactiveAccountCleanupHandler = async () => {
     await cleanupInactiveAccounts()
-    res
-      .status(200)
-      .json('successfully scheduled cron job for cleaning up inactive accounts')
+    res.status(200).json('successfully cleaned up inactive accounts')
   }
 
   const middlewareLoadedHandler = withMiddleware(

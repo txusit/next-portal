@@ -1,0 +1,30 @@
+import mongoose from 'mongoose'
+import { Schema, model, models } from 'mongoose'
+// type: [Schema.Types.ObjectId],
+const VoteSchema = new Schema({
+  userEmail: {
+    type: String,
+    required: [true, 'User email is not set'],
+  },
+  ticker: {
+    type: String,
+    required: [true, 'Ticker of stock is not set'],
+  },
+  price: {
+    type: Number,
+    required: [true, 'Price of stock is not set'],
+  },
+  direction: {
+    type: String,
+    required: [true, 'direction of stock is not set'],
+  },
+  creationTime: {
+    type: Date,
+    required: [true, 'Stock creation date is not set '],
+  },
+})
+
+// Return existing model or create a new one
+const Vote = models.Vote || model('Vote', VoteSchema)
+
+export default Vote

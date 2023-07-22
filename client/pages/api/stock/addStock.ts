@@ -3,59 +3,58 @@ import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMiddleware from '@/middleware/withMiddleware'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
 import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
-import Meeting from '@/models/Meeting'
 import User from '@/models/User'
-import { Meeting as TMeeting, ResponseData } from '@/types'
+import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import { Chathura } from 'next/font/google'
+import { fetchMarketPrices } from '@/helpers/marketDataHelpers'
+import Stock from '@/models/Stock'
+import { Stock as TStock } from '@/types'
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    const { meetingDate, creationTime, stockTicker } = req.body
-    const meetingExists = await Meeting.findOne({ meetingDate })
+    const { name, ticker, direction } = req.body
 
-    //Checking if meeting is already created
-    if (meetingExists) {
-      throw new ApiError(
-        HttpStatusCode.Conflict,
-        'Unable to create meeting because meeting already exists'
-      )
-    }
+    // Find price of ticker using external api
+    const response = await fetchMarketPrices([ticker])
 
-    //Setting old active meetings to be not active
-    const activeMeetings = await Meeting.updateMany(
-      { isActive: { $eq: true } },
-      { $set: { isActive: false } }
-    )
-
-    //Add new active meeting
-    const newMeetingData: TMeeting = {
-      userIds: [],
-      meetingDate,
-      stockTicker,
-      creationTime,
-      isActive: true,
-    }
-
-    let newMeeting
-    try {
-      newMeeting = await Meeting.create(newMeetingData)
-    } catch (error) {
+    if (response.code) {
+      // If error retrieving price
       throw new ApiError(
         HttpStatusCode.InternalServerError,
-        'Unable to create meeting because an error occured during Meeting.create'
+        `Error retreiving price for stocks: ${response.message}`
       )
     }
-    res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message: 'Meeting successfully created',
-      data: newMeeting,
-    })
+
+    const price = parseFloat(response.price)
+
+    // Look through stocks to check if a matching ticker exists
+    const stockExists = await Stock.findOne({ ticker })
+    console.log('existingStock:', stockExists)
+
+    // If does not exist create new stock using name, ticker, and current price
+    if (!stockExists) {
+      console.log('stock does not exist')
+      const stock: TStock = {
+        name,
+        ticker,
+        price,
+        direction,
+        creationTime: new Date(),
+      }
+
+      Stock.create(stock)
+    } else {
+      console.log('stock does exist')
+
+      // If it does exist, update price
+      Stock.updateOne({ ticker }, { price })
+    }
+    res.status(HttpStatusCode.Accepted).json({ ok: true })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
