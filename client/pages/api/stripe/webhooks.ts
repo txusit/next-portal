@@ -8,6 +8,7 @@ import { HttpStatusCode } from 'axios'
 import { buffer } from 'node:stream/consumers'
 import { loadStripe } from '@stripe/stripe-js'
 import User from '@/models/User'
+import { getLogger } from '@/logging/log-util'
 import withMiddleware from '@/middleware/withMiddleware'
 import withMethodsGuard from '@/middleware/withMethodsGuard'
 import withMongoDBConnection from '@/middleware/withMongoDBConnection'
@@ -36,6 +37,8 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const webhookHandler = async () => {
+    const logger = getLogger()
+
     if (req.method === 'POST') {
       const buf = await buffer(req)
       const sig = req.headers['stripe-signature']!
@@ -53,34 +56,33 @@ const handler = async (
       } catch (err) {
         if (err instanceof Error) {
           // On error, log and return the error message
+          logger.error(`Webhook Error: ${err.message}`)
           console.log(`❌ Error message: ${err.message}`)
           res
             .status(400)
             .send({ ok: false, message: `Webhook Error: ${err.message}` })
         } else {
+          logger.info(`Webhook Error: ${err}`)
           console.log(err)
         }
         return
       }
 
       // Successfully constructed event
+      logger.info(`Success: ${event.id}`)
       console.log('✅ Success:', event.id)
-
+      logger.info(`event type: ${event.id}`)
       console.log('event type: ', event.type)
 
       // Handle the checkout.session.completed event
       if (event.type === 'checkout.session.completed') {
         // Retrieve the session. If you require line items in the response, you may include them by expanding line_items.
-        console.log('pre-event retrieval')
         const checkoutEvent = await stripe.checkout.sessions.retrieve(
           event.data.object.id,
           {
             expand: ['line_items'],
           }
         )
-        // , customer_details.email
-        console.log('checkoutEvent:', checkoutEvent)
-        console.log('post-event retrieval')
 
         const line_items = checkoutEvent.line_items
         if (!line_items) {
@@ -92,8 +94,6 @@ const handler = async (
 
         const customerEmail = checkoutEvent.customer_details.email
         const productId = line_items.data[0].price.product
-        console.log('customer_email:', checkoutEvent.customer_details.email)
-        console.log('product_id:', line_items.data[0].price.product)
 
         await fulfillOrder(customerEmail, productId)
       }
@@ -113,9 +113,6 @@ const handler = async (
 }
 
 const fulfillOrder = async (customerEmail: string, productId: string) => {
-  console.log('productId:', productId)
-  console.log('customerEmail:', customerEmail)
-
   const { name: productName } = await stripe.products.retrieve(productId)
 
   const membership = (productName as string).replaceAll(' ', '-').toLowerCase()
