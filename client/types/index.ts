@@ -18,6 +18,7 @@ export type Meeting = {
   _id?: string
   userIds: string[]
   meetingDate: Date
+  stockTicker: string
   creationTime: Date
   isActive: Boolean
 }
@@ -27,6 +28,26 @@ export type Stock = {
   name: string
   ticker: string
   price: number
+  direction: string
+  creationTime: Date
+}
+
+export type Vote = {
+  _id?: string
+  userEmail: string
+  ticker: string
+  price: number
+  direction: string
+  creationTime: Date
+}
+
+export type Pitch = {
+  _id?: string
+  stockTicker: string
+  percentYes?: number
+  votesFor: number
+  votesAgainst: number
+  direction: string
   creationTime: Date
 }
 

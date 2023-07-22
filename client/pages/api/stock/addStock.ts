@@ -17,7 +17,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    const { name, ticker } = req.body
+    const { name, ticker, direction } = req.body
 
     // Find price of ticker using external api
     const response = await fetchMarketPrices([ticker])
@@ -43,6 +43,7 @@ const handler = async (
         name,
         ticker,
         price,
+        direction,
         creationTime: new Date(),
       }
 

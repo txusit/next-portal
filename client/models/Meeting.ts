@@ -10,6 +10,10 @@ const MeetingSchema = new Schema({
     type: Date,
     required: [true, 'Meeting date is not set'],
   },
+  stockTicker: {
+    type: String,
+    required: [true, 'Stock ticker is not set'],
+  },
   creationTime: {
     type: Date,
     required: [true, 'Meeting creation date is not set '],

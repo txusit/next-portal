@@ -1,14 +1,27 @@
 import axios, { AxiosError } from 'axios'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 
 type Props = {}
 
 const AddMeeting = (props: Props) => {
   const [message, setMessage] = useState<string>()
+  const [selectedTicker, setSelectedTicker] = useState('')
+  const [tickers, setTickers] = useState([])
+
+  useEffect(() => {
+    const fetchTickers = async () => {
+      const result = await axios.get('/api/stock/getAllTickers')
+      setTickers(result.data.data)
+      setSelectedTicker(result.data.data[0])
+    }
+    fetchTickers()
+  }, [])
+
   const handleAddMeeting = async () => {
     const now = Date.now()
     try {
       const result = await axios.post('/api/meeting/addMeeting', {
+        stockTicker: selectedTicker,
         meetingDate: now,
         creationTime: now,
       })
@@ -19,8 +32,22 @@ const AddMeeting = (props: Props) => {
       }
     }
   }
+
   return (
     <React.Fragment>
+      <select
+        value={selectedTicker}
+        onChange={({ target }) => setSelectedTicker(target.value)}
+      >
+        {tickers &&
+          tickers.map((ticker) => {
+            return (
+              <option key={ticker} value={ticker}>
+                {ticker}
+              </option>
+            )
+          })}
+      </select>
       <button onClick={handleAddMeeting}>Add New Meeting</button>
       {message && <p>{message}</p>}
     </React.Fragment>

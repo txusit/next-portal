@@ -36,7 +36,7 @@ const HomePage = () => {
           <br />
           <br />
 
-          <Link href='/pitch/addVotePage'>add pitch</Link>
+          <Link href='/pitch/addPitchPage'>add pitch</Link>
           <br />
           <br />
 

@@ -1,10 +1,10 @@
 import mongoose from 'mongoose'
 import { Schema, model, models } from 'mongoose'
 // type: [Schema.Types.ObjectId],
-const StockSchema = new Schema({
-  name: {
+const VoteSchema = new Schema({
+  userEmail: {
     type: String,
-    required: [true, 'Name of stock is not set'],
+    required: [true, 'User email is not set'],
   },
   ticker: {
     type: String,
@@ -25,6 +25,6 @@ const StockSchema = new Schema({
 })
 
 // Return existing model or create a new one
-const Stock = models.Stock || model('Stock', StockSchema)
+const Vote = models.Vote || model('Vote', VoteSchema)
 
-export default Stock
+export default Vote
