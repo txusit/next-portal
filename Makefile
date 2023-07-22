@@ -1,5 +1,5 @@
 # Default script that gets run when only 'make' is run
-.DEFAULT_GOAL := clean-frontend-db
+.DEFAULT_GOAL := clean-app-db
 
 
 # Cleans up docker containers, volumes, and networks in project (fresh start)
@@ -7,33 +7,19 @@ clean:
 	docker-compose down -v
 	docker image prune -f
 
-# Frontend, Backend, and Database
-clean-full-test: clean
-	docker-compose up --build
+# app
+clean-app: clean
+	docker-compose up --build app
 
-full-test:
-	docker-compose up
+app:
+	docker-compose up app
 
-# Frontend
-clean-frontend: clean
-	docker-compose up --build frontend
+# app and Database
+clean-app-db: clean
+	docker-compose up --build db app
 
-frontend:
-	docker-compose up frontend
-
-# Frontend and Database
-clean-frontend-db: clean
-	docker-compose up --build db frontend
-
-frontend-db:
-	docker-compose up db frontend
-
-# Backend and Database
-clean-backend-db: clean
-	docker-compose up --build db backend
-
-backend-db:
-	docker-compose up db backend
+app-db:
+	docker-compose up db app
 
 # Database
 clean-db: clean
@@ -41,14 +27,10 @@ clean-db: clean
 
 db:
 	docker-compose up db
-	
 
 # Access Docker Container Shells
-frontend-shell:
-	docker exec -t -i next_portal_frontend_container /bin/bash
-
-backend-shell:
-	docker exec -t -i next_portal_backend_container /bin/bash
+app-shell:
+	docker exec -t -i next_portal_app_container /bin/bash
 
 # Open Jest Coverage Report
 open-jest-report:

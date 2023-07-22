@@ -15,38 +15,21 @@ services:
       MONGO_INITDB_ROOT_USERNAME: testadmin
       MONGO_INITDB_ROOT_PASSWORD: password
 
-  # Build container for client
-  frontend:
+  # Build container for portal
+  app:
     build:
-      context: ./client
+      context: ./portal
     volumes:
-      - ./client:/app
+      - ./portal:/app
       - /app/node_modules
     ports:
       - 3000:3000
-    image: next_portal:frontend
-    container_name: next_portal_frontend_container
+    image: next_portal:app
+    container_name: next_portal_app_container
     environment:
       - CHOKIDAR_USEPOLLING=true
       - PORT=3000
 
-  # Build container for server
-  backend:
-    build:
-      context: ./server # Maps backend directory on local drive to /app directory on container
-    volumes:
-      - ./server:/app
-      - /app/node_modules
-    ports:
-      - 5001:5001 # Maps port 8080 on local machine to 8080 on container
-    image: next_portal:backend # Image:tag
-    container_name: next_portal_backend_container
-    depends_on:
-      - db
-    environment:
-      WAIT_HOSTS: mongodb:27017
-
 networks:
   db:
-  frontend:
-  backend:
+  app:
