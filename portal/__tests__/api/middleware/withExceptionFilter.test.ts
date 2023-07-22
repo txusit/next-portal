@@ -4,7 +4,7 @@
 // required-header-for-jest-test.js
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
-import withExceptionFilter from '@/middleware/withExceptionFilter'
+import withExceptionFilter from '@/lib/middleware/withExceptionFilter'
 import { jest, describe, beforeEach, it, expect } from '@jest/globals'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'

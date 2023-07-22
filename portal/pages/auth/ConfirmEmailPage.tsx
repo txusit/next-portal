@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import axios from 'axios'
-import { loginUser } from '@/helpers/clientSideHelpers'
+import { loginUser } from '@/lib/helpers/clientSideHelpers'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 
 const ConfirmEmailPage = ({
   publicEnv,

@@ -1,6 +1,6 @@
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import axios, { AxiosError } from 'axios'
 
 export const AddStockPage = ({

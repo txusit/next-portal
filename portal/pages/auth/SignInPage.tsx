@@ -1,12 +1,12 @@
 import React from 'react'
-import { loginUser } from '@/helpers/clientSideHelpers'
-import { encryptData } from '@/helpers/encryptionHelpers'
+import { loginUser } from '@/lib/helpers/clientSideHelpers'
+import { encryptData } from '@/lib/helpers/encryptionHelpers'
 import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import Link from 'next/link'
 
 const SignInPage: NextPage = ({

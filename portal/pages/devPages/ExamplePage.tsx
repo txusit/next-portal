@@ -1,6 +1,6 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 
 export const ExamplePage = ({
   publicEnv, // Retrieved from getServerSideProps

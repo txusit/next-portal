@@ -1,7 +1,7 @@
 import React, { FormEventHandler, useState, useEffect } from 'react'
 import { ApiError } from 'next/dist/server/api-utils'
 import axios, { HttpStatusCode } from 'axios'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import { InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
 
@@ -39,90 +39,89 @@ export const PreviewPage = ({
     }
   }, [])
 
-  return (
-    !loading ? (
-      <form action='/api/stripe/checkout_sessions' method='POST'>
-        <section>
-          <input
-            type='string'
-            id='selectedProductID-input'
-            value={selectedProductID}
-            name='selectedProductID'
-            hidden
-            readOnly
-          />
+  return !loading ? (
+    <form action='/api/stripe/checkout_sessions' method='POST'>
+      <section>
+        <input
+          type='string'
+          id='selectedProductID-input'
+          value={selectedProductID}
+          name='selectedProductID'
+          hidden
+          readOnly
+        />
 
-          <input
-            type='string'
-            id='email-input'
-            value={session?.user?.email!}
-            name='email'
-            hidden
-            readOnly
-          />
+        <input
+          type='string'
+          id='email-input'
+          value={session?.user?.email!}
+          name='email'
+          hidden
+          readOnly
+        />
 
-          <button
-            type='submit'
-            role='link'
-            id='price_1MoF7BKMISeWWjOmkW5lNbpe'
-            onClick={(event) => {
-              setSelectedProductID((event.target as HTMLButtonElement).id)
-            }}
-          >
-            Spring Membership
-          </button>
+        <button
+          type='submit'
+          role='link'
+          id='price_1MoF7BKMISeWWjOmkW5lNbpe'
+          onClick={(event) => {
+            setSelectedProductID((event.target as HTMLButtonElement).id)
+          }}
+        >
+          Spring Membership
+        </button>
 
-          <button
-            type='submit'
-            role='link'
-            id='price_1MoF6qKMISeWWjOmvQtEcz6q'
-            onClick={(event) => {
-              setSelectedProductID((event.target as HTMLButtonElement).id)
-            }}
-          >
-            Fall Membership
-          </button>
+        <button
+          type='submit'
+          role='link'
+          id='price_1MoF6qKMISeWWjOmvQtEcz6q'
+          onClick={(event) => {
+            setSelectedProductID((event.target as HTMLButtonElement).id)
+          }}
+        >
+          Fall Membership
+        </button>
 
-          <button
-            type='submit'
-            role='link'
-            id='price_1MoF6XKMISeWWjOmLrqiyiHF'
-            onClick={(event) => {
-              setSelectedProductID((event.target as HTMLButtonElement).id)
-            }}
-          >
-            Full Year Membership
-          </button>
-        </section>
-        <style jsx>
-          {`
-            section {
-              background: #ffffff;
-              display: flex;
-              flex-direction: column;
-              width: 400px;
-              height: 112px;
-              border-radius: 6px;
-              justify-content: space-between;
-            }
-            button {
-              height: 36px;
-              background: #556cd6;
-              border-radius: 4px;
-              color: white;
-              border: 0;
-              font-weight: 600;
-              cursor: pointer;
-              transition: all 0.2s ease;
-              box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
-            }
-            button:hover {
-              opacity: 0.8;
-            }
-          `}
-        </style>
-      </form>
-    ) :
+        <button
+          type='submit'
+          role='link'
+          id='price_1MoF6XKMISeWWjOmLrqiyiHF'
+          onClick={(event) => {
+            setSelectedProductID((event.target as HTMLButtonElement).id)
+          }}
+        >
+          Full Year Membership
+        </button>
+      </section>
+      <style jsx>
+        {`
+          section {
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            width: 400px;
+            height: 112px;
+            border-radius: 6px;
+            justify-content: space-between;
+          }
+          button {
+            height: 36px;
+            background: #556cd6;
+            border-radius: 4px;
+            color: white;
+            border: 0;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0px 4px 5.5px 0px rgba(0, 0, 0, 0.07);
+          }
+          button:hover {
+            opacity: 0.8;
+          }
+        `}
+      </style>
+    </form>
+  ) : (
     <p>Loading or user not signed in</p>
   )
 }

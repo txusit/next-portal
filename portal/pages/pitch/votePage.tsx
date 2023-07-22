@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import axios, { AxiosError } from 'axios'
 import { useSession } from 'next-auth/react'
 

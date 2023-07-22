@@ -1,8 +1,8 @@
-import withExceptionFilter from '@/middleware/withExceptionFilter'
-import withMethodsGuard from '@/middleware/withMethodsGuard'
-import withMiddleware from '@/middleware/withMiddleware'
-import withMongoDBConnection from '@/middleware/withMongoDBConnection'
-import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import withExceptionFilter from '@/lib/middleware/withExceptionFilter'
+import withMethodsGuard from '@/lib/middleware/withMethodsGuard'
+import withMiddleware from '@/lib/middleware/withMiddleware'
+import withMongoDBConnection from '@/lib/middleware/withMongoDBConnection'
+import withRequestBodyGuard from '@/lib/middleware/withRequestBodyGuard'
 import Meeting from '@/models/Meeting'
 import User from '@/models/User'
 import { Meeting as TMeeting, ResponseData, User as TUser } from '@/types'
@@ -19,7 +19,7 @@ import { ApiError } from 'next/dist/server/api-utils'
  */
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
+  res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
@@ -33,13 +33,13 @@ const handler = async (
     if (!meeting) {
       throw new ApiError(
         HttpStatusCode.NotFound,
-        'Unable to find active meeting',
+        'Unable to find active meeting'
       )
     }
     if (!user) {
       throw new ApiError(
         HttpStatusCode.NotFound,
-        `Unable to find the user with email ${userEmail}`,
+        `Unable to find the user with email ${userEmail}`
       )
     }
     const usersAttending = meeting.userIds
@@ -54,7 +54,7 @@ const handler = async (
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    handlerMainFunction,
+    handlerMainFunction
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

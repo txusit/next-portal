@@ -1,8 +1,8 @@
-import withExceptionFilter from '@/middleware/withExceptionFilter'
-import withMethodsGuard from '@/middleware/withMethodsGuard'
-import withMiddleware from '@/middleware/withMiddleware'
-import withMongoDBConnection from '@/middleware/withMongoDBConnection'
-import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import withExceptionFilter from '@/lib/middleware/withExceptionFilter'
+import withMethodsGuard from '@/lib/middleware/withMethodsGuard'
+import withMiddleware from '@/lib/middleware/withMiddleware'
+import withMongoDBConnection from '@/lib/middleware/withMongoDBConnection'
+import withRequestBodyGuard from '@/lib/middleware/withRequestBodyGuard'
 import Meeting from '@/models/Meeting'
 import User from '@/models/User'
 import { ResponseData, User as TUser } from '@/types'
@@ -12,7 +12,7 @@ import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,
-  res: NextApiResponse<ResponseData>,
+  res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
@@ -26,7 +26,7 @@ const handler = async (
     } catch (error) {
       throw new ApiError(
         HttpStatusCode.InternalServerError,
-        'Unknown MongoDb error encounter while finding user with email',
+        'Unknown MongoDb error encounter while finding user with email'
       )
     }
 
@@ -35,7 +35,7 @@ const handler = async (
     if (!user) {
       throw new ApiError(
         HttpStatusCode.InternalServerError,
-        'Unable to find user with email to mark meeting attendance',
+        'Unable to find user with email to mark meeting attendance'
       )
     }
 
@@ -46,13 +46,13 @@ const handler = async (
         { isActive: true },
         {
           $push: { userIds: user._id },
-        },
+        }
       )
     } catch (error) {
       if (error instanceof Error) {
         throw new ApiError(
           HttpStatusCode.InternalServerError,
-          `Unable to find and update meeting ${error.message}`,
+          `Unable to find and update meeting ${error.message}`
         )
       }
     }
@@ -63,13 +63,13 @@ const handler = async (
         { _id: user._id },
         {
           $push: { attendedMeetingIds: activeMeeting._id },
-        },
+        }
       )
     } catch (error) {
       if (error instanceof Error) {
         throw new ApiError(
           HttpStatusCode.InternalServerError,
-          `Unable to find and update user's meeting attendance ${error.message}`,
+          `Unable to find and update user's meeting attendance ${error.message}`
         )
       }
     }
@@ -84,7 +84,7 @@ const handler = async (
     withMethodsGuard(['PATCH']),
     withRequestBodyGuard(),
     withMongoDBConnection(),
-    handlerMainFunction,
+    handlerMainFunction
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

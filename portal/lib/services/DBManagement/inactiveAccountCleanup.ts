@@ -1,5 +1,5 @@
 import User from '@/models/User'
-import { getLogger } from '@/logging/log-util'
+import { getLogger } from '@/lib/helpers/log-util'
 
 export default async function cleanupInactiveAccounts() {
   const logger = getLogger()

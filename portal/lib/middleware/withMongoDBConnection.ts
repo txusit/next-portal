@@ -1,4 +1,4 @@
-import { connectToMongoDB } from '@/lib/mongodb'
+import { connectToMongoDB } from '@/lib/helpers/mongodb'
 import { Middleware } from '@/types'
 import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'

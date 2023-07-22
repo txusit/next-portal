@@ -10,7 +10,7 @@ import { HttpStatusCode } from 'axios'
 import { RequestMethod } from 'node-mocks-http'
 import { createRequest } from 'node-mocks-http'
 import { createResponse } from 'node-mocks-http'
-import withRequestBodyGuard from '@/middleware/withRequestBodyGuard'
+import withRequestBodyGuard from '@/lib/middleware/withRequestBodyGuard'
 
 // Test Type: Unit Tests
 describe('withRequestBodyGuard', () => {
