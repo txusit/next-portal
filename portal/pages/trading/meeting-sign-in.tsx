@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 
 type Props = {}
 
-const MeetingPage = (props: Props) => {
+const MeetingSignInPage = (props: Props) => {
   const session = useSession()
   const [message, setMessage] = useState<string>()
   const [isMeetingAttended, setIsMeetingAttended] = useState<boolean>(true)
@@ -45,4 +45,4 @@ const MeetingPage = (props: Props) => {
   )
 }
 
-export default MeetingPage
+export default MeetingSignInPage

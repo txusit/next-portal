@@ -4,7 +4,7 @@ import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import axios, { AxiosError } from 'axios'
 import { useSession } from 'next-auth/react'
 
-export const VotePage = ({
+export const PitchVotePage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const session = useSession()
@@ -92,7 +92,7 @@ const getMeetingStock = async () => {
   return request.data.data
 }
 
-export default VotePage
+export default PitchVotePage
 
 // Retrieves NEXT_PUBLIC_ prefixed environment variables
 export { getServerSideProps }

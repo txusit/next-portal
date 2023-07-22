@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react'
 
 type Props = {}
 
-const AddMeeting = (props: Props) => {
+const AddMeetingPage = (props: Props) => {
   const [message, setMessage] = useState<string>()
   const [selectedTicker, setSelectedTicker] = useState('')
   const [tickers, setTickers] = useState([])
@@ -54,4 +54,4 @@ const AddMeeting = (props: Props) => {
   )
 }
 
-export default AddMeeting
+export default AddMeetingPage

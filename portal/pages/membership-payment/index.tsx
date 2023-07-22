@@ -9,7 +9,7 @@ import { useSession } from 'next-auth/react'
 // user != undefined
 // isConfirmed = true
 
-export const PreviewPage = ({
+export const MembershipPaymentPage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   if (!publicEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
@@ -126,6 +126,6 @@ export const PreviewPage = ({
   )
 }
 
-export default PreviewPage
+export default MembershipPaymentPage
 
 export { getServerSideProps }

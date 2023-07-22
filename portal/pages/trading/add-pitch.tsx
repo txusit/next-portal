@@ -3,7 +3,7 @@ import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
 import axios, { AxiosError } from 'axios'
 
-export const AddStockPage = ({
+export const AddPitchPage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const [pitchData, setPitchData] = useState({
@@ -80,7 +80,7 @@ export const AddStockPage = ({
   )
 }
 
-export default AddStockPage
+export default AddPitchPage
 
 // Retrieves NEXT_PUBLIC_ prefixed environment variables
 export { getServerSideProps }
