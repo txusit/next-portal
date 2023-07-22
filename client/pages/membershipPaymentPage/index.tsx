@@ -40,7 +40,7 @@ export const PreviewPage = ({
   }, [])
 
   return (
-    !loading && (
+    !loading ? (
       <form action='/api/stripe/checkout_sessions' method='POST'>
         <section>
           <input
@@ -122,7 +122,8 @@ export const PreviewPage = ({
           `}
         </style>
       </form>
-    )
+    ) :
+    <p>Loading or user not signed in</p>
   )
 }
 

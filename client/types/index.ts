@@ -22,6 +22,14 @@ export type Meeting = {
   isActive: Boolean
 }
 
+export type Stock = {
+  _id?: string
+  name: string
+  ticker: string
+  price: number
+  creationTime: Date
+}
+
 export type JwtEmailToken = {
   user_id: string
 }
