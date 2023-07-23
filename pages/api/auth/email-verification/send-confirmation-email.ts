@@ -43,10 +43,7 @@ const handler = async (
     }
 
     // Send successful response
-    return res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message: 'confirmation email sent',
-    })
+    return res.status(HttpStatusCode.Ok).end()
   }
 
   const middlewareLoadedHandler = withMiddleware(

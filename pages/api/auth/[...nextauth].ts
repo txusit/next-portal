@@ -4,7 +4,7 @@ import { ResponseData, User as TUser } from '@/types'
 import axios from 'axios'
 
 export const authOptions: NextAuthOptions = {
-  // Configure one or more authentication providers
+  // Configure NextAuth Credential provider
   providers: [
     CredentialsProvider({
       id: 'credentials',
@@ -20,14 +20,14 @@ export const authOptions: NextAuthOptions = {
         const validCredentials = credentials ? true : false
 
         // Perform authorization logic and get 'user' from result
-        let result = await axios.post<ResponseData>(
+        let { data: response } = await axios.post(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorize-with-credentials`,
           {
             validCredentials,
             credentials,
           }
         )
-        const user = result.data.data
+        const user = response.data
 
         return user
       },

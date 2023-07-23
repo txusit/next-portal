@@ -21,6 +21,10 @@ const handler = async (
   const handlerMainFunction = async () => {
     // Retrieve tickers of all stocks in db
     const stocks = await Stock.find()
+    if (!stocks || stocks.length == 0) {
+      res.status(HttpStatusCode.Ok).end()
+    }
+
     const tickers = stocks.map((stock) => stock.ticker)
 
     // Divide tickers into batches of 120
@@ -31,7 +35,7 @@ const handler = async (
       batchUpdateStockPrice(tickerBatch)
     }
 
-    res.status(HttpStatusCode.Accepted).json({ ok: true })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

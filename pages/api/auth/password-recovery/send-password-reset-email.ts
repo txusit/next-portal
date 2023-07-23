@@ -17,27 +17,25 @@ const handler = async (
   const sendPasswordResetEmail = async () => {
     const { email } = req.body
     if (!email) {
-      res.status(HttpStatusCode.BadRequest).json({
-        ok: true,
-        message:
-          'Unable to send confirmation email because of missing or invalid email',
-      })
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'Unable to send confirmation email because of missing or invalid email'
+      )
     }
 
     // Find user with matching email
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
     if (!user) {
-      res.status(HttpStatusCode.Accepted).json({
-        ok: true,
-        message:
-          'If this email exists address in our database, a recovery email has been sent to it',
-      })
+      throw new ApiError(
+        HttpStatusCode.NotFound,
+        'Unable to send confirmation email because no user with email exists'
+      )
     }
     if (!user.isConfirmed) {
-      res.status(HttpStatusCode.BadRequest).json({
-        ok: true,
-        message: 'The email associated with this account has not been verified',
-      })
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'The email associated with this account has not been verified'
+      )
     }
 
     // Send email with password reset link
@@ -49,12 +47,7 @@ const handler = async (
       )
     }
 
-    // Send back successful response
-    res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message:
-        'If this email exists address in our database, a recovery email has been sent to it',
-    })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

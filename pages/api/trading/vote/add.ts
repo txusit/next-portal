@@ -29,7 +29,7 @@ const handler = async (
     await Pitch.updateOne({ ticker }, { $inc: { voteFor: 1 } })
     await Pitch.updateOne({ ticker }, { $inc: { voteAgainst: 1 } })
 
-    res.status(HttpStatusCode.Accepted).json({ ok: true })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

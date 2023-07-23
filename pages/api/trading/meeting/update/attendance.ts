@@ -15,23 +15,10 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    // Used to test if connection to mongoDB is valid
-    // const result = await User.find()
     const { userEmail } = req.body
-    //TODO: Filter for email and get userId
-    //TODo; Filter for Active Meeting
-    let user
-    try {
-      user = await User.findOne({ email: userEmail })
-    } catch (error) {
-      throw new ApiError(
-        HttpStatusCode.InternalServerError,
-        'Unknown MongoDb error encounter while finding user with email'
-      )
-    }
 
-    //find user ID
-    user = user as TUser
+    const user = (await User.findOne({ email: userEmail })) as TUser
+
     if (!user) {
       throw new ApiError(
         HttpStatusCode.InternalServerError,
@@ -40,43 +27,22 @@ const handler = async (
     }
 
     //update active meeting's userIds
-    let activeMeeting
-    try {
-      activeMeeting = await Meeting.findOneAndUpdate(
-        { isActive: true },
-        {
-          $push: { userIds: user._id },
-        }
-      )
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new ApiError(
-          HttpStatusCode.InternalServerError,
-          `Unable to find and update meeting ${error.message}`
-        )
+    const activeMeeting = await Meeting.findOneAndUpdate(
+      { isActive: true },
+      {
+        $push: { userIds: user._id },
       }
-    }
+    )
 
     //Update user's meetings attended
-    try {
-      await User.findOneAndUpdate(
-        { _id: user._id },
-        {
-          $push: { attendedMeetingIds: activeMeeting._id },
-        }
-      )
-    } catch (error) {
-      if (error instanceof Error) {
-        throw new ApiError(
-          HttpStatusCode.InternalServerError,
-          `Unable to find and update user's meeting attendance ${error.message}`
-        )
+    await User.findOneAndUpdate(
+      { _id: user._id },
+      {
+        $push: { attendedMeetingIds: activeMeeting._id },
       }
-    }
-    //send successful response
-    res
-      .status(HttpStatusCode.Accepted)
-      .json({ ok: true, message: 'example endpoint response', data: userEmail })
+    )
+
+    res.status(HttpStatusCode.Ok).json({ data: userEmail })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

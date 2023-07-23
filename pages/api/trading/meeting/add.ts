@@ -28,7 +28,7 @@ const handler = async (
     }
 
     //Setting old active meetings to be not active
-    const activeMeetings = await Meeting.updateMany(
+    await Meeting.updateMany(
       { isActive: { $eq: true } },
       { $set: { isActive: false } }
     )
@@ -42,18 +42,9 @@ const handler = async (
       isActive: true,
     }
 
-    let newMeeting
-    try {
-      newMeeting = await Meeting.create(newMeetingData)
-    } catch (error) {
-      throw new ApiError(
-        HttpStatusCode.InternalServerError,
-        'Unable to create meeting because an error occured during Meeting.create'
-      )
-    }
-    res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message: 'Meeting successfully created',
+    const newMeeting = await Meeting.create(newMeetingData)
+
+    res.status(HttpStatusCode.Ok).json({
       data: newMeeting,
     })
   }

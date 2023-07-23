@@ -11,20 +11,11 @@ import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 
-/**
- *
- * Endpoint used to test new middleware and central error handler (exception filter).
- *
- * Use this endpoint as a reference for creating new endpoints using middleware and exception filter
- *
- */
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    // Used to test if connection to mongoDB is valid
-
     const { email } = req.query
     const meeting: TMeeting | null = await Meeting.findOne({
       isActive: true,
@@ -46,9 +37,7 @@ const handler = async (
     }
     const usersAttending = meeting.userIds
     const isMeetingAttended = usersAttending.includes(user._id!)
-    res
-      .status(HttpStatusCode.Accepted)
-      .json({ ok: true, data: isMeetingAttended })
+    res.status(HttpStatusCode.Ok).json({ data: isMeetingAttended })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

@@ -27,7 +27,7 @@ const handler = async (
       creationTime: new Date(),
     })
 
-    res.status(HttpStatusCode.Accepted).json({ ok: true })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

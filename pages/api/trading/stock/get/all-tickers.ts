@@ -19,7 +19,7 @@ const handler = async (
 
     const tickers = stocks.map((stock) => stock.ticker)
 
-    res.status(HttpStatusCode.Accepted).json({ ok: true, data: tickers })
+    res.status(HttpStatusCode.Ok).json({ data: tickers })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

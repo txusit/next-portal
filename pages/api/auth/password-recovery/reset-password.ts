@@ -15,7 +15,6 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const resetPassword = async () => {
-    // Parse request body
     let { token, password } = req.body
     if (!token || !password)
       throw new ApiError(
@@ -25,38 +24,23 @@ const handler = async (
 
     // Type check token and get _id payload from token
     token = token as string
-    let payload
-    try {
-      payload = jwt.verify(
-        token,
-        process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
-      ) as JwtEmailToken
-    } catch (jwtTokenError) {
-      // Reformat and forward any jwt errors as api errors to error handler
-      throw new ApiError(
-        HttpStatusCode.Unauthorized,
-        'verification of JWT Token failed'
-      )
-    }
+    const payload = jwt.verify(
+      token,
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
+    ) as JwtEmailToken
 
-    // Update user to reflect confirmed email status
-    let updatedUser
-    try {
-      updatedUser = await User.findOneAndUpdate(
-        { _id: payload.user_id },
-        {
-          $set: {
-            password: password,
-          },
+    // Update confirmed email status
+
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: payload.user_id },
+      {
+        $set: {
+          password: password,
         },
-        { new: true }
-      )
-    } catch (error) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'Unable to find user because user_id is not of type ObjectId'
-      )
-    }
+      },
+      { new: true }
+    )
+
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
@@ -64,10 +48,7 @@ const handler = async (
       )
 
     // Send successful response
-    res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message: 'successfully updated password',
-    })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   const middlewareLoadedHandler = withMiddleware(

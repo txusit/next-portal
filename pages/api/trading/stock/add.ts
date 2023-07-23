@@ -54,7 +54,7 @@ const handler = async (
       // If it does exist, update price
       Stock.updateOne({ ticker }, { price })
     }
-    res.status(HttpStatusCode.Accepted).json({ ok: true })
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

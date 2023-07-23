@@ -15,9 +15,11 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const authorizeWithCredentials = async () => {
-    // Unpack request body
-    const { validCredentials, credentials } = req.body
-    const { email, password } = credentials
+    const {
+      validCredentials,
+      credentials: { email, password },
+    } = req.body
+
     if (!validCredentials)
       throw new ApiError(
         HttpStatusCode.Unauthorized,
@@ -33,8 +35,7 @@ const handler = async (
     }
 
     // Check credentials
-    const isEmailConfirmed = (await user.isConfirmed) == true
-    if (!isEmailConfirmed) {
+    if (!user.isConfirmed) {
       throw new ApiError(HttpStatusCode.Unauthorized, 'Email is not verified')
     }
 
@@ -46,9 +47,7 @@ const handler = async (
     }
 
     // Send back successful response with user
-    return res
-      .status(HttpStatusCode.Accepted)
-      .json({ ok: true, message: 'successfully authorized user', data: user })
+    return res.status(HttpStatusCode.Ok).json({ data: user })
   }
 
   const middlewareLoadedHandler = withMiddleware(

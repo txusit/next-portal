@@ -14,14 +14,7 @@ const withMongoDBConnection: MiddlewareWithoutParams = () => {
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
     // Connect to mongoDB if there is no existing connection
-    try {
-      await connectToMongoDB()
-    } catch (error) {
-      throw new ApiError(
-        HttpStatusCode.ServiceUnavailable,
-        'Cannot connect to MongoDB'
-      )
-    }
+    await connectToMongoDB()
   }
 }
 export default withMongoDBConnection

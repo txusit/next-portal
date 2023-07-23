@@ -43,36 +43,17 @@ const handler = async (
       const buf = await buffer(req)
       const sig = req.headers['stripe-signature']!
 
-      let event
-
-      try {
-        // Verifies that our request sender is from stripe
-        // Constructs a checkout.session.completed event (or similar)
-        event = stripe.webhooks.constructEvent(
-          buf.toString(),
-          sig,
-          webhookSecret
-        ) as Stripe.DiscriminatedEvent
-      } catch (err) {
-        if (err instanceof Error) {
-          // On error, log and return the error message
-          logger.error(`Webhook Error: ${err.message}`)
-          console.log(`❌ Error message: ${err.message}`)
-          res
-            .status(400)
-            .send({ ok: false, message: `Webhook Error: ${err.message}` })
-        } else {
-          logger.info(`Webhook Error: ${err}`)
-          console.log(err)
-        }
-        return
-      }
+      // Verifies that our request sender is from stripe
+      // Constructs a checkout.session.completed event (or similar)
+      const event = stripe.webhooks.constructEvent(
+        buf.toString(),
+        sig,
+        webhookSecret
+      ) as Stripe.DiscriminatedEvent
 
       // Successfully constructed event
-      logger.info(`Success: ${event.id}`)
-      console.log('✅ Success:', event.id)
-      logger.info(`event type: ${event.id}`)
-      console.log('event type: ', event.type)
+      logger.info(`Success: ${event.id} event type: ', ${event.type}`)
+      console.log(`✅ Success: ${event.id} event type: ', ${event.type}`)
 
       // Handle the checkout.session.completed event
       if (event.type === 'checkout.session.completed') {
@@ -98,7 +79,7 @@ const handler = async (
         await fulfillOrder(customerEmail, productId)
       }
 
-      res.status(200).json({ ok: true })
+      res.status(HttpStatusCode.Ok).end()
     }
   }
 
@@ -116,14 +97,7 @@ const fulfillOrder = async (customerEmail: string, productId: string) => {
   const { name: productName } = await stripe.products.retrieve(productId)
 
   const membership = (productName as string).replaceAll(' ', '-').toLowerCase()
-  try {
-    await User.findOneAndUpdate({ email: customerEmail }, { membership })
-  } catch (error) {
-    throw new ApiError(
-      HttpStatusCode.InternalServerError,
-      'Unable to find user and update membership of user'
-    )
-  }
+  await User.findOneAndUpdate({ email: customerEmail }, { membership })
 }
 
 // TODO: payment db table

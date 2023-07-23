@@ -25,37 +25,21 @@ const handler = async (
     token = token as string
 
     // Retrieve payload from jwt token
-    let payload
-    try {
-      payload = jwt.verify(
-        token,
-        process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
-      ) as JwtEmailToken
-    } catch (jwtTokenError) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        `verification of JWT Token failed: ${jwtTokenError}`
-      )
-    }
+    const payload = jwt.verify(
+      token,
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET!
+    ) as JwtEmailToken
 
     // Update user to reflect confirmed email status
-    let updatedUser
-    try {
-      updatedUser = await User.findOneAndUpdate(
-        { _id: payload.user_id },
-        {
-          $set: {
-            isConfirmed: true,
-          },
+    const updatedUser = await User.findOneAndUpdate(
+      { _id: payload.user_id },
+      {
+        $set: {
+          isConfirmed: true,
         },
-        { new: true }
-      ).select('+password')
-    } catch (error) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        `Unable to find user because user_id is not of type ObjectId: ${error}`
-      )
-    }
+      },
+      { new: true }
+    ).select('+password')
 
     if (!updatedUser)
       throw new ApiError(
@@ -69,9 +53,7 @@ const handler = async (
     }
 
     // Send successful response
-    res.status(HttpStatusCode.Accepted).json({
-      ok: true,
-      message: 'successfully verified email',
+    res.status(HttpStatusCode.Ok).json({
       data: user,
     })
   }

@@ -27,7 +27,7 @@ const handler = async (
 
     const stock = await Stock.findOne({ ticker: activeMeeting.stockTicker })
 
-    res.status(HttpStatusCode.Accepted).json({ ok: true, data: stock })
+    res.status(HttpStatusCode.Ok).json({ data: stock })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.

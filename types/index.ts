@@ -1,3 +1,4 @@
+import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Stripe from 'stripe'
@@ -64,10 +65,16 @@ export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
 
 export type Maybe<T> = T | null | undefined
 
+type ErrorData = {
+  statusCode: number
+  message: string
+  path: string
+  timestamp: string
+}
+
 export type ResponseData = {
-  ok: boolean
-  message?: string
   data?: any
+  error?: ErrorData
 }
 
 export type PublicEnv = { [key: string]: string }

@@ -1,11 +1,15 @@
 import { getLogger } from '@/lib/helpers/server-side/log-util'
+import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 
 // wrap all api endpoint handlers with this method before exporting
-const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
+const withExceptionFilter = (
+  req: NextApiRequest,
+  res: NextApiResponse<ResponseData>
+) => {
   const logger = getLogger()
 
   return async (handler: NextApiHandler) => {
@@ -31,7 +35,7 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
       // this is the context being logged
       const requestContext = {
         statusCode,
-        path: url,
+        path: url!,
         message,
       }
 
@@ -54,7 +58,9 @@ const withExceptionFilter = (req: NextApiRequest, res: NextApiResponse) => {
       }
 
       // const serializedResponse = JSON.stringify(responseBody)
-      return res.status(statusCode).json(responseBody)
+      return res.status(statusCode).json({
+        error: { ...responseBody },
+      })
     }
   }
 }

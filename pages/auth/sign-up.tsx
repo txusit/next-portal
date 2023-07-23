@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, HttpStatusCode } from 'axios'
 import Link from 'next/link'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
@@ -63,9 +63,9 @@ export const SignUpPage = ({
 
       try {
         setLoading(true)
-        const apiRes = await axios.post('/api/auth/sign-up', userData)
+        const result = await axios.post('/api/auth/sign-up', userData)
 
-        if (apiRes?.data?.ok) {
+        if (result.status == HttpStatusCode.Created) {
           setMessage(
             'A confirmation email has been sent to the address specified. Please check your inbox.'
           )
@@ -73,9 +73,8 @@ export const SignUpPage = ({
           setDisplayResendOption(true)
         }
       } catch (error) {
-        console.log('entered error catch from signup api endpoint')
         if (error instanceof AxiosError) {
-          const errorMsg = error.response?.data?.error
+          const errorMsg = error.response?.data?.error.message
           setSubmitError(errorMsg)
         }
       }
