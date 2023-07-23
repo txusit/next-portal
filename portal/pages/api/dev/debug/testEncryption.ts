@@ -1,4 +1,4 @@
-import { decryptData, encryptData } from '@/lib/helpers/encryptionHelpers'
+import { decryptData, encryptData } from '@/lib/helpers/encryption-helpers'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

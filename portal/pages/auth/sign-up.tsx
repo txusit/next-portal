@@ -2,11 +2,11 @@ import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
-import { getErrorMsg } from '@/lib/helpers/clientSideHelpers'
-import { encryptData } from '@/lib/helpers/encryptionHelpers'
+import { getErrorMsg } from '@/lib/helpers/client-side-helpers'
+import { encryptData } from '@/lib/helpers/encryption-helpers'
 import Link from 'next/link'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/common-get-server-side-props'
 
 export const SignUpPage = ({
   publicEnv,

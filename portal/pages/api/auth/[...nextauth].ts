@@ -3,7 +3,7 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { ResponseData, User as TUser } from '@/types'
 import axios from 'axios'
 import { AES } from 'crypto-js'
-import { decryptData } from '@/lib/helpers/encryptionHelpers'
+import { decryptData } from '@/lib/helpers/encryption-helpers'
 
 export const authOptions: NextAuthOptions = {
   // Configure one or more authentication providers

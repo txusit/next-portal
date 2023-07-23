@@ -1,9 +1,9 @@
-import { encryptData } from '@/lib/helpers/encryptionHelpers'
+import { encryptData } from '@/lib/helpers/encryption-helpers'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/lib/helpers/commonGetServerSideProps'
+import { getServerSideProps } from '@/lib/helpers/common-get-server-side-props'
 
 const ResetPasswordPage = ({
   publicEnv,

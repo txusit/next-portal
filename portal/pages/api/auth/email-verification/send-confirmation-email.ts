@@ -1,15 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import User from '@/models/User'
-import withMongoDBConnection from '@/lib/middleware/withMongoDBConnection'
-import withMethodsGuard from '@/lib/middleware/withMethodsGuard'
-import withMiddleware from '@/lib/middleware/withMiddleware'
-import withExceptionFilter from '@/lib/middleware/withExceptionFilter'
+import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
+import withMethodsGuard from '@/lib/middleware/with-methods-guard'
+import withMiddleware from '@/lib/middleware/with-middleware'
+import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import { HttpStatusCode } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import withRequestBodyGuard from '@/lib/middleware/withRequestBodyGuard'
+import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
-import { decryptData } from '@/lib/helpers/encryptionHelpers'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/serverSideHelpers'
+import { decryptData } from '@/lib/helpers/encryption-helpers'
+import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side-helpers'
 
 const handler = async (
   req: NextApiRequest,

@@ -12,7 +12,7 @@ import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
 import * as jwt from 'jsonwebtoken'
-import { encryptData } from '@/lib/helpers/encryptionHelpers'
+import { encryptData } from '@/lib/helpers/encryption-helpers'
 
 describe('confirmEmail', () => {
   const OLD_ENV = process.env

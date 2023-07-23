@@ -1,9 +1,9 @@
 import { connectToMongoDB } from '@/lib/helpers/mongodb'
-import withExceptionFilter from '@/lib/middleware/withExceptionFilter'
-import withMethodsGuard from '@/lib/middleware/withMethodsGuard'
-import withMiddleware from '@/lib/middleware/withMiddleware'
-import withMongoDBConnection from '@/lib/middleware/withMongoDBConnection'
-import cleanupInactiveAccounts from '@/lib/services/DBManagement/inactiveAccountCleanup'
+import withExceptionFilter from '@/lib/middleware/with-exception-filter'
+import withMethodsGuard from '@/lib/middleware/with-methods-guard'
+import withMiddleware from '@/lib/middleware/with-middleware'
+import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
+import cleanupInactiveAccounts from '@/lib/services/db-management/inactiveAccountCleanup'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {

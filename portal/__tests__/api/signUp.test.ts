@@ -11,9 +11,9 @@ import { createRequest } from 'node-mocks-http'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
-import { encryptData } from '@/lib/helpers/encryptionHelpers'
+import { encryptData } from '@/lib/helpers/encryption-helpers'
 import { compare } from 'bcryptjs'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/serverSideHelpers'
+import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side-helpers'
 
 // Set up module mocks
 jest.mock('@/helpers/serverSideHelpers', () => {
