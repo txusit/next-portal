@@ -38,7 +38,7 @@ export const PitchVotePage = ({
 
   const handleAddVote = async () => {
     try {
-      await axios.post('/api/pitch/addVote', {
+      await axios.post('/api/trading/vote/add', {
         userEmail: session.data?.user?.email,
         ticker: stockData.ticker,
         ...userPosition,
@@ -87,7 +87,7 @@ export const PitchVotePage = ({
 }
 
 const getMeetingStock = async () => {
-  const request = await axios.get('/api/meeting/getActiveMeetingStock')
+  const request = await axios.get('/api/trading/stock/get/active-stock')
 
   return request.data.data
 }

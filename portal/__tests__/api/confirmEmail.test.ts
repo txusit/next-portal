@@ -4,7 +4,7 @@
 // required-header-for-jest-test.js
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
-import handler from '@/pages/api/auth/ConfirmEmail'
+import handler from '@/pages/api/auth/email-verification/confirm-email'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { createRequest } from 'node-mocks-http'

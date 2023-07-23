@@ -27,13 +27,10 @@ const ResetPasswordPage = ({
         // Asymmetrically encrypt password
         const asymEncryptPassword = encryptData(data.password, publicEnv)
 
-        await axios.patch(
-          `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/ResetPassword`,
-          {
-            asymEncryptPassword,
-            token: token,
-          }
-        )
+        await axios.patch('/api/auth/password-recovery/reset-password', {
+          asymEncryptPassword,
+          token: token,
+        })
         setMessage('Password reset')
       } catch (error) {
         const caughtError = error as Error

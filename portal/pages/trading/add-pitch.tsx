@@ -19,7 +19,7 @@ export const AddPitchPage = ({
 
   useEffect(() => {
     const fetchTickers = async () => {
-      const result = await axios.get('/api/stock/getAllTickers')
+      const result = await axios.get('/api/trading/stock/get/all-tickers')
       setTickers(result.data.data)
       setSelectedTicker(result.data.data[0])
     }
@@ -31,7 +31,7 @@ export const AddPitchPage = ({
     setPitchData({ ...pitchData, stockTicker: selectedTicker })
 
     try {
-      await axios.post('/api/pitch/addPitch', {
+      await axios.post('/api/trading/pitch/add', {
         ...pitchData,
       })
       setMessage('Added Pitch')

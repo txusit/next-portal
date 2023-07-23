@@ -3,6 +3,7 @@ import withMethodsGuard from '@/lib/middleware/withMethodsGuard'
 import withMiddleware from '@/lib/middleware/withMiddleware'
 import withMongoDBConnection from '@/lib/middleware/withMongoDBConnection'
 import withRequestBodyGuard from '@/lib/middleware/withRequestBodyGuard'
+import withRequestQueryGuard from '@/lib/middleware/withRequestQueryGuard'
 import Meeting from '@/models/Meeting'
 import User from '@/models/User'
 import { Meeting as TMeeting, ResponseData, User as TUser } from '@/types'
@@ -23,7 +24,7 @@ const handler = async (
 ) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
-    const { userEmail } = req.body
+    const { userEmail } = req.query
     const meeting: TMeeting | null = await Meeting.findOne({
       isActive: true,
     })
@@ -52,7 +53,7 @@ const handler = async (
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
-    withRequestBodyGuard(),
+    withRequestQueryGuard(),
     withMongoDBConnection(),
     handlerMainFunction
   )

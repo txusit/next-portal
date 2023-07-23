@@ -10,7 +10,7 @@ const AddMeetingPage = (props: Props) => {
 
   useEffect(() => {
     const fetchTickers = async () => {
-      const result = await axios.get('/api/stock/getAllTickers')
+      const result = await axios.get('/api/trading/stock/get/all-tickers')
       setTickers(result.data.data)
       setSelectedTicker(result.data.data[0])
     }
@@ -20,7 +20,7 @@ const AddMeetingPage = (props: Props) => {
   const handleAddMeeting = async () => {
     const now = Date.now()
     try {
-      const result = await axios.post('/api/meeting/addMeeting', {
+      const result = await axios.post('/api/trading/meeting/add', {
         stockTicker: selectedTicker,
         meetingDate: now,
         creationTime: now,

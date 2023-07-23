@@ -19,7 +19,7 @@ const ForgotPasswordPage = ({
       const asymEncryptEmail = encryptData(email, publicEnv)
 
       await axios.post(
-        `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendPasswordResetEmail`,
+        '/api/auth/password-recovery/send-password-reset-email',
         {
           asymEncryptEmail,
         }

@@ -22,7 +22,7 @@ const ConfirmEmailPage = ({
           // Pass token to confirmEmail endpoint to handle email verification logic
           setMessage('Confirming email...')
           const response = await axios.patch(
-            `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/ConfirmEmail`,
+            '/api/auth/email-verification/confirm-email',
             {
               token: token,
             }

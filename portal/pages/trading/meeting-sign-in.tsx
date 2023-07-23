@@ -11,9 +11,10 @@ const MeetingSignInPage = (props: Props) => {
   useEffect(() => {
     const checkIsMeetingAttended = async () => {
       try {
-        const result = await axios.post('api/meeting/checkIsMeetingAttended', {
-          userEmail: session.data?.user?.email,
-        })
+        const userEmail = session.data?.user?.email
+        const result = await axios.get(
+          `api/trading/meeting/get/user-attendance/${userEmail}`
+        )
         setIsMeetingAttended(result.data.data)
       } catch (error) {}
     }
@@ -24,9 +25,12 @@ const MeetingSignInPage = (props: Props) => {
   const handleMeetingSignIn = async () => {
     setIsMeetingAttended(true)
     try {
-      const result = await axios.patch('/api/meeting/updateAttendance', {
-        userEmail: session.data?.user?.email,
-      })
+      const result = await axios.patch(
+        '/api/trading/meeting/update/attendance',
+        {
+          userEmail: session.data?.user?.email,
+        }
+      )
       setMessage('Signed into meeting')
     } catch (error) {
       if (error instanceof AxiosError) {

@@ -15,7 +15,7 @@ export const AddStockPage = ({
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
     try {
-      await axios.post('/api/stock/addStock', {
+      await axios.post('/api/trading/stock/add', {
         name,
         ticker,
         direction,

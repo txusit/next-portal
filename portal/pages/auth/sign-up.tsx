@@ -65,10 +65,7 @@ export const SignUpPage = ({
 
       try {
         setLoading(true)
-        const apiRes = await axios.post(
-          `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SignUp`,
-          asymEncryptData
-        )
+        const apiRes = await axios.post('/api/auth/sign-up', asymEncryptData)
 
         if (apiRes?.data?.ok) {
           setMessage(
@@ -93,7 +90,7 @@ export const SignUpPage = ({
     try {
       setMessage('Sending confirmation mail')
       const result = await axios.post(
-        `${publicEnv.NEXT_PUBLIC_BASE_URL}/api/auth/SendConfirmationEmail`,
+        '/api/auth/email-verification/send-confirmation-email',
         {
           asymEncryptEmail: encryptData(data.email, publicEnv),
         }
