@@ -1,5 +1,5 @@
 import { decryptData } from '@/lib/helpers/encryption-helpers'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side-helpers'
+import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
@@ -44,11 +44,7 @@ const handler = async (
     }
 
     // Send email with password reset link
-    const result = await generateTokenAndSendActionEmail(
-      user._id,
-      email,
-      'ResetPasswordPage'
-    )
+    const result = await sendActionEmail(user._id, email, 'ResetPasswordPage')
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,

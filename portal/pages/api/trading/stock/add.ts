@@ -8,7 +8,7 @@ import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import { fetchMarketPrices } from '@/lib/helpers/market-data-helpers'
+import { fetchMarketPrices } from '@/lib/helpers/server-side/market-data-helpers'
 import Stock from '@/models/Stock'
 import { Stock as TStock } from '@/types'
 

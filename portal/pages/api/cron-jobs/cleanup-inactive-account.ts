@@ -1,4 +1,4 @@
-import { connectToMongoDB } from '@/lib/helpers/mongodb'
+import { connectToMongoDB } from '@/lib/helpers/server-side/mongodb'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'

@@ -9,7 +9,7 @@ import { ApiError } from 'next/dist/server/api-utils'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
 import { decryptData } from '@/lib/helpers/encryption-helpers'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side-helpers'
+import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 
 const handler = async (
   req: NextApiRequest,
@@ -38,7 +38,7 @@ const handler = async (
       )
 
     // Send confirmation email with verification token
-    const result = await generateTokenAndSendActionEmail(
+    const result = await sendActionEmail(
       user._id,
       user.email,
       'ConfirmEmailPage'

@@ -2,7 +2,7 @@ import { encryptData } from '@/lib/helpers/encryption-helpers'
 import axios from 'axios'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/lib/helpers/common-get-server-side-props'
+import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 
 const ForgotPasswordPage = ({
   publicEnv,

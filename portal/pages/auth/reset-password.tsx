@@ -3,7 +3,7 @@ import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
-import { getServerSideProps } from '@/lib/helpers/common-get-server-side-props'
+import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 
 const ResetPasswordPage = ({
   publicEnv,

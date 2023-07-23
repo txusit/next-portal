@@ -1,4 +1,4 @@
-import { getLogger } from '@/lib/helpers/log-util'
+import { getLogger } from '@/lib/helpers/server-side/log-util'
 import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'

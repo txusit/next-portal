@@ -8,7 +8,7 @@ import { ResponseData, Stock as TStock } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import { fetchMarketPrices } from '@/lib/helpers/market-data-helpers'
+import { fetchMarketPrices } from '@/lib/helpers/server-side/market-data-helpers'
 import Stock from '@/models/Stock'
 
 // Batch requests to Twelve Data API limited to 120 symbols per request.

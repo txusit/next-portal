@@ -1,7 +1,7 @@
 import * as jwt from 'jsonwebtoken'
 import { sendEmailSES } from '@/lib/services/email/awsSES'
 
-export const generateTokenAndSendActionEmail = async (
+export const sendActionEmail = async (
   user_id: string,
   email: string,
   actionPage: string

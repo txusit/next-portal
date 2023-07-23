@@ -6,7 +6,7 @@ import withMiddleware from '@/lib/middleware/with-middleware'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side-helpers'
+import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import { HttpStatusCode } from 'axios'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -76,7 +76,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     // Type check newUser and send confirmation email with verification token
     newUser = newUser as TUser
-    const result = await generateTokenAndSendActionEmail(
+    const result = await sendActionEmail(
       newUser._id || '',
       newUser.email,
       'ConfirmEmailPage'

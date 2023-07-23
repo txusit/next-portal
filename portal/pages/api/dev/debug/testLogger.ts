@@ -1,4 +1,4 @@
-import { getLogger } from '@/lib/helpers/log-util'
+import { getLogger } from '@/lib/helpers/server-side/log-util'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'

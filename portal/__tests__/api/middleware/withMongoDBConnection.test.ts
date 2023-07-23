@@ -11,7 +11,7 @@ import { HttpStatusCode } from 'axios'
 import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-import { connectToMongoDB } from '@/lib/helpers/mongodb'
+import { connectToMongoDB } from '@/lib/helpers/server-side/mongodb'
 // import * as withMongoDBConnection from '@/middleware/withMongoDBConnection'
 
 // TODO: Figure out a useful test or delete
