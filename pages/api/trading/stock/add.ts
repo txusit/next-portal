@@ -34,11 +34,9 @@ const handler = async (
 
     // Look through stocks to check if a matching ticker exists
     const stockExists = await Stock.findOne({ ticker })
-    console.log('existingStock:', stockExists)
 
     // If does not exist create new stock using name, ticker, and current price
     if (!stockExists) {
-      console.log('stock does not exist')
       const stock: TStock = {
         name,
         ticker,
@@ -49,8 +47,6 @@ const handler = async (
 
       Stock.create(stock)
     } else {
-      console.log('stock does exist')
-
       // If it does exist, update price
       Stock.updateOne({ ticker }, { price })
     }

@@ -23,7 +23,7 @@ const handler = async (
       )
 
     // Find user that matches email
-    let user = await User.findOne({
+    let user: TUser | null = await User.findOne({
       email: email,
     })
     if (!user)
@@ -32,9 +32,8 @@ const handler = async (
         'Unable to send confirmation email because there is no account associated with the email provided'
       )
 
-    user = user as TUser
     // Send confirmation email with verification token
-    const result = await sendActionEmail(user._id, user.email, 'confirm-email')
+    const result = await sendActionEmail(user._id!, user.email, 'confirm-email')
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,

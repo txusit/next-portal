@@ -17,7 +17,7 @@ const handler = async (
   const handlerMainFunction = async () => {
     const { userEmail } = req.body
 
-    const user = (await User.findOne({ email: userEmail })) as TUser
+    const user: TUser | null = await User.findOne({ email: userEmail })
 
     if (!user) {
       throw new ApiError(

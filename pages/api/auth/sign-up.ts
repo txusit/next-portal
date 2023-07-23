@@ -44,14 +44,14 @@ const handler = async (
 
     // Create user and process any errors
 
-    const newUser = (await User.create({
+    const newUser: TUser = await User.create({
       fullName,
       email,
       password: hashedPassword,
       isConfirmed: false,
       membership: 'none',
       creationTime: new Date(),
-    })) as TUser
+    })
     // Type check newUser and send confirmation email with verification token
 
     const result = await sendActionEmail(

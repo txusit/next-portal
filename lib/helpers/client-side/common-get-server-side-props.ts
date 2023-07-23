@@ -11,8 +11,6 @@ export const getServerSideProps: GetServerSideProps = async () => {
 
   let publicEnv: PublicEnv = {}
   for (let envVar in packagedEnv) {
-    envVar = envVar as string
-
     if (envVar.includes('NEXT_PUBLIC_')) {
       publicEnv[envVar] = process.env[envVar] || ''
     }
