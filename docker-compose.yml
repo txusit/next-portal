@@ -16,7 +16,7 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: password
 
   # Build container for portal
-  app:
+  portal:
     build:
       context: ./portal
     volumes:
@@ -32,4 +32,4 @@ services:
 
 networks:
   db:
-  app:
+  portal:

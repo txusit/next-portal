@@ -1,5 +1,5 @@
 # Default script that gets run when only 'make' is run
-.DEFAULT_GOAL := clean-app-db
+.DEFAULT_GOAL := clean-portal-db
 
 
 # Cleans up docker containers, volumes, and networks in project (fresh start)
@@ -7,19 +7,19 @@ clean:
 	docker-compose down -v
 	docker image prune -f
 
-# app
-clean-app: clean
-	docker-compose up --build app
+# portal
+clean-portal: clean
+	docker-compose up --build portal
 
-app:
-	docker-compose up app
+portal:
+	docker-compose up portal
 
-# app and Database
-clean-app-db: clean
-	docker-compose up --build db app
+# portal and Database
+clean-portal-db: clean
+	docker-compose up --build db portal
 
-app-db:
-	docker-compose up db app
+portal-db:
+	docker-compose up db portal
 
 # Database
 clean-db: clean
@@ -29,8 +29,8 @@ db:
 	docker-compose up db
 
 # Access Docker Container Shells
-app-shell:
-	docker exec -t -i next_portal_app_container /bin/bash
+portal-shell:
+	docker exec -t -i next_portal_portal_container /bin/bash
 
 # Open Jest Coverage Report
 open-jest-report:
