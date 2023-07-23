@@ -1,5 +1,4 @@
 import React from 'react'
-import { encryptData } from '@/lib/helpers/encryption-helpers'
 import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
@@ -21,14 +20,10 @@ const SignInPage: NextPage = ({
     e.preventDefault()
     try {
       setLoading(true)
-      // Asymmetrically encrypt credentials
-      const asymEncryptEmail = encryptData(userInfo.email, publicEnv)
-      const asymEncryptPassword = encryptData(userInfo.password, publicEnv)
-
-      // Attempt Login
+      
       const loginRes = await loginUser({
-        asymEncryptEmail,
-        asymEncryptPassword,
+        email: userInfo.email,
+        password: userInfo.password,
       })
 
       // Handle login response

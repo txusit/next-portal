@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import { InputError } from '@/types/error'
 import { useRouter } from 'next/router'
 import axios, { AxiosError } from 'axios'
-import { encryptData } from '@/lib/helpers/encryption-helpers'
 import Link from 'next/link'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
@@ -56,16 +55,15 @@ export const SignUpPage = ({
 
     const isValid = validateData()
     if (isValid) {
-      // Encrypt sensitive data asymmetrically
-      const asymEncryptData = {
-        asymEncryptFullName: encryptData(data.fullName, publicEnv),
-        asymEncryptEmail: encryptData(data.email, publicEnv),
-        asymEncryptPassword: encryptData(data.password, publicEnv),
+      const userData = {
+        fullName: data.fullName,
+        email: data.email,
+        password: data.password,
       }
 
       try {
         setLoading(true)
-        const apiRes = await axios.post('/api/auth/sign-up', asymEncryptData)
+        const apiRes = await axios.post('/api/auth/sign-up', userData)
 
         if (apiRes?.data?.ok) {
           setMessage(
@@ -92,7 +90,7 @@ export const SignUpPage = ({
       const result = await axios.post(
         '/api/auth/email-verification/send-confirmation-email',
         {
-          asymEncryptEmail: encryptData(data.email, publicEnv),
+          email: data.email,
         }
       )
 

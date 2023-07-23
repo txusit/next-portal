@@ -7,8 +7,7 @@ import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import { HttpStatusCode } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
-import { ResponseData } from '@/types'
-import { decryptData } from '@/lib/helpers/encryption-helpers'
+import { ResponseData, User as TUser } from '@/types'
 import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 
 const handler = async (
@@ -16,27 +15,24 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendConfirmationEmail = async () => {
-    // Parse request body
-    const { asymEncryptEmail } = req.body
-    if (!asymEncryptEmail)
+    const { email } = req.body
+    if (!email)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to send confirmation email because of missing or invalid asymEncryptEmail'
+        'Unable to send confirmation email because of missing or invalid email'
       )
 
-    // Decrypt Email
-    const email = decryptData(asymEncryptEmail)
-
     // Find user that matches email
-    const user = await User.findOne({
+    let user = await User.findOne({
       email: email,
-    }).lean()
+    })
     if (!user)
       throw new ApiError(
         HttpStatusCode.NotFound,
         'Unable to send confirmation email because there is no account associated with the email provided'
       )
 
+    user = user as TUser
     // Send confirmation email with verification token
     const result = await sendActionEmail(user._id, user.email, 'confirm-email')
     if (!result.ok) {

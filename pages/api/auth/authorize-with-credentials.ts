@@ -8,7 +8,6 @@ import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import { AES, enc } from 'crypto-js'
 import { compare } from 'bcryptjs'
 
 const handler = async (
@@ -17,18 +16,13 @@ const handler = async (
 ) => {
   const authorizeWithCredentials = async () => {
     // Unpack request body
-    const { validCredentials, symEncryptCredentials } = req.body
-    const { symEncryptEmail, symEncryptPassword } = symEncryptCredentials
+    const { validCredentials, credentials } = req.body
+    const { email, password } = credentials
     if (!validCredentials)
       throw new ApiError(
         HttpStatusCode.Unauthorized,
         'Missing or invalid credentials'
       )
-
-    // Decrypt credentials
-    const aesKey: string = process.env.AES_KEY as string
-    const email = AES.decrypt(symEncryptEmail, aesKey).toString(enc.Utf8)
-    const password = AES.decrypt(symEncryptPassword, aesKey).toString(enc.Utf8)
 
     // Find user with matching email
     const user = await User.findOne({

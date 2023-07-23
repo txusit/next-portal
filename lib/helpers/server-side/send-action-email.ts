@@ -9,7 +9,7 @@ export const sendActionEmail = async (
   // Construct JWT token payload
   const payload = { user_id: user_id }
 
-  // Generate JWT token with encrypted payload
+  // Generate JWT token with payload
   const token = jwt.sign(
     payload,
     process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,

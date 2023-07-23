@@ -10,24 +10,16 @@ import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import { HttpStatusCode } from 'axios'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ApiError } from 'next/dist/server/api-utils'
-import { decryptData } from '@/lib/helpers/encryption-helpers'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const signUp = async () => {
-    // Parse request body
-    const { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } =
-      req.body
-    if (!asymEncryptFullName || !asymEncryptEmail || !asymEncryptPassword) {
+    const { fullName, email, password } = req.body
+    if (!fullName || !email || !password) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
         'Unable to sign up because of missing user information'
       )
     }
-
-    // Decrypt asymmetrically encrypted data
-    const fullName = decryptData(asymEncryptFullName)
-    const email = decryptData(asymEncryptEmail)
-    const password = decryptData(asymEncryptPassword)
 
     if (!fullName || !email || !password)
       throw new ApiError(

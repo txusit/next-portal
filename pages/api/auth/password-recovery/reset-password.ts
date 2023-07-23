@@ -9,7 +9,6 @@ import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { decryptData } from '@/lib/helpers/encryption-helpers'
 
 const handler = async (
   req: NextApiRequest,
@@ -17,15 +16,12 @@ const handler = async (
 ) => {
   const resetPassword = async () => {
     // Parse request body
-    let { token, asymEncryptPassword } = req.body
-    if (!token || !asymEncryptPassword)
+    let { token, password } = req.body
+    if (!token || !password)
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to reset password because of missing token and/or asymEncryptedPassword'
+        'Unable to reset password because of missing token and/or password'
       )
-
-    // decrypt password
-    const password = decryptData(asymEncryptPassword)
 
     // Type check token and get _id payload from token
     token = token as string

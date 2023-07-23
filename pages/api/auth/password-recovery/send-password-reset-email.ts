@@ -1,4 +1,3 @@
-import { decryptData } from '@/lib/helpers/encryption-helpers'
 import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
@@ -16,18 +15,16 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendPasswordResetEmail = async () => {
-    // Unpack request body
-    const { asymEncryptEmail } = req.body
-    if (!asymEncryptEmail) {
+    const { email } = req.body
+    if (!email) {
       res.status(HttpStatusCode.BadRequest).json({
         ok: true,
         message:
-          'Unable to send confirmation email because of missing or invalid asymEncryptEmail',
+          'Unable to send confirmation email because of missing or invalid email',
       })
     }
 
     // Find user with matching email
-    const email = decryptData(asymEncryptEmail)
     const user = await User.findOne({ email }).select('+_id +isConfirmed')
     if (!user) {
       res.status(HttpStatusCode.Accepted).json({

@@ -29,14 +29,13 @@ const ConfirmEmailPage = ({
           )
           setMessage('Email confirmed!')
 
-          // Unpack asymmetrically encrypted user credentials from server response
-          const asymEncryptUser = response.data.data
-          const { asymEncryptEmail, asymEncryptPassword } = asymEncryptUser
+          const user = response.data.data
+          const { email, password } = user
 
           // Log in user of confirmed email and redirect to home
           await loginUser({
-            asymEncryptEmail,
-            asymEncryptPassword,
+            email,
+            password,
           })
           router.push('/')
         } catch (error) {

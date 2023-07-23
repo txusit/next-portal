@@ -9,14 +9,12 @@ import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { encryptData } from '@/lib/helpers/encryption-helpers'
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const confirmEmail = async () => {
-    // Parse request body
     let { token } = req.body
     if (!token)
       throw new ApiError(
@@ -24,10 +22,9 @@ const handler = async (
         'Unable to confirm email because of missing or invalid token'
       )
 
-    // Type check token and get _id payload from token
     token = token as string
 
-    // try catch block used here as an exception to central error handling. catch jwtTokenError, reformat it, and send to error handler
+    // Retrieve payload from jwt token
     let payload
     try {
       payload = jwt.verify(
@@ -37,7 +34,7 @@ const handler = async (
     } catch (jwtTokenError) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'verification of JWT Token failed'
+        `verification of JWT Token failed: ${jwtTokenError}`
       )
     }
 
@@ -56,28 +53,26 @@ const handler = async (
     } catch (error) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        'Unable to find user because user_id is not of type ObjectId'
+        `Unable to find user because user_id is not of type ObjectId: ${error}`
       )
     }
+
     if (!updatedUser)
       throw new ApiError(
         HttpStatusCode.NotFound,
         'Unable to send confirm email because there is no account associated with the _id provided'
       )
 
-    // Encrypt user credentials to send to client for login using asymmetric public key
-    const asymEncryptEmail = encryptData(updatedUser!.email)
-    const asymEncryptPassword = encryptData(updatedUser!.password)
-    const asymEncryptUser = {
-      asymEncryptEmail,
-      asymEncryptPassword,
+    const user = {
+      email: updatedUser!.email,
+      password: updatedUser!.password,
     }
 
     // Send successful response
     res.status(HttpStatusCode.Accepted).json({
       ok: true,
       message: 'successfully verified email',
-      data: asymEncryptUser,
+      data: user,
     })
   }
 

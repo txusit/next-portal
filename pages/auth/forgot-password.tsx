@@ -1,4 +1,3 @@
-import { encryptData } from '@/lib/helpers/encryption-helpers'
 import axios from 'axios'
 import React, { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
@@ -14,14 +13,10 @@ const ForgotPasswordPage = ({
     e.preventDefault()
     try {
       setMessage('Sending password reset email')
-
-      // Asymmetrically encrypt email
-      const asymEncryptEmail = encryptData(email, publicEnv)
-
       await axios.post(
         '/api/auth/password-recovery/send-password-reset-email',
         {
-          asymEncryptEmail,
+          email,
         }
       )
       setMessage('Password reset email sent')

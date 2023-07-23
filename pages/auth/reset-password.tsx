@@ -1,4 +1,3 @@
-import { encryptData } from '@/lib/helpers/encryption-helpers'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import React, { FormEventHandler, useState } from 'react'
@@ -24,11 +23,8 @@ const ResetPasswordPage = ({
       setSubmitError('Passwords do not match')
     } else {
       try {
-        // Asymmetrically encrypt password
-        const asymEncryptPassword = encryptData(data.password, publicEnv)
-
         await axios.patch('/api/auth/password-recovery/reset-password', {
-          asymEncryptPassword,
+          password: data.password,
           token: token,
         })
         setMessage('Password reset')
