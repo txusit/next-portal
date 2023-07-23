@@ -17,16 +17,13 @@ jobs:
 
       - name: Build
         run: |
-          cd portal
           npm ci
           npm run build
 
       - name: Generate deployment package
         run: |
-          cd portal
           zip -r deploy_frontend.zip . -x '*.git*' -x '*.DS_Store'
           mv deploy_frontend.zip ../
-          cd ..
 
       - name: Generate build number
         id: buildnumber

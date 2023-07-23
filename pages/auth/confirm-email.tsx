@@ -3,7 +3,7 @@ import { useRouter } from 'next/router'
 import axios from 'axios'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { loginUser } from '@/lib/helpers/client-side/login-util'
+import { loginUser } from '@/lib/helpers/login-util'
 
 const ConfirmEmailPage = ({
   publicEnv,

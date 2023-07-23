@@ -26,10 +26,10 @@ const transporter = nodemailer.createTransport({
 // point to the template folder
 const handlebarOptions: hbs.NodemailerExpressHandlebarsOptions = {
   viewEngine: {
-    partialsDir: path.resolve(process.cwd(), 'services/email/emailTemplates'),
+    partialsDir: path.resolve(process.cwd(), 'lib/services/email/templates'),
     defaultLayout: false,
   },
-  viewPath: path.resolve(process.cwd(), 'services/email/emailTemplates'),
+  viewPath: path.resolve(process.cwd(), 'lib/services/email/templates'),
 }
 
 // use a template file with nodemailer
@@ -42,13 +42,13 @@ export const sendEmailSES = async (
 ) => {
   const url = `${process.env.NEXT_PUBLIC_BASE_URL}/auth/${actionPage}?token=${token}`
   const subject =
-    actionPage == 'ConfirmEmailPage'
+    actionPage == 'confirm-email'
       ? 'USIT Portal Sign Up Verification'
       : 'USIT Portal Password Reset'
   const template =
-    actionPage == 'ConfirmEmailPage'
-      ? 'confirmEmailTemplate'
-      : 'resetPasswordEmailTemplate'
+    actionPage == 'confirm-email'
+      ? 'confirm-email-template'
+      : 'reset-password-email-template'
   var mailOptions = {
     from: adminMail,
     to: userEmail,

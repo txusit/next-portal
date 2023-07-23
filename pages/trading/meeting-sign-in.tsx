@@ -13,7 +13,7 @@ const MeetingSignInPage = (props: Props) => {
       try {
         const userEmail = session.data?.user?.email
         const result = await axios.get(
-          `api/trading/meeting/get/user-attendance/${userEmail}`
+          `/api/trading/meeting/get/user-attendance/${userEmail}`
         )
         setIsMeetingAttended(result.data.data)
       } catch (error) {}

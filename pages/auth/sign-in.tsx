@@ -7,7 +7,7 @@ import { FormEventHandler, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import Link from 'next/link'
-import { loginUser } from '@/lib/helpers/client-side/login-util'
+import { loginUser } from '@/lib/helpers/login-util'
 
 const SignInPage: NextPage = ({
   publicEnv,

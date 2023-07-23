@@ -20,36 +20,36 @@ const HomePage = () => {
         <p>Homepage</p>
 
         <div>
-          <Link href='/meeting'>Sign into meeting</Link>
+          <Link href='/trading/meeting-sign-in'>Sign into meeting</Link>
           <br />
           <br />
 
-          <Link href='/meeting/AddMeeting'>Add meeting</Link>
+          <Link href='/trading/add-meeting'>Add meeting</Link>
           <br />
           <br />
 
-          <Link href='/membershipPaymentPage'>membership payment page</Link>
+          <Link href='/membership-payment'>membership payment page</Link>
           <br />
           <br />
 
-          <Link href='/pitch/votePage'>Vote for pitch</Link>
+          <Link href='/trading/pitch-vote'>Vote for pitch</Link>
           <br />
           <br />
 
-          <Link href='/pitch/addPitchPage'>add pitch</Link>
+          <Link href='/trading/add-pitch'>add pitch</Link>
           <br />
           <br />
 
-          <Link href='stock/addStockPage'>add stock</Link>
+          <Link href='/trading/add-stock'>add stock</Link>
         </div>
 
         {session ? (
           <Link href='/profile'>profile</Link>
         ) : (
           <div>
-            <Link href='/auth/SignInPage'>Sign In</Link>
+            <Link href='/auth/sign-in'>Sign In</Link>
             <span> | </span>
-            <Link href='/auth/SignUpPage'>Sign Up</Link>
+            <Link href='/auth/sign-up'>Sign Up</Link>
           </div>
         )}
       </main>

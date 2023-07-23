@@ -18,9 +18,9 @@ services:
   # Build container for portal
   portal:
     build:
-      context: ./portal
+      context: ./
     volumes:
-      - ./portal:/app
+      - ./:/app
       - /app/node_modules
     ports:
       - 3000:3000

@@ -38,11 +38,7 @@ const handler = async (
       )
 
     // Send confirmation email with verification token
-    const result = await sendActionEmail(
-      user._id,
-      user.email,
-      'ConfirmEmailPage'
-    )
+    const result = await sendActionEmail(user._id, user.email, 'confirm-email')
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,

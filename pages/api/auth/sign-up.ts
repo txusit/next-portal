@@ -79,7 +79,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     const result = await sendActionEmail(
       newUser._id || '',
       newUser.email,
-      'ConfirmEmailPage'
+      'confirm-email'
     )
     if (!result.ok) {
       throw new ApiError(

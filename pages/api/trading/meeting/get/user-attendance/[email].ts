@@ -24,12 +24,13 @@ const handler = async (
 ) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
-    const { userEmail } = req.query
+
+    const { email } = req.query
     const meeting: TMeeting | null = await Meeting.findOne({
       isActive: true,
     })
     const user: TUser | null = await User.findOne({
-      email: userEmail,
+      email,
     })
     if (!meeting) {
       throw new ApiError(
@@ -40,7 +41,7 @@ const handler = async (
     if (!user) {
       throw new ApiError(
         HttpStatusCode.NotFound,
-        `Unable to find the user with email ${userEmail}`
+        `Unable to find the user with email ${email}`
       )
     }
     const usersAttending = meeting.userIds
@@ -52,7 +53,7 @@ const handler = async (
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
-    withMethodsGuard(['POST']),
+    withMethodsGuard(['GET']),
     withRequestQueryGuard(),
     withMongoDBConnection(),
     handlerMainFunction
