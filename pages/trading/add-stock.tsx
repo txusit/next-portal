@@ -10,7 +10,6 @@ export const AddStockPage = ({
   const [ticker, setTicker] = useState('')
   const [message, setMessage] = useState('')
   const [submitError, setSubmitError] = useState('')
-  const [direction, setDirection] = useState('')
 
   const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
     e.preventDefault()
@@ -18,7 +17,6 @@ export const AddStockPage = ({
       await axios.post('/api/trading/stock/add', {
         name,
         ticker,
-        direction,
       })
       setMessage('Added Stock')
     } catch (error) {
@@ -45,14 +43,6 @@ export const AddStockPage = ({
           type='text'
           placeholder='ticker'
         />
-        <select
-          defaultValue={direction}
-          onChange={({ target }) => setDirection(target.value)}
-        >
-          <option value='long'>Long</option>
-          <option value='short'>Short</option>
-          <option value='hold'>Hold</option>
-        </select>
         <input type='submit' value='Add' />
         {submitError && <p>{submitError}</p>}
         {message && <p>{message}</p>}

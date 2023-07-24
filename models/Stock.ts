@@ -13,10 +13,6 @@ const StockSchema = new Schema({
     type: Number,
     required: [true, 'Price of stock is not set'],
   },
-  direction: {
-    type: String,
-    required: [true, 'direction of stock is not set'],
-  },
   creationTime: {
     type: Date,
     required: [true, 'Stock creation date is not set '],

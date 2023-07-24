@@ -26,7 +26,6 @@ export type Stock = {
   name: string
   ticker: string
   price: number
-  direction: string
   creationTime: Date
 }
 
