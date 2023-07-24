@@ -24,7 +24,6 @@ jobs:
       - name: Generate deployment package
         run: |
           zip -r deploy_portal.zip . -x '*.git*' -x '*.DS_Store'
-          mv deploy_portal.zip ../
 
       - name: Generate build number
         id: buildnumber
