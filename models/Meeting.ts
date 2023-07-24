@@ -1,4 +1,3 @@
-import mongoose from 'mongoose'
 import { Schema, model, models } from 'mongoose'
 // type: [Schema.Types.ObjectId],
 const MeetingSchema = new Schema({

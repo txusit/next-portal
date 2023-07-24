@@ -1,7 +1,4 @@
-import { HttpStatusCode } from 'axios'
-import mongoose from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
-import Stripe from 'stripe'
 
 export type User = {
   _id?: string

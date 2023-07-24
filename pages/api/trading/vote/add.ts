@@ -2,15 +2,11 @@ import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
-import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import Pitch from '@/models/Pitch'
-import Stock from '@/models/Stock'
-import User from '@/models/User'
 import Vote from '@/models/Vote'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,

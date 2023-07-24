@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { ResponseData, User as TUser } from '@/types'
+import { User as TUser } from '@/types'
 import axios from 'axios'
 
 export const authOptions: NextAuthOptions = {

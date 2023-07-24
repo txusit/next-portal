@@ -4,12 +4,10 @@ import withMiddleware from '@/lib/middleware/with-middleware'
 import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import Meeting from '@/models/Meeting'
-import User from '@/models/User'
 import { Meeting as TMeeting, ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
-import { Chathura } from 'next/font/google'
 
 const handler = async (
   req: NextApiRequest,

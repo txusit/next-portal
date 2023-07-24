@@ -1,18 +1,15 @@
-import { ResponseData, User as TUser } from '@/types'
+import { ResponseData } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Cors from 'micro-cors'
 import Stripe from 'stripe'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
 import { buffer } from 'node:stream/consumers'
-import { loadStripe } from '@stripe/stripe-js'
 import User from '@/models/User'
 import { getLogger } from '@/lib/helpers/server-side/log-util'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
-import { getStripe } from '@/lib/helpers/server-side/stripe'
 
 const cors = Cors({
   allowMethods: ['POST', 'HEAD'],

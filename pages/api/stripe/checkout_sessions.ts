@@ -5,7 +5,6 @@ import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiError } from 'next/dist/server/api-utils'
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 

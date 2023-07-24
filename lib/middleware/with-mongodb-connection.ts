@@ -1,9 +1,7 @@
 import { connectToMongoDB } from '@/lib/helpers/server-side/mongodb'
 import { Middleware } from '@/types'
-import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiError } from 'next/dist/server/api-utils'
 
 type MiddlewareWithoutParams = () => Middleware
 

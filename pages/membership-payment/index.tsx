@@ -1,6 +1,4 @@
-import React, { FormEventHandler, useState, useEffect } from 'react'
-import { ApiError } from 'next/dist/server/api-utils'
-import axios, { HttpStatusCode } from 'axios'
+import React, { useState, useEffect } from 'react'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { InferGetServerSidePropsType } from 'next'
 import { useSession } from 'next-auth/react'
