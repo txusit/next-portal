@@ -1,0 +1,60 @@
+import NextAuth, { NextAuthOptions } from 'next-auth'
+import CredentialsProvider from 'next-auth/providers/credentials'
+import { User as TUser } from '@/types'
+import axios from 'axios'
+
+export const authOptions: NextAuthOptions = {
+  // Configure NextAuth Credential provider
+  providers: [
+    CredentialsProvider({
+      id: 'credentials',
+      type: 'credentials',
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'text' },
+        password: { label: 'Password', type: 'password' },
+      },
+
+      async authorize(credentials) {
+        // Check if credentials exists
+        const validCredentials = credentials ? true : false
+
+        // Perform authorization logic and get 'user' from result
+        let { data: response } = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorize-with-credentials`,
+          {
+            validCredentials,
+            credentials,
+          }
+        )
+        const user = response.data
+
+        return user
+      },
+    }),
+  ],
+  pages: {
+    signIn: '/auth/SignInPage',
+  },
+  session: {
+    strategy: 'jwt',
+  },
+  callbacks: {
+    jwt: async ({ token, user }) => {
+      if (user) {
+        token.user = user
+      }
+
+      return token
+    },
+
+    session: async ({ session, token }) => {
+      const user = token.user as TUser
+      session.user = user
+
+      return session
+    },
+  },
+}
+
+export default NextAuth(authOptions)
