@@ -10,10 +10,7 @@ import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
-) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const handlerMainFunction = async () => {
     // Used to test if connection to mongoDB is valid
     const result = await Pitch.find()
