@@ -10,10 +10,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
  * Endpoint used to test if env variables are defined
  *
  */
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
-) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const handlerMainFunction = async () => {
     res
       .status(HttpStatusCode.Accepted)
