@@ -15,10 +15,7 @@ import { ApiError } from 'next/dist/server/api-utils'
  * Endpoint used to test pino logger and papertrail
  *
  */
-const handler = async (
-  req: NextApiRequest,
-  res: NextApiResponse<ResponseData>
-) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const handlerMainFunction = async () => {
     const logger = getLogger()
     logger.info('testing')
