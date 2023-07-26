@@ -1,41 +1,72 @@
-import axios, { AxiosError } from 'axios'
+import { ResponseData } from '@/types'
+import axios, { AxiosError, HttpStatusCode } from 'axios'
 import { useSession } from 'next-auth/react'
 import React, { useEffect, useState } from 'react'
 
 type Props = {}
 
 const MeetingSignInPage = (props: Props) => {
-  const session = useSession()
+  const { data, status } = useSession()
   const [message, setMessage] = useState<string>()
   const [isMeetingAttended, setIsMeetingAttended] = useState<boolean>(true)
+
   useEffect(() => {
     const checkIsMeetingAttended = async () => {
-      try {
-        const userEmail = session.data?.user?.email
-        const result = await axios.get(
-          `/api/trading/meeting/get/user-attendance/${userEmail}`
-        )
-        setIsMeetingAttended(result.data.data)
-      } catch (error) {}
+      const email = data?.user?.email
+      if (!email) {
+        return
+      }
+
+      const response = await axios.get<ResponseData>(
+        `/api/trading/meeting/get/active-attendance/${email}`,
+        {
+          validateStatus() {
+            return true
+          },
+        }
+      )
+
+      if (response.status == HttpStatusCode.Ok) {
+        setIsMeetingAttended(response.data.payload)
+      } else {
+        const error = response.data.error
+        setMessage(`Error ${error?.statusCode}: ${error?.message}`)
+      }
     }
-    if (session.data?.user?.email) {
-      checkIsMeetingAttended()
-    }
-  }, [session.data?.user?.email])
+
+    checkIsMeetingAttended()
+  }, [data?.user?.email])
+
   const handleMeetingSignIn = async () => {
     setIsMeetingAttended(true)
-    try {
-      await axios.patch('/api/trading/meeting/update/attendance', {
-        email: session.data?.user?.email,
-      })
-      setMessage('Signed into meeting')
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        setMessage(error.response?.data?.error)
+
+    const response = await axios.post<ResponseData>(
+      '/api/trading/meeting/update/active-attendance',
+      {
+        email: data?.user?.email,
+      },
+      {
+        validateStatus() {
+          return true
+        },
       }
+    )
+
+    if (response.status == HttpStatusCode.Ok) {
+      setMessage('Signed into meeting')
+    } else {
+      const error = response.data.error
+      setMessage(`Error ${error?.statusCode}: ${error?.message}`)
       setIsMeetingAttended(false)
     }
   }
+
+  if (status == 'unauthenticated') {
+    return <p>Not logged in</p>
+  } else if (status == 'loading') {
+    return <p>Loading...</p>
+  }
+
   return (
     <React.Fragment>
       <button onClick={handleMeetingSignIn} disabled={isMeetingAttended}>

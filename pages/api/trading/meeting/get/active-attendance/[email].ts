@@ -43,7 +43,7 @@ const handler = async (
     if (fetchAttendanceRecordError) throw fetchAttendanceRecordError
 
     const isMeetingAttended = attendanceRecord ? true : false
-    res.status(HttpStatusCode.Ok).json({ payload: { isMeetingAttended } })
+    res.status(HttpStatusCode.Ok).json({ payload: isMeetingAttended })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
