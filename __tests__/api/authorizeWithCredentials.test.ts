@@ -17,7 +17,7 @@ import { AES } from 'crypto-js'
 describe('authorizeWithCredentials', () => {
   const OLD_ENV = process.env
   OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
-  const aesKey = process.env.AES_KEY || ''
+  const aesKey = ''
 
   let mongoServer: MongoMemoryServer
   let req: jest.Mocked<NextApiRequest>
