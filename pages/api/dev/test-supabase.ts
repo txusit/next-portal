@@ -35,7 +35,6 @@ const handler = async (
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
     // withRequestBodyGuard(),
-    // withMongoDBConnection(),
     handlerMainFunction
   )
 
