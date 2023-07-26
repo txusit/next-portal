@@ -1,8 +1,9 @@
-name: Deploy master
+name: Deploy to Staging
 on:
   push:
     branches:
-      - master
+      - dev
+  workflow_dispatch:
 
 jobs:
   build_and_deploy:
@@ -22,7 +23,7 @@ jobs:
 
       - name: Generate deployment package
         run: |
-          zip -r deploy_frontend.zip . -x '*.git*' -x '*.DS_Store'
+          zip -r deploy_portal.zip . -x '*.git*' -x '*.DS_Store'
 
       - name: Generate build number
         id: buildnumber
@@ -36,7 +37,25 @@ jobs:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           application_name: next-portal
-          environment_name: next-portal-prod
-          version_label: next-portal-prod-${{ steps.buildnumber.outputs.build_number }}
+          environment_name: next-portal-dev
+          version_label: next-portal-dev-${{ steps.buildnumber.outputs.build_number }}
           region: us-east-1
-          deployment_package: deploy_frontend.zip
+          deployment_package: deploy_portal.zip
+
+  deploy_supabase_migrations:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.STAGING_DB_PASSWORD }}
+      SUPABASE_PROJECT_ID: ${{ secrets.STAGING_PROJECT_ID }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - run: supabase link --project-ref $SUPABASE_PROJECT_ID
+      - run: supabase db push

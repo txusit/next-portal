@@ -1,13 +1,13 @@
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
-import { ResponseData, Stock as TStock } from '@/types'
+import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 import { fetchMarketPrices } from '@/lib/helpers/server-side/market-data-helpers'
-import Stock from '@/models/Stock'
+import { supabase } from '@/lib/helpers/supabase'
+import { Stock } from '@/types/database-schemas'
 
 // Batch requests to Twelve Data API limited to 120 symbols per request.
 const SYMBOL_REQUEST_LIMIT = 120
@@ -17,20 +17,23 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
+    const { data: stocks, error: fetchStocksError } = await supabase
+      .from('stock')
+      .select('*')
+
+    if (fetchStocksError) throw fetchStocksError
+
     // Retrieve tickers of all stocks in db
-    const stocks = await Stock.find()
-    if (!stocks || stocks.length == 0) {
+    if (stocks.length == 0) {
       res.status(HttpStatusCode.Ok).end()
     }
 
-    const tickers = stocks.map((stock) => stock.ticker)
-
     // Divide tickers into batches of 120
-    let tickerBatches = getTickerBatches(tickers)
+    let stockBatches = getStockBatches(stocks)
 
     // Update stock prices by the batches
-    for (let tickerBatch of tickerBatches) {
-      batchUpdateStockPrice(tickerBatch)
+    for (let stockBatch of stockBatches) {
+      batchUpdateStockPrice(stockBatch)
     }
 
     res.status(HttpStatusCode.Ok).end()
@@ -39,7 +42,6 @@ const handler = async (
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['PATCH']),
-    withMongoDBConnection(),
     handlerMainFunction
   )
 
@@ -47,55 +49,66 @@ const handler = async (
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
-const getTickerBatches = (tickers: string[]) => {
-  const tickerBatches = []
+const getStockBatches = (stocks: Stock[]) => {
+  const updatedStockBatches = []
 
-  const batchCount = Math.floor(tickers.length / SYMBOL_REQUEST_LIMIT)
+  const batchCount = Math.ceil(stocks.length / SYMBOL_REQUEST_LIMIT)
+
   for (let i = 0; i < batchCount; i++) {
     const batchStart = i * SYMBOL_REQUEST_LIMIT
     const batchEnd =
-      (i + 1) * SYMBOL_REQUEST_LIMIT < tickers.length
+      (i + 1) * SYMBOL_REQUEST_LIMIT < stocks.length
         ? (i + 1) * SYMBOL_REQUEST_LIMIT
-        : tickers.length
+        : stocks.length
 
-    tickerBatches.push(tickers.slice(batchStart, batchEnd))
+    updatedStockBatches.push(stocks.slice(batchStart, batchEnd))
   }
 
-  return tickerBatches
+  return updatedStockBatches
 }
 
-const batchUpdateStockPrice = async (tickers: string[]) => {
-  if (tickers.length > SYMBOL_REQUEST_LIMIT) {
+const batchUpdateStockPrice = async (stocks: Stock[]) => {
+  if (stocks.length > SYMBOL_REQUEST_LIMIT) {
     throw new ApiError(
       HttpStatusCode.BadRequest,
       'Too many symbols were passed to batchUpdateStockPrice. (>120)'
     )
   }
 
-  // Find price of tickers using external api
+  // Bulk retrieve stock prices
+  const tickers = stocks.map((stock) => stock.ticker)
   const response = await fetchMarketPrices(tickers)
   if (response.code) {
-    // If error retrieving price
     throw new ApiError(
       HttpStatusCode.InternalServerError,
       `Error retreiving price for stocks: ${response.message}`
     )
   }
 
-  // Update stock prices
+  let updatedStocks: {
+    ticker: string
+    price: number
+  }[] = []
+
+  // Retrieve stock tickers with updated price
   if (tickers.length == 1) {
-    // Deal with special response structure in case of single ticker
-    const { price: priceStr } = response
-    const price = parseFloat(priceStr)
-    await Stock.updateOne({ ticker: tickers[0] }, { price })
+    const price = parseFloat(response.price)
+
+    updatedStocks.push({ ticker: tickers[0], price })
   } else {
-    // Deal with response in case of tickers
     for (let ticker of tickers) {
-      const { price: priceStr } = response[ticker]
-      const price = parseFloat(priceStr)
-      await Stock.updateOne({ ticker }, { price })
+      const price = parseFloat(response[ticker].price)
+
+      updatedStocks.push({ ticker, price })
     }
   }
+
+  // Update stock prices
+  const { error: updateStocksError } = await supabase
+    .from('stock')
+    .upsert(updatedStocks, { onConflict: 'ticker' })
+
+  if (updateStocksError) throw updateStocksError
 }
 
 export default handler

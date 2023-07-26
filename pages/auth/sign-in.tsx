@@ -1,75 +1,73 @@
 import React from 'react'
-import { AxiosError } from 'axios'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { FormEventHandler, useState } from 'react'
+import { useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import Link from 'next/link'
 import { loginUser } from '@/lib/helpers/login-util'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import {
+  Credentials,
+  CredentialsSchema,
+} from '@/types/endpoint-request-schemas'
+import { zodResolver } from '@hookform/resolvers/zod'
 
 const SignInPage: NextPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): JSX.Element => {
-  const [userInfo, setUserInfo] = useState({ email: '', password: '' })
-  const [loading, setLoading] = useState(false)
-  const [submitError, setSubmitError] = useState<string>('')
+  const [message, setMessage] = useState<string>()
   const router = useRouter()
 
-  const handleSubmit: FormEventHandler<HTMLFormElement> = async (e) => {
-    e.preventDefault()
-    try {
-      setLoading(true)
-      
-      const loginRes = await loginUser({
-        email: userInfo.email,
-        password: userInfo.password,
-      })
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<Credentials>({
+    resolver: zodResolver(CredentialsSchema),
+  })
 
-      // Handle login response
-      if (loginRes && !loginRes.ok) {
-        setSubmitError(loginRes.error || '')
-      } else {
-        router.push('/')
-      }
+  const onSubmit: SubmitHandler<Credentials> = async (data) => {
+    const loginRes = await loginUser({
+      email: data.email,
+      password: data.password,
+    })
 
-      setLoading(false)
-    } catch (error) {
-      if (error instanceof AxiosError) {
-        const errorMsg = error.response?.data?.error
-        setSubmitError(errorMsg)
-      } else {
-        const caughtError = error as Error
-        console.log('Unable to sign in: ', caughtError.message)
-        setSubmitError(caughtError.message)
-      }
+    // Handle login response
+    if (loginRes && !loginRes.ok) {
+      setMessage(loginRes.error)
+    } else {
+      router.push('/')
     }
   }
 
   return (
     <React.Fragment>
       <div className='sign-in-form'>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit(onSubmit)}>
           <h1>Login</h1>
+          <label>Email</label>
           <input
-            value={userInfo.email}
-            onChange={({ target }) =>
-              setUserInfo({ ...userInfo, email: target.value })
-            }
-            type='email'
-            placeholder='john@email.com'
+            type='text'
+            placeholder='johndoe@gmail.com'
+            {...register('email')}
           />
+          <div>{errors.email?.message}</div>
+
+          <label>Password</label>
           <input
-            value={userInfo.password}
-            onChange={({ target }) =>
-              setUserInfo({ ...userInfo, password: target.value })
-            }
             type='password'
-            placeholder='****'
+            placeholder='••••••••'
+            {...register('password')}
           />
-          <input type='submit' value='login' />
-          <Link href='/ForgotPasswordPage'>Forgot Password</Link>
-          {submitError && <p>{submitError}</p>}
+          <div>{errors.password?.message}</div>
+
+          <button type='submit' disabled={isSubmitting}>
+            Log in
+          </button>
+
+          <div>{message}</div>
+          <Link href='/auth/forgot-password'>Forgot Password</Link>
         </form>
       </div>
     </React.Fragment>

@@ -10,18 +10,8 @@ import { useSession } from 'next-auth/react'
 export const MembershipPaymentPage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  if (!publicEnv.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY) {
-    throw new Error('NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY is undefined')
-  }
-
   const { data: session, status } = useSession()
-
-  const [loading, setLoading] = useState(true)
   const [selectedProductID, setSelectedProductID] = useState('')
-
-  useEffect(() => {
-    setLoading(status !== 'authenticated')
-  }, [status])
 
   useEffect(() => {
     // Check to see if this is a redirect back from Checkout
@@ -31,13 +21,17 @@ export const MembershipPaymentPage = ({
     }
 
     if (query.get('canceled')) {
-      console.log(
-        'Order canceled -- continue to shop around and checkout when you’re ready.'
-      )
+      console.log('Order canceled')
     }
   }, [])
 
-  return !loading ? (
+  if (status == 'unauthenticated') {
+    return <p>Not logged in</p>
+  } else if (status == 'loading') {
+    return <p>Loading...</p>
+  }
+
+  return (
     <form action='/api/stripe/checkout_sessions' method='POST'>
       <section>
         <input
@@ -119,8 +113,6 @@ export const MembershipPaymentPage = ({
         `}
       </style>
     </form>
-  ) : (
-    <p>Loading or user not signed in</p>
   )
 }
 

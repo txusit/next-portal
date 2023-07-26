@@ -1,11 +1,11 @@
 import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
+import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
-import User from '@/models/User'
 import { ResponseData } from '@/types'
+import { SendPasswordResetEmailSchema } from '@/types/endpoint-request-schemas'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -15,31 +15,25 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const sendPasswordResetEmail = async () => {
-    const { email } = req.body
-    if (!email) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'Unable to send confirmation email because of missing or invalid email'
-      )
-    }
+    const parsedBody = SendPasswordResetEmailSchema.parse(req.body)
+    const { email } = parsedBody
 
-    // Find user with matching email
-    const user = await User.findOne({ email }).select('+_id +isConfirmed')
-    if (!user) {
-      throw new ApiError(
-        HttpStatusCode.NotFound,
-        'Unable to send confirmation email because no user with email exists'
-      )
-    }
-    if (!user.isConfirmed) {
+    // Get member id
+    const { data: member, error: fetchMemberError } = await supabase
+      .from('member')
+      .select('id, is_confirmed')
+      .eq('email', email)
+      .single()
+    if (fetchMemberError) throw fetchMemberError
+    if (!member.is_confirmed) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
         'The email associated with this account has not been verified'
       )
     }
 
-    // Send email with password reset link
-    const result = await sendActionEmail(user._id, email, 'ResetPasswordPage')
+    // Send password reset email
+    const result = await sendActionEmail(member.id, email, 'reset-password')
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
@@ -54,7 +48,6 @@ const handler = async (
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
-    withMongoDBConnection(),
     sendPasswordResetEmail
   )
 

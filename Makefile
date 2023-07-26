@@ -1,5 +1,5 @@
 # Default script that gets run when only 'make' is run
-.DEFAULT_GOAL := clean-portal-db
+.DEFAULT_GOAL := clean-portal
 
 
 # Cleans up docker containers, volumes, and networks in project (fresh start)
@@ -15,18 +15,18 @@ portal:
 	docker-compose up portal
 
 # portal and Database
-clean-portal-db: clean
-	docker-compose up --build db portal
+# clean-portal-db: clean
+# 	docker-compose up --build db portal
 
-portal-db:
-	docker-compose up db portal
+# portal-db:
+# 	docker-compose up db portal
 
 # Database
-clean-db: clean
-	docker-compose up --build db
+# clean-db: clean
+# 	docker-compose up --build db
 
-db:
-	docker-compose up db
+# db:
+# 	docker-compose up db
 
 # Access Docker Container Shells
 portal-shell:

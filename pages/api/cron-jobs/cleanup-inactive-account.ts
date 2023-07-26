@@ -1,9 +1,8 @@
 import { getLogger } from '@/lib/helpers/server-side/log-util'
+import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
-import User from '@/models/User'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
@@ -17,26 +16,23 @@ const handler = async (
 
     // Define the cutoff time for inactive accounts
     const cutoffTime = new Date()
-    cutoffTime.setDate(cutoffTime.getDate() - 1) // For example, consider accounts inactive for 24 hours
+    cutoffTime.setDate(cutoffTime.getDate() - 1) // Consider accounts inactive for 24 hours
+    const cutoffTimeISO = cutoffTime.toISOString()
 
-    // Find inactive, unverified accounts
-    const inactiveAccounts: any[] = await User.find({
-      isEmailVerified: false,
-      createdAt: { $lte: cutoffTime },
-    })
+    const { count, error: deleteMembersError } = await supabase
+      .from('member')
+      .delete({ count: 'exact' })
+      .lte('created_at', cutoffTimeISO)
+      .eq('is_confirmed', false)
 
-    // Delete the inactive accounts
-    inactiveAccounts.forEach(async (account) => {
-      await User.deleteOne({ _id: account._id })
-    })
+    if (deleteMembersError) throw deleteMembersError
 
-    logger.info(`${inactiveAccounts.length} inactive accounts cleaned up.`)
-    res.status(HttpStatusCode.Ok).end()
+    logger.info(`${count} inactive accounts cleaned up.`)
+    res.status(HttpStatusCode.Ok).json({ payload: { deletedCount: count } })
   }
 
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['DELETE']),
-    withMongoDBConnection(),
     inactiveAccountCleanupHandler
   )
 

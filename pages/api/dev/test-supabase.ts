@@ -1,11 +1,11 @@
+import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
-import withRequestQueryGuard from '@/lib/middleware/with-request-query-guard'
-import Meeting from '@/models/Meeting'
+import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import User from '@/models/User'
-import { Meeting as TMeeting, ResponseData, User as TUser } from '@/types'
+import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -15,35 +15,26 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const handlerMainFunction = async () => {
-    const { email } = req.query
-    const meeting: TMeeting | null = await Meeting.findOne({
-      isActive: true,
-    })
-    const user: TUser | null = await User.findOne({
-      email,
-    })
-    if (!meeting) {
-      throw new ApiError(
-        HttpStatusCode.NotFound,
-        'Unable to find active meeting'
-      )
-    }
-    if (!user) {
-      throw new ApiError(
-        HttpStatusCode.NotFound,
-        `Unable to find the user with email ${email}`
-      )
-    }
-    const usersAttending = meeting.userIds
-    const isMeetingAttended = usersAttending.includes(user._id!)
-    res.status(HttpStatusCode.Ok).json({ data: isMeetingAttended })
+    // const result = await supabase.from('membership').select()
+    const result = await supabase
+      .from('member')
+      .insert({
+        first_name: 'aaron',
+        last_name: 'lee',
+        email: 'aaronlee232@gmail.com',
+        password: 'qwerty',
+        is_confirmed: false,
+      })
+      .select('id, email')
+      .single()
+
+    res.status(HttpStatusCode.Ok).json({ payload: result })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
-    withRequestQueryGuard(),
-    withMongoDBConnection(),
+    // withRequestBodyGuard(),
     handlerMainFunction
   )
 

@@ -1,7 +1,10 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { User as TUser } from '@/types'
-import axios from 'axios'
+import { ResponseData, User as TUser } from '@/types'
+import axios, { HttpStatusCode } from 'axios'
+import { ApiError } from 'next/dist/server/api-utils'
+import { ZodIssue } from 'zod'
+import { Member } from '@/types/database-schemas'
 
 export const authOptions: NextAuthOptions = {
   // Configure NextAuth Credential provider
@@ -17,19 +20,45 @@ export const authOptions: NextAuthOptions = {
 
       async authorize(credentials) {
         // Check if credentials exists
-        const validCredentials = credentials ? true : false
+        const isValidCredentials = credentials ? true : false
 
         // Perform authorization logic and get 'user' from result
-        let { data: response } = await axios.post(
+        const response = await axios.post<ResponseData>(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorize-with-credentials`,
           {
-            validCredentials,
+            isValidCredentials,
             credentials,
+          },
+          {
+            validateStatus() {
+              return true
+            },
           }
         )
-        const user = response.data
 
-        return user
+        if (response.status != HttpStatusCode.Ok) {
+          const error = response.data.error!
+          const statusCode = error.statusCode || 500
+          const rawMessage = error.message
+
+          if (!rawMessage) {
+            throw new ApiError(statusCode, 'Unable to login')
+          }
+
+          // Handle different error message types
+          if (typeof rawMessage === 'string' || rawMessage instanceof String) {
+            let message = error.message as string
+            throw new ApiError(statusCode, message)
+          } else {
+            throw new ApiError(
+              statusCode,
+              'Unable to log in. Credential validation error.'
+            )
+          }
+        }
+
+        const member = response.data.payload
+        return member
       },
     }),
   ],
@@ -49,8 +78,13 @@ export const authOptions: NextAuthOptions = {
     },
 
     session: async ({ session, token }) => {
-      const user = token.user as TUser
-      session.user = user
+      const member = token.user as Member
+
+      if (session.user !== undefined) {
+        session.user.name = member.full_name
+        session.user.email = member.email
+        // Add additional fields to session user schema...
+      }
 
       return session
     },
