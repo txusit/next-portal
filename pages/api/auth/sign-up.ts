@@ -1,64 +1,62 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { hash } from 'bcryptjs'
-import User from '@/models/User'
-import { ResponseData, User as TUser } from '@/types'
+import { ResponseData } from '@/types'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import { HttpStatusCode } from 'axios'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ApiError } from 'next/dist/server/api-utils'
+import { supabase } from '@/lib/helpers/supabase'
+import { Member } from '@/types/database-schemas'
+import { SignUpSchema } from '@/types/endpoint-request-schemas'
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const signUp = async () => {
-    const { fullName, email, password } = req.body
-    if (!fullName || !email || !password) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'Unable to sign up because of missing user information'
-      )
-    }
+    const parsedBody = SignUpSchema.parse(req.body)
+    const { firstName, lastName, email, password } = parsedBody
 
-    // Check for existing user
-    const userExists = await User.findOne({ email })
-    if (userExists) {
+    const isUniqueMember = await checkDuplicate(email)
+    if (!isUniqueMember) {
       throw new ApiError(
         HttpStatusCode.Conflict,
-        'Unable to sign up because user already exists'
+        'Unable to sign up because member already exists'
       )
     }
 
-    // Check for valid password and hash it
-    if (password.length < 6) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'Unable to sign up because password should be 6 characters long'
-      )
-    }
     const hashedPassword = await hash(password, 12)
 
-    // Create user and process any errors
-
-    const newUser: TUser = await User.create({
-      fullName,
+    // Add new member
+    const memberData: Member = {
       email,
+      first_name: firstName,
+      last_name: lastName,
       password: hashedPassword,
-      isConfirmed: false,
-      membership: 'none',
-      creationTime: new Date(),
-    })
-    // Type check newUser and send confirmation email with verification token
+      is_confirmed: false,
+      membership_id: null,
+    }
 
+    const { data: newMember, error: insertMemberError } = await supabase
+      .from('member')
+      .insert(memberData)
+      .select('id, email')
+      .single()
+
+    if (insertMemberError) {
+      throw insertMemberError
+    }
+
+    // Send confirmation email
     const result = await sendActionEmail(
-      newUser._id || '',
-      newUser.email,
+      newMember.id || '',
+      newMember.email,
       'confirm-email'
     )
+
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
@@ -66,18 +64,29 @@ const handler = async (
       )
     }
 
-    // Send successful response
     return res.status(HttpStatusCode.Created).end()
   }
 
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
-    withMongoDBConnection(),
     signUp
   )
 
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
+}
+
+const checkDuplicate = async (email: string) => {
+  const { count: memberExists, error: fetchMemberError } = await supabase
+    .from('member')
+    .select('*', { count: 'exact', head: true })
+    .eq('email', email)
+
+  if (fetchMemberError) {
+    throw fetchMemberError
+  }
+
+  return memberExists == 0
 }
 
 export default handler

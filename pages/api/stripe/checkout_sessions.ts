@@ -3,6 +3,7 @@ import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
+import { CheckoutSessionSchema } from '@/types/endpoint-request-schemas'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -12,8 +13,9 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const handleStripeCheckoutSession = async () => {
-    const { selectedProductID, email } = req.body
+  const checkoutSession = async () => {
+    const parsedBody = CheckoutSessionSchema.parse(req.body)
+    const { selectedProductID, email } = parsedBody
 
     // Create Checkout Sessions from body params.
     const session = await stripe.checkout.sessions.create({
@@ -36,7 +38,7 @@ const handler = async (
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
-    handleStripeCheckoutSession
+    checkoutSession
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

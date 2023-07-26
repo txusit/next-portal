@@ -31,7 +31,7 @@ const HomePage = () => {
           <br />
           <br />
 
-          <Link href='/trading/pitch-vote'>Vote for pitch</Link>
+          <Link href='/trading/add-vote'>Vote for pitch</Link>
           <br />
           <br />
 

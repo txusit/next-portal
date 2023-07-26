@@ -4,6 +4,7 @@ import { HttpStatusCode } from 'axios'
 import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
+import { ZodError } from 'zod'
 
 // wrap all api endpoint handlers with this method before exporting
 const withExceptionFilter = (
@@ -20,11 +21,9 @@ const withExceptionFilter = (
 
       let statusCode, message, stack
       // Handle Specific Errors
-      // * PLACEHOLDER SPECIFIC ERROR *
-      if (exception instanceof mongoose.Error.ValidationError) {
-        statusCode = HttpStatusCode.InternalServerError
-        message = 'mongoose error caught'
-        stack = 'no stack'
+      if (exception instanceof ZodError) {
+        statusCode = HttpStatusCode.BadRequest
+        message = exception.errors
       }
 
       // Handle generic API Errors if not handled by specific error handling above
@@ -37,6 +36,7 @@ const withExceptionFilter = (
         statusCode,
         path: url!,
         message,
+        stack,
       }
 
       // edit the message according to your preferences

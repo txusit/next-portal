@@ -25,12 +25,9 @@ const MeetingSignInPage = (props: Props) => {
   const handleMeetingSignIn = async () => {
     setIsMeetingAttended(true)
     try {
-      const result = await axios.patch(
-        '/api/trading/meeting/update/attendance',
-        {
-          userEmail: session.data?.user?.email,
-        }
-      )
+      await axios.patch('/api/trading/meeting/update/attendance', {
+        email: session.data?.user?.email,
+      })
       setMessage('Signed into meeting')
     } catch (error) {
       if (error instanceof AxiosError) {

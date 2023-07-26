@@ -1,10 +1,11 @@
+import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
-import Meeting from '@/models/Meeting'
-import { Meeting as TMeeting, ResponseData } from '@/types'
+import { ResponseData } from '@/types'
+import { Meeting } from '@/types/database-schemas'
+import { AddMeetingSchema } from '@/types/endpoint-request-schemas'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
@@ -13,46 +14,47 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const handlerMainFunction = async () => {
-    const { meetingDate, creationTime, stockTicker } = req.body
-    const meetingExists = await Meeting.findOne({ meetingDate })
+  const addMeeting = async () => {
+    const parsedBody = AddMeetingSchema.parse(req.body)
+    const { meetingDate } = parsedBody
 
-    //Checking if meeting is already created
-    if (meetingExists) {
+    // Check if duplicate meeting date exists
+    const { data: meeting, error: fetchMeetingError } = await supabase
+      .from('meeting')
+      .select()
+      .eq('meeting_date', meetingDate)
+      .maybeSingle()
+    if (fetchMeetingError) throw fetchMeetingError
+    if (meeting) {
       throw new ApiError(
         HttpStatusCode.Conflict,
-        'Unable to create meeting because meeting already exists'
+        'Unable to create meeting because meeting with same date already exists'
       )
     }
 
-    //Setting old active meetings to be not active
-    await Meeting.updateMany(
-      { isActive: { $eq: true } },
-      { $set: { isActive: false } }
+    const { error: deactivateMeetingsError } = await supabase.rpc(
+      'deactivate_old_active_meetings'
     )
+    if (deactivateMeetingsError) throw deactivateMeetingsError
 
-    //Add new active meeting
-    const newMeetingData: TMeeting = {
-      userIds: [],
-      meetingDate,
-      stockTicker,
-      creationTime,
-      isActive: true,
+    // Add new meeting
+    const newMeeting: Meeting = {
+      is_active: true,
+      meeting_date: meetingDate,
     }
+    const { error: insertMeetingError } = await supabase
+      .from('meeting')
+      .insert(newMeeting)
+    if (insertMeetingError) throw insertMeetingError
 
-    const newMeeting = await Meeting.create(newMeetingData)
-
-    res.status(HttpStatusCode.Ok).json({
-      data: newMeeting,
-    })
+    res.status(HttpStatusCode.Created).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
     withRequestBodyGuard(),
-    withMongoDBConnection(),
-    handlerMainFunction
+    addMeeting
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

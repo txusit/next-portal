@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { ZodIssue } from 'zod'
 
 export type User = {
   _id?: string
@@ -49,7 +50,7 @@ export type Pitch = {
 }
 
 export type JwtEmailToken = {
-  user_id: string
+  member_id: string
 }
 
 export type LoginUserParams = {
@@ -63,13 +64,14 @@ export type Maybe<T> = T | null | undefined
 
 type ErrorData = {
   statusCode: number
-  message: string
+  message: string | ZodIssue[]
   path: string
+  stack: string | undefined
   timestamp: string
 }
 
 export type ResponseData = {
-  data?: any
+  payload?: any
   error?: ErrorData
 }
 

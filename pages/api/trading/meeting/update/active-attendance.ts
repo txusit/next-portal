@@ -2,9 +2,9 @@ import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
+import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
-import { Pitch } from '@/types/database-schemas'
-import { AddPitchSchema } from '@/types/endpoint-request-schemas'
+import { UpdateAttendanceSchema } from '@/types/endpoint-request-schemas'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -12,11 +12,19 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const addPitch = async () => {
-    const parsedBody = AddPitchSchema.parse(req.body)
-    const { stockId, direction } = parsedBody
+  const updateAttendance = async () => {
+    const parsedBody = UpdateAttendanceSchema.parse(req.body)
+    const { email } = parsedBody
 
-    // Get active meeting
+    // Get member id
+    const { data: member, error: fetchMemberError } = await supabase
+      .from('member')
+      .select('id')
+      .eq('email', email)
+      .single()
+    if (fetchMemberError) throw fetchMemberError
+
+    // Get active meeting id
     const { data: meeting, error: fetchMeetingError } = await supabase
       .from('meeting')
       .select('id')
@@ -24,24 +32,21 @@ const handler = async (
       .single()
     if (fetchMeetingError) throw fetchMeetingError
 
-    // Add new pitch
-    const newPitch: Pitch = {
-      stock_id: stockId,
-      meeting_id: meeting.id,
-      direction,
-    }
-    const { error: insertPitchError } = await supabase
-      .from('pitch')
-      .insert(newPitch)
-    if (insertPitchError) throw insertPitchError
+    // Add new attendance record
+    const newAttendanceRecord = { meeting_id: meeting.id, member_id: member.id }
+    const { error: insertAttendanceRecordError } = await supabase
+      .from('attendance_record')
+      .insert(newAttendanceRecord)
+    if (insertAttendanceRecordError) throw insertAttendanceRecordError
 
-    res.status(HttpStatusCode.Created).end()
+    res.status(HttpStatusCode.Ok).end()
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['POST']),
-    addPitch
+    withRequestBodyGuard(),
+    updateAttendance
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

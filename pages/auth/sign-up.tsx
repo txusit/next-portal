@@ -1,175 +1,80 @@
 import React, { useState } from 'react'
-import { InputError } from '@/types/error'
-import { useRouter } from 'next/router'
-import axios, { AxiosError, HttpStatusCode } from 'axios'
+import axios, { HttpStatusCode } from 'axios'
 import Link from 'next/link'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { getErrorMsg } from '@/lib/helpers/client-side/error-util'
+import { SubmitHandler, useForm } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { ResponseData } from '@/types'
+import { SignUp, SignUpSchema } from '@/types/endpoint-request-schemas'
 
 export const SignUpPage = ({
   publicEnv,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-  const [data, setData] = useState({
-    fullName: '',
-    email: '',
-    password: '',
-    confirmPassword: '',
-    attendedMeetingIds: [],
+  const [message, setMessage] = useState<string>()
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUp>({
+    resolver: zodResolver(SignUpSchema),
   })
-  const [validationErrors, setValidationErrors] = useState<InputError[]>([])
-  const [loading, setLoading] = useState(false)
-  const [displayResendOption, setDisplayResendOption] = useState(false)
-  const [message, setMessage] = useState<string>('')
-  const [submitError, setSubmitError] = useState<string>('')
-  const router = useRouter()
 
-  // Check if data fields match requirements
-  const validateData = (): boolean => {
-    const err = []
+  const onSubmit: SubmitHandler<SignUp> = async (data) => {
+    const response = await axios.post<ResponseData>('/api/auth/sign-up', data, {
+      validateStatus() {
+        return true
+      },
+    })
 
-    if (data.fullName?.length < 4) {
-      err.push({ fullName: 'Full name must be at least 4 characters long' })
-    }
-    if (data.fullName?.length > 30) {
-      err.push({ fullName: 'Full name must be less than 30 characters' })
-    }
-    if (data.password?.length < 6) {
-      err.push({ password: 'Password must be at least 6 characters' })
-    }
-    if (data.password !== data.confirmPassword) {
-      err.push({ confirmPassword: "Passwords don't match" })
-    }
-
-    setValidationErrors(err)
-
-    if (err.length > 0) {
-      return false
-    } else {
-      return true
-    }
-  }
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-
-    const isValid = validateData()
-    if (isValid) {
-      const userData = {
-        fullName: data.fullName,
-        email: data.email,
-        password: data.password,
-      }
-
-      try {
-        setLoading(true)
-        const result = await axios.post('/api/auth/sign-up', userData)
-
-        if (result.status == HttpStatusCode.Created) {
-          setMessage(
-            'A confirmation email has been sent to the address specified. Please check your inbox.'
-          )
-
-          setDisplayResendOption(true)
-        }
-      } catch (error) {
-        if (error instanceof AxiosError) {
-          const errorMsg = error.response?.data?.error.message
-          setSubmitError(errorMsg)
-        }
-      }
-
-      setLoading(false)
-    }
-  }
-
-  const sendMail = async () => {
-    try {
-      setMessage('Sending confirmation mail')
-      const result = await axios.post(
-        '/api/auth/email-verification/send-confirmation-email',
-        {
-          email: data.email,
-        }
+    if (response.status == HttpStatusCode.Created) {
+      setMessage(
+        `A confirmation email has been sent to ${data.email}. Please check your inbox.`
       )
-
-      setMessage('Confirmation sent')
-    } catch (error) {
-      console.log(error)
-      // handle the error
-      setMessage('Unable to send confirmation email')
+    } else {
+      const error = response.data.error
+      setMessage(`Error ${error?.statusCode}: ${error?.message}`)
     }
-  }
-
-  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    // get property name from event.target.name and set the value from onChange in it
-    // So name in our input component should be same as property in data state
-
-    setData({ ...data, [event.target.name]: event.target.value })
   }
 
   return (
     <React.Fragment>
       <h1>Create an Account</h1>
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
+        <label>First Name</label>
+        <input type='text' placeholder='John' {...register('firstName')} />
+        <div>{errors.firstName?.message}</div>
+
+        <label>Last Name</label>
+        <input type='text' placeholder='Doe' {...register('lastName')} />
+        <div>{errors.firstName?.message}</div>
+
+        <label>Email</label>
         <input
           type='text'
-          placeholder={'Full Name'}
-          value={data.fullName}
-          name='fullName'
-          onChange={handleInputChange}
-          required
+          placeholder='johndoe@gmail.com'
+          {...register('email')}
         />
-        <p>{getErrorMsg('fullName', validationErrors)}</p>
+        <div>{errors.email?.message}</div>
 
-        <input
-          type='email'
-          placeholder={'Email'}
-          value={data.email}
-          name='email'
-          onChange={handleInputChange}
-          required
-        />
+        <label>Password</label>
         <input
           type='password'
-          placeholder={'Password'}
-          value={data.password}
-          name='password'
-          onChange={handleInputChange}
-          required
+          placeholder='••••••••'
+          {...register('password')}
         />
-        <p>{getErrorMsg('password', validationErrors)}</p>
+        <div>{errors.password?.message}</div>
 
-        <input
-          type='password'
-          placeholder={'Confirm Password'}
-          value={data.confirmPassword}
-          name='confirmPassword'
-          onChange={handleInputChange}
-          required
-        />
-        <p>{getErrorMsg('confirmPassword', validationErrors)}</p>
-
-        <button title={'Sign up'} type='submit' disabled={loading}>
-          Sign Up
+        <button type='submit' disabled={isSubmitting}>
+          Create an account
         </button>
+
+        <div>{message}</div>
       </form>
 
       <div>
-        {/* TODO Add 30 second cooldown timer */}
-        {displayResendOption && (
-          <button onClick={sendMail}>Resend Confirmation Email</button>
-        )}
-      </div>
-      {message && <p>{message}</p>}
-      {submitError && <p>{submitError}</p>}
-
-      <br />
-      <br />
-      <br />
-      <div>
         <h2>Already have account?</h2>
-
         <Link href='/auth/SignInPage'>Sign In</Link>
       </div>
     </React.Fragment>

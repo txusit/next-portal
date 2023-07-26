@@ -3,8 +3,6 @@ import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import { ResponseData } from '@/types'
-import { Pitch } from '@/types/database-schemas'
-import { AddPitchSchema } from '@/types/endpoint-request-schemas'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
 
@@ -12,11 +10,8 @@ const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const addPitch = async () => {
-    const parsedBody = AddPitchSchema.parse(req.body)
-    const { stockId, direction } = parsedBody
-
-    // Get active meeting
+  // Get active meeting id
+  const getActivePitch = async () => {
     const { data: meeting, error: fetchMeetingError } = await supabase
       .from('meeting')
       .select('id')
@@ -24,24 +19,29 @@ const handler = async (
       .single()
     if (fetchMeetingError) throw fetchMeetingError
 
-    // Add new pitch
-    const newPitch: Pitch = {
-      stock_id: stockId,
-      meeting_id: meeting.id,
-      direction,
-    }
-    const { error: insertPitchError } = await supabase
+    // Get pitch using meeting id
+    const { data: pitch, error: fetchPitchError } = await supabase
       .from('pitch')
-      .insert(newPitch)
-    if (insertPitchError) throw insertPitchError
+      .select('stock_id, direction')
+      .eq('meeting_id', meeting.id)
+      .single()
+    if (fetchPitchError) throw fetchPitchError
 
-    res.status(HttpStatusCode.Created).end()
+    // Get stock using stock_id
+    const { data: stock, error: fetchStockError } = await supabase
+      .from('stock')
+      .select('name')
+      .eq('id', pitch.stock_id)
+      .single()
+    if (fetchStockError) throw fetchStockError
+
+    res.status(HttpStatusCode.Ok).json({ payload: { pitch, stock } })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
-    withMethodsGuard(['POST']),
-    addPitch
+    withMethodsGuard(['GET']),
+    getActivePitch
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

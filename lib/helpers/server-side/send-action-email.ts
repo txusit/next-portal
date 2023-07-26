@@ -2,12 +2,12 @@ import * as jwt from 'jsonwebtoken'
 import { sendEmailSES } from '@/lib/services/email/awsSES'
 
 export const sendActionEmail = async (
-  user_id: string,
+  member_id: string,
   email: string,
   actionPage: string
 ) => {
   // Construct JWT token payload
-  const payload = { user_id: user_id }
+  const payload = { member_id }
 
   // Generate JWT token with payload
   const token = jwt.sign(payload, process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET!, {

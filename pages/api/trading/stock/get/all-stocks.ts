@@ -1,39 +1,29 @@
+import { supabase } from '@/lib/helpers/supabase'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
-import Meeting from '@/models/Meeting'
-import Stock from '@/models/Stock'
-import { Meeting as TMeeting, ResponseData } from '@/types'
+import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
-import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
-  const handlerMainFunction = async () => {
-    // Used to test if connection to mongoDB is valid
-    let activeMeeting: TMeeting | null = await Meeting.findOne({
-      isActive: true,
-    })
+  const getAllStocks = async () => {
+    // Get all stocks
+    const { data: stocks, error: fetchStocksError } = await supabase
+      .from('stock')
+      .select()
+    if (fetchStocksError) throw fetchStocksError
 
-    if (!activeMeeting) {
-      throw new ApiError(HttpStatusCode.NotFound, 'Missing active meeting')
-    }
-
-    const stock = await Stock.findOne({ ticker: activeMeeting.stockTicker })
-
-    res.status(HttpStatusCode.Ok).json({ data: stock })
+    res.status(HttpStatusCode.Ok).json({ payload: stocks })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
-    // withRequestBodyGuard(),
-    withMongoDBConnection(),
-    handlerMainFunction
+    getAllStocks
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

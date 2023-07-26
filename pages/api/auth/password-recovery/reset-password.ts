@@ -1,60 +1,46 @@
 import * as jwt from 'jsonwebtoken'
 import { JwtEmailToken, ResponseData } from '@/types'
 import { NextApiRequest, NextApiResponse } from 'next'
-import User from '@/models/User'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
-import withMongoDBConnection from '@/lib/middleware/with-mongodb-connection'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
-import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
+import { ResetPasswordSchema } from '@/types/endpoint-request-schemas'
+import { supabase } from '@/lib/helpers/supabase'
+import { hash } from 'bcryptjs'
+import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const resetPassword = async () => {
-    let { token, password } = req.body
-    if (!token || !password)
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'Unable to reset password because of missing token and/or password'
-      )
+    const parsedBody = ResetPasswordSchema.parse(req.body)
+    let { token, password } = parsedBody
 
-    // Type check token and get _id payload from token
-    token = token as string
+    // Get member id from token
     const payload = jwt.verify(
       token,
-      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET!
     ) as JwtEmailToken
 
-    // Update confirmed email status
+    const hashedPassword = await hash(password, 12)
 
-    const updatedUser = await User.findOneAndUpdate(
-      { _id: payload.user_id },
-      {
-        $set: {
-          password: password,
-        },
-      },
-      { new: true }
-    )
+    // Update member with new hashed password
+    const { error: updateMemberError } = await supabase
+      .from('member')
+      .update({ password: hashedPassword })
+      .eq('id', payload.member_id)
 
-    if (!updatedUser)
-      throw new ApiError(
-        HttpStatusCode.NotFound,
-        'Unable to update password because there is no account associated with the _id provided'
-      )
+    if (updateMemberError) throw updateMemberError
 
-    // Send successful response
     res.status(HttpStatusCode.Ok).end()
   }
 
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['PATCH']),
     withRequestBodyGuard(),
-    withMongoDBConnection(),
     resetPassword
   )
 
