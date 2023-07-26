@@ -10,13 +10,18 @@ import { fetchMarketPrices } from '@/lib/helpers/server-side/market-data-helpers
 import { AddStockSchema } from '@/types/endpoint-request-schemas'
 import { supabase } from '@/lib/helpers/supabase'
 import { Stock } from '@/types/database-schemas'
+import { getLogger } from '@/lib/helpers/server-side/log-util'
+
+const logger = getLogger()
 
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const addStock = async () => {
+    logger.info('raw request body:', req.body)
     const parsedBody = AddStockSchema.parse(req.body)
+    logger.info('parsed request body:', parsedBody)
     const { name, ticker } = parsedBody
 
     // Find price of ticker using external api
