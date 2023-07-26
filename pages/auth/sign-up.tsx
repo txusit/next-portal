@@ -75,7 +75,7 @@ export const SignUpPage = ({
 
       <div>
         <h2>Already have account?</h2>
-        <Link href='/auth/SignInPage'>Sign In</Link>
+        <Link href='/auth/sign-in'>Sign In</Link>
       </div>
     </React.Fragment>
   )

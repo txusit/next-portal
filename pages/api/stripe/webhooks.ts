@@ -91,19 +91,13 @@ const fulfillOrder = async (customerEmail: string, productId: string) => {
     .single()
   if (fetchMembershipError) throw fetchMembershipError
 
-  // Get member id
-  const { data: member, error: fetchMemberError } = await supabase
-    .from('member')
-    .select('id')
-    .eq('email', customerEmail)
-    .single()
-  if (fetchMemberError) throw fetchMemberError
-
   // Update member membership
-  const { error: updateMemberError } = await supabase
+  const { data: member, error: updateMemberError } = await supabase
     .from('member')
     .update({ membership_id: membership.id })
-    .eq('id', member.id)
+    .eq('email', customerEmail)
+    .select()
+    .single()
   if (updateMemberError) throw updateMemberError
 
   // Add new payment

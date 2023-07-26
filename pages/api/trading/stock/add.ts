@@ -19,9 +19,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   const addStock = async () => {
-    logger.info('raw request body:', req.body)
     const parsedBody = AddStockSchema.parse(req.body)
-    logger.info('parsed request body:', parsedBody)
     const { name, ticker } = parsedBody
 
     // Find price of ticker using external api
