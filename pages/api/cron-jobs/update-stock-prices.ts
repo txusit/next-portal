@@ -19,8 +19,7 @@ const handler = async (
   const handlerMainFunction = async () => {
     const { data: stocks, error: fetchStocksError } = await supabase
       .from('stock')
-      .select('*')
-
+      .select()
     if (fetchStocksError) throw fetchStocksError
 
     // Retrieve tickers of all stocks in db
@@ -107,7 +106,6 @@ const batchUpdateStockPrice = async (stocks: Stock[]) => {
   const { error: updateStocksError } = await supabase
     .from('stock')
     .upsert(updatedStocks, { onConflict: 'ticker' })
-
   if (updateStocksError) throw updateStocksError
 }
 

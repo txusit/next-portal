@@ -27,7 +27,6 @@ const handler = async (
       .from('member')
       .update({ is_confirmed: true })
       .eq('id', payload.member_id)
-
     if (fetchAndUpdateMemberError) throw fetchAndUpdateMemberError
 
     res.status(HttpStatusCode.Ok).end()

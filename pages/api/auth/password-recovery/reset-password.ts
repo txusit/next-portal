@@ -32,7 +32,6 @@ const handler = async (
       .from('member')
       .update({ password: hashedPassword })
       .eq('id', payload.member_id)
-
     if (updateMemberError) throw updateMemberError
 
     res.status(HttpStatusCode.Ok).end()

@@ -45,10 +45,7 @@ const handler = async (
       .insert(memberData)
       .select('id, email')
       .single()
-
-    if (insertMemberError) {
-      throw insertMemberError
-    }
+    if (insertMemberError) throw insertMemberError
 
     // Send confirmation email
     const result = await sendActionEmail(
@@ -81,10 +78,7 @@ const checkDuplicate = async (email: string) => {
     .from('member')
     .select('*', { count: 'exact', head: true })
     .eq('email', email)
-
-  if (fetchMemberError) {
-    throw fetchMemberError
-  }
+  if (fetchMemberError) throw fetchMemberError
 
   return memberExists == 0
 }

@@ -23,7 +23,6 @@ const handler = async (
       .select('id, email')
       .eq('email', email)
       .single()
-
     if (fetchMemberError) throw fetchMemberError
 
     const result = await sendActionEmail(

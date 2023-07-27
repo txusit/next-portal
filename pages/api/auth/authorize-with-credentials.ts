@@ -28,7 +28,6 @@ const handler = async (
       .select('email, full_name, password, is_confirmed')
       .eq('email', email)
       .single()
-
     if (fetchMemberError) throw fetchMemberError
     if (!member.is_confirmed) {
       throw new ApiError(HttpStatusCode.Unauthorized, 'Email is not verified')

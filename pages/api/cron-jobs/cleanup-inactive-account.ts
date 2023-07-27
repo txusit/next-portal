@@ -24,7 +24,6 @@ const handler = async (
       .delete({ count: 'exact' })
       .lte('created_at', cutoffTimeISO)
       .eq('is_confirmed', false)
-
     if (deleteMembersError) throw deleteMembersError
 
     logger.info(`${count} inactive accounts cleaned up.`)
