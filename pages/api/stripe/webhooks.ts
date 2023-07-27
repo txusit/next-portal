@@ -92,6 +92,9 @@ const handler = async (
 
 const fulfillOrder = async (customerEmail: string, priceId: string) => {
   // Get membership id
+  logger.info(
+    `Entering fulfillOrder with: email as ${customerEmail} and priceId as ${priceId}`
+  )
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
     .select('id')
