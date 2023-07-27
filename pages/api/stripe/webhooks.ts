@@ -56,18 +56,24 @@ const handler = async (
           expand: ['line_items'],
         }
       )
-      const lineItems = checkoutEvent.data.object.line_items.data
+      logger.info(`checkout event id: ${checkoutEvent.id}`)
+      logger.info(`checkoutEvent: ${checkoutEvent}`)
+
+      logger.info(`line items: ${checkoutEvent.line_items}`)
+      logger.info(`line items url: ${checkoutEvent.line_items.url}`)
+
+      const lineItems = checkoutEvent.line_items.data
+
       if (!lineItems || lineItems.length == 0) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
           'Stripe webhook event shows checkout session completed, but no product was received'
         )
       }
-      logger.info('lineItems:', lineItems)
-      const customerEmail = checkoutEvent.data.object.customer_details.email
+      const customerEmail = checkoutEvent.customer_details.email
       const priceId = lineItems[0].price.id
-      logger.info('customerEmail: ', customerEmail)
-      logger.info('priceId: ', priceId)
+      logger.info(`customerEmail: ${customerEmail}`)
+      logger.info(`priceId: ${priceId}`)
 
       await fulfillOrder(customerEmail, priceId)
     }
@@ -85,8 +91,6 @@ const handler = async (
 }
 
 const fulfillOrder = async (customerEmail: string, priceId: string) => {
-  logger.info('passed priceId:', priceId)
-  logger.info('passed customerEmail:', customerEmail)
   // Get membership id
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
@@ -94,7 +98,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
-  logger.info('membership id:', membership.id)
+  logger.info(`membership id: ${membership.id}`)
 
   // Update member membership
   const { data: member, error: updateMemberError } = await supabase
@@ -104,7 +108,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .select()
     .single()
   if (updateMemberError) throw updateMemberError
-  logger.info('member id:', member.id)
+  logger.info(`member id: ${member.id}`)
 
   // Add new payment
   const paymentRecord: PaymentRecord = {
