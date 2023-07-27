@@ -87,10 +87,22 @@ const isMembershipAlreadyPurchased = async (
     (membership) => membership.type
   )
 
-  return (
-    MembershipTypesPaidFor.includes('full') ||
-    MembershipTypesPaidFor.includes(selectedMembership.type)
-  )
+  let isMembershipAlreadyPurchased = false
+
+  // Check for full year membership overlap
+  if (selectedMembership.type == 'full' && MembershipTypesPaidFor.length != 0) {
+    isMembershipAlreadyPurchased = true
+  }
+
+  // Check for semester membership overlap
+  if (
+    MembershipTypesPaidFor.includes(selectedMembership.type) ||
+    MembershipTypesPaidFor.includes('full')
+  ) {
+    isMembershipAlreadyPurchased = true
+  }
+
+  return isMembershipAlreadyPurchased
 }
 
 export default handler
