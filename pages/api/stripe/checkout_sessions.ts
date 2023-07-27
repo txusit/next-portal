@@ -65,6 +65,7 @@ const isMembershipAlreadyPurchased = async (
     .eq('email', email)
     .single()
   if (fetchMemberError) throw fetchMemberError
+  console.log('member:', member)
 
   // Retrieve selected membership type
   const { data: selectedMembership, error: fetchMembershipError } =
@@ -74,17 +75,18 @@ const isMembershipAlreadyPurchased = async (
       .eq('price_id', selectedPriceId)
       .single()
   if (fetchMembershipError) throw fetchMembershipError
+  console.log('selectedMembership:', selectedMembership)
 
-  // Retrieve past payment record types
+  // Retrieve types of past payment records
   const { data: paymentRecords, error: fetchPaymentRecordsError } =
     await supabase
       .from('payment_record')
-      .select('type')
+      .select('*, membership(type)')
       .eq('member_id', member.id)
   if (fetchPaymentRecordsError) throw fetchPaymentRecordsError
 
   const MembershipTypesPaidFor = paymentRecords.map(
-    (membership) => membership.type
+    (paymentRecord) => paymentRecord.membership.type
   )
 
   let isMembershipAlreadyPurchased = false
