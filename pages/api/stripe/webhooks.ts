@@ -85,6 +85,8 @@ const handler = async (
 }
 
 const fulfillOrder = async (customerEmail: string, priceId: string) => {
+  logger.info('passed priceId:', priceId)
+  logger.info('passed customerEmail:', customerEmail)
   // Get membership id
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')

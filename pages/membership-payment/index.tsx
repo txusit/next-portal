@@ -36,9 +36,9 @@ export const MembershipPaymentPage = ({
       <section>
         <input
           type='string'
-          id='selectedProductID-input'
+          id='selectedPriceId'
           value={selectedPriceId}
-          name='selectedProductID'
+          name='selectedPriceId'
           hidden
           readOnly
         />
