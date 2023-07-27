@@ -90,14 +90,14 @@ const isMembershipAlreadyPurchased = async (
   let isMembershipAlreadyPurchased = false
 
   // Check for full year membership overlap
-  if (selectedMembership.type == 'full' && MembershipTypesPaidFor.length != 0) {
+  if (selectedMembership.type == 'year' && MembershipTypesPaidFor.length != 0) {
     isMembershipAlreadyPurchased = true
   }
 
   // Check for semester membership overlap
   if (
     MembershipTypesPaidFor.includes(selectedMembership.type) ||
-    MembershipTypesPaidFor.includes('full')
+    MembershipTypesPaidFor.includes('year')
   ) {
     isMembershipAlreadyPurchased = true
   }
