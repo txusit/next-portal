@@ -45,7 +45,7 @@ const handler = async (
     ) as Stripe.DiscriminatedEvent
 
     // Successfully constructed event
-    logger.info(`Success: ${event.id} event type: ', ${event.type}`)
+    logger.debug(`Success: ${event.id} event type: ', ${event.type}`)
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
@@ -56,11 +56,11 @@ const handler = async (
           expand: ['line_items'],
         }
       )
-      logger.info(`checkout event id: ${checkoutEvent.id}`)
-      logger.info(`checkoutEvent: ${checkoutEvent}`)
+      logger.debug(`checkout event id: ${checkoutEvent.id}`)
+      logger.debug(`checkoutEvent: ${checkoutEvent}`)
 
-      logger.info(`line items: ${checkoutEvent.line_items}`)
-      logger.info(`line items url: ${checkoutEvent.line_items.url}`)
+      logger.debug(`line items: ${checkoutEvent.line_items}`)
+      logger.debug(`line items url: ${checkoutEvent.line_items.url}`)
 
       const lineItems = checkoutEvent.line_items.data
 
@@ -72,8 +72,8 @@ const handler = async (
       }
       const customerEmail = checkoutEvent.customer_details.email
       const priceId = lineItems[0].price.id
-      logger.info(`customerEmail: ${customerEmail}`)
-      logger.info(`priceId: ${priceId}`)
+      logger.debug(`customerEmail: ${customerEmail}`)
+      logger.debug(`priceId: ${priceId}`)
 
       await fulfillOrder(customerEmail, priceId)
     }
@@ -92,7 +92,7 @@ const handler = async (
 
 const fulfillOrder = async (customerEmail: string, priceId: string) => {
   // Get membership id
-  logger.info(
+  logger.debug(
     `Entering fulfillOrder with: email as ${customerEmail} and priceId as ${priceId}`
   )
   const { data: membership, error: fetchMembershipError } = await supabase
@@ -101,7 +101,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
-  logger.info(`membership id: ${membership.id}`)
+  logger.debug(`membership id: ${membership.id}`)
 
   // Update member membership
   const { data: member, error: updateMemberError } = await supabase
@@ -111,7 +111,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .select()
     .single()
   if (updateMemberError) throw updateMemberError
-  logger.info(`member id: ${member.id}`)
+  logger.debug(`member id: ${member.id}`)
 
   // Add new payment
   const paymentRecord: PaymentRecord = {
