@@ -41,7 +41,7 @@ export const ConfirmEmailSchema = z.object({
 })
 
 export const CheckoutSessionSchema = z.object({
-  selectedProductID: z.string().nonempty(),
+  selectedPriceId: z.string().nonempty(),
   email: z.string().email(),
 })
 export type CheckoutSession = z.infer<typeof CheckoutSessionSchema>

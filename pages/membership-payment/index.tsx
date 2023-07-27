@@ -11,7 +11,7 @@ export const MembershipPaymentPage = ({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
   const { data: session, status } = useSession()
-  const [selectedProductID, setSelectedProductID] = useState('')
+  const [selectedPriceId, setSelectedPriceId] = useState('')
 
   useEffect(() => {
     // Check to see if this is a redirect back from Checkout
@@ -36,9 +36,9 @@ export const MembershipPaymentPage = ({
       <section>
         <input
           type='string'
-          id='selectedProductID-input'
-          value={selectedProductID}
-          name='selectedProductID'
+          id='selectedPriceId'
+          value={selectedPriceId}
+          name='selectedPriceId'
           hidden
           readOnly
         />
@@ -57,7 +57,7 @@ export const MembershipPaymentPage = ({
           role='link'
           id='price_1MoF7BKMISeWWjOmkW5lNbpe'
           onClick={(event) => {
-            setSelectedProductID((event.target as HTMLButtonElement).id)
+            setSelectedPriceId((event.target as HTMLButtonElement).id)
           }}
         >
           Spring Membership
@@ -68,7 +68,7 @@ export const MembershipPaymentPage = ({
           role='link'
           id='price_1MoF6qKMISeWWjOmvQtEcz6q'
           onClick={(event) => {
-            setSelectedProductID((event.target as HTMLButtonElement).id)
+            setSelectedPriceId((event.target as HTMLButtonElement).id)
           }}
         >
           Fall Membership
@@ -79,7 +79,7 @@ export const MembershipPaymentPage = ({
           role='link'
           id='price_1MoF6XKMISeWWjOmLrqiyiHF'
           onClick={(event) => {
-            setSelectedProductID((event.target as HTMLButtonElement).id)
+            setSelectedPriceId((event.target as HTMLButtonElement).id)
           }}
         >
           Full Year Membership

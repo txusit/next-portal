@@ -26,13 +26,13 @@ export const config = {
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
+const logger = getLogger()
+
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const processStripeEvent = async () => {
-    const logger = getLogger()
-
     const buf = await buffer(req)
     const sig = req.headers['stripe-signature']!
 
@@ -45,26 +45,35 @@ const handler = async (
     ) as Stripe.DiscriminatedEvent
 
     // Successfully constructed event
-    logger.info(`Success: ${event.id} event type: ', ${event.type}`)
+    logger.debug(`Success: ${event.id} event type: ', ${event.type}`)
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
       const checkoutObjectId = event.data.object.id
       const checkoutEvent = await stripe.checkout.sessions.retrieve(
-        checkoutObjectId
+        checkoutObjectId,
+        {
+          expand: ['line_items'],
+        }
       )
+      logger.debug(`checkout event id: ${checkoutEvent.id}`)
+      logger.debug(`checkoutEvent: ${checkoutEvent}`)
 
-      const lineItems = await stripe.checkout.sessions.listLineItems(
-        checkoutObjectId
-      )
-      if (!lineItems) {
+      logger.debug(`line items: ${checkoutEvent.line_items}`)
+      logger.debug(`line items url: ${checkoutEvent.line_items.url}`)
+
+      const lineItems = checkoutEvent.line_items.data
+
+      if (!lineItems || lineItems.length == 0) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
           'Stripe webhook event shows checkout session completed, but no product was received'
         )
       }
       const customerEmail = checkoutEvent.customer_details.email
-      const priceId = lineItems.data[0].price.id
+      const priceId = lineItems[0].price.id
+      logger.debug(`customerEmail: ${customerEmail}`)
+      logger.debug(`priceId: ${priceId}`)
 
       await fulfillOrder(customerEmail, priceId)
     }
@@ -83,12 +92,16 @@ const handler = async (
 
 const fulfillOrder = async (customerEmail: string, priceId: string) => {
   // Get membership id
+  logger.debug(
+    `Entering fulfillOrder with: email as ${customerEmail} and priceId as ${priceId}`
+  )
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
     .select('id')
     .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
+  logger.debug(`membership id: ${membership.id}`)
 
   // Update member membership
   const { data: member, error: updateMemberError } = await supabase
@@ -98,6 +111,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .select()
     .single()
   if (updateMemberError) throw updateMemberError
+  logger.debug(`member id: ${member.id}`)
 
   // Add new payment
   const paymentRecord: PaymentRecord = {
