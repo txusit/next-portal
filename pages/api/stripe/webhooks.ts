@@ -49,18 +49,14 @@ const handler = async (
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
+      const checkoutObjectId = event.data.object.id
       const checkoutEvent = await stripe.checkout.sessions.retrieve(
-        event.data.object.id,
-        {
-          expand: ['line_items'],
-        }
+        checkoutObjectId
       )
-      const lineItems = await stripe.checkout.sessions.listLineItems(
-        event.data.object.id
-      )
-      // Retrieve productId
 
-      console.log('lineItems:', lineItems)
+      const lineItems = await stripe.checkout.sessions.listLineItems(
+        checkoutObjectId
+      )
       if (!lineItems) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
@@ -68,9 +64,9 @@ const handler = async (
         )
       }
       const customerEmail = checkoutEvent.customer_details.email
-      const productId = lineItems.data[0].price.product
+      const priceId = lineItems.data[0].price.id
 
-      await fulfillOrder(customerEmail, productId)
+      await fulfillOrder(customerEmail, priceId)
     }
 
     res.status(HttpStatusCode.Ok).end()
@@ -85,12 +81,12 @@ const handler = async (
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
-const fulfillOrder = async (customerEmail: string, productId: string) => {
+const fulfillOrder = async (customerEmail: string, priceId: string) => {
   // Get membership id
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
     .select('id')
-    .eq('product_id', productId)
+    .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
 
