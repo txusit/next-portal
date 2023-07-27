@@ -26,13 +26,13 @@ export const config = {
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
+const logger = getLogger()
+
 const handler = async (
   req: NextApiRequest,
   res: NextApiResponse<ResponseData>
 ) => {
   const processStripeEvent = async () => {
-    const logger = getLogger()
-
     const buf = await buffer(req)
     const sig = req.headers['stripe-signature']!
 
@@ -65,6 +65,8 @@ const handler = async (
       }
       const customerEmail = checkoutEvent.customer_details.email
       const priceId = lineItems.data[0].price.id
+      logger.info('customerEmail: ', customerEmail)
+      logger.info('priceId: ', priceId)
 
       await fulfillOrder(customerEmail, priceId)
     }
@@ -89,6 +91,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
+  logger.info('membership id:', membership.id)
 
   // Update member membership
   const { data: member, error: updateMemberError } = await supabase
@@ -98,6 +101,7 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
     .select()
     .single()
   if (updateMemberError) throw updateMemberError
+  logger.info('member id:', member.id)
 
   // Add new payment
   const paymentRecord: PaymentRecord = {
