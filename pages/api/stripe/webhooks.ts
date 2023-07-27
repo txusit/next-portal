@@ -57,12 +57,13 @@ const handler = async (
       const lineItems = await stripe.checkout.sessions.listLineItems(
         checkoutObjectId
       )
-      if (!lineItems) {
+      if (!lineItems || lineItems.length == 0) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
           'Stripe webhook event shows checkout session completed, but no product was received'
         )
       }
+      logger.info('lineItems:', lineItems)
       const customerEmail = checkoutEvent.customer_details.email
       const priceId = lineItems.data[0].price.id
       logger.info('customerEmail: ', customerEmail)

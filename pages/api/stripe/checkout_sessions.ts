@@ -15,15 +15,15 @@ const handler = async (
 ) => {
   const checkoutSession = async () => {
     const parsedBody = CheckoutSessionSchema.parse(req.body)
-    const { selectedProductID, email } = parsedBody
-    console.log('selectedProductID:', selectedProductID)
+    const { selectedPriceId, email } = parsedBody
+    console.log('selectedPriceId:', selectedPriceId)
 
     // Create Checkout Sessions from body params.
     const session = await stripe.checkout.sessions.create({
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-          price: selectedProductID,
+          price: selectedPriceId,
           quantity: 1,
         },
       ],
