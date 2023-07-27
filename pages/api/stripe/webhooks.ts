@@ -23,6 +23,8 @@ export const config = {
   },
 }
 
+const logger = getLogger()
+
 const webhookSecret: string = process.env.STRIPE_WEBHOOK_SECRET!
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY)
 
@@ -83,6 +85,8 @@ const handler = async (
 }
 
 const fulfillOrder = async (customerEmail: string, productId: string) => {
+  logger.info('customerEmail: ', customerEmail)
+  logger.info('productId: ', productId)
   // Get membership id
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
@@ -90,27 +94,24 @@ const fulfillOrder = async (customerEmail: string, productId: string) => {
     .eq('product_id', productId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
-
-  // Get member id
-  const { data: member, error: fetchMemberError } = await supabase
-    .from('member')
-    .select('id')
-    .eq('email', customerEmail)
-    .single()
-  if (fetchMemberError) throw fetchMemberError
+  logger.info('membership:', membership)
 
   // Update member membership
-  const { error: updateMemberError } = await supabase
+  const { data: member, error: updateMemberError } = await supabase
     .from('member')
     .update({ membership_id: membership.id })
-    .eq('id', member.id)
+    .eq('email', customerEmail)
+    .select()
+    .single()
   if (updateMemberError) throw updateMemberError
+  logger.info('member:', member)
 
   // Add new payment
   const paymentRecord: PaymentRecord = {
     member_id: member.id,
     membership_id: membership.id,
   }
+  logger.info('paymentRecord:', paymentRecord)
   const { error: insertPaymentRecordError } = await supabase
     .from('payment_record')
     .insert(paymentRecord)
