@@ -16,6 +16,7 @@ const handler = async (
   const checkoutSession = async () => {
     const parsedBody = CheckoutSessionSchema.parse(req.body)
     const { selectedProductID, email } = parsedBody
+    console.log('selectedProductID:', selectedProductID)
 
     // Create Checkout Sessions from body params.
     const session = await stripe.checkout.sessions.create({

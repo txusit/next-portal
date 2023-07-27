@@ -49,24 +49,24 @@ const handler = async (
 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
+      const checkoutObjectId = event.data.object.id
       const checkoutEvent = await stripe.checkout.sessions.retrieve(
-        event.data.object.id,
-        {
-          expand: ['line_items'],
-        }
+        checkoutObjectId
       )
-      // Retrieve productId
-      const line_items = checkoutEvent.line_items
-      if (!line_items) {
+
+      const lineItems = await stripe.checkout.sessions.listLineItems(
+        checkoutObjectId
+      )
+      if (!lineItems) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
           'Stripe webhook event shows checkout session completed, but no product was received'
         )
       }
       const customerEmail = checkoutEvent.customer_details.email
-      const productId = line_items.data[0].price.product
+      const priceId = lineItems.data[0].price.id
 
-      await fulfillOrder(customerEmail, productId)
+      await fulfillOrder(customerEmail, priceId)
     }
 
     res.status(HttpStatusCode.Ok).end()
@@ -81,12 +81,12 @@ const handler = async (
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
-const fulfillOrder = async (customerEmail: string, productId: string) => {
+const fulfillOrder = async (customerEmail: string, priceId: string) => {
   // Get membership id
   const { data: membership, error: fetchMembershipError } = await supabase
     .from('membership')
     .select('id')
-    .eq('product_id', productId)
+    .eq('price_id', priceId)
     .single()
   if (fetchMembershipError) throw fetchMembershipError
 
