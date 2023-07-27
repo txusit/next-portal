@@ -51,12 +51,12 @@ const handler = async (
     if (event.type === 'checkout.session.completed') {
       const checkoutObjectId = event.data.object.id
       const checkoutEvent = await stripe.checkout.sessions.retrieve(
-        checkoutObjectId
+        checkoutObjectId,
+        {
+          expand: ['line_items'],
+        }
       )
-
-      const lineItems = await stripe.checkout.sessions.listLineItems(
-        checkoutObjectId
-      )
+      const lineItems = checkoutEvent.data.object.line_items.data
       if (!lineItems || lineItems.length == 0) {
         throw new ApiError(
           HttpStatusCode.ExpectationFailed,
@@ -64,8 +64,8 @@ const handler = async (
         )
       }
       logger.info('lineItems:', lineItems)
-      const customerEmail = checkoutEvent.customer_details.email
-      const priceId = lineItems.data[0].price.id
+      const customerEmail = checkoutEvent.data.object.customer_details.email
+      const priceId = lineItems[0].price.id
       logger.info('customerEmail: ', customerEmail)
       logger.info('priceId: ', priceId)
 
