@@ -57,6 +57,7 @@ const handler = async (
           expand: ['line_items'],
         }
       )
+      logger.info('checkoutEvent: ', checkoutEvent)
 
       // Retrieve productId
       const line_items = checkoutEvent.line_items
@@ -68,6 +69,8 @@ const handler = async (
       }
       const customerEmail = checkoutEvent.customer_details.email
       const productId = line_items.data[0].price.product
+      logger.info('customerEmail: ', customerEmail)
+      logger.info('productId: ', productId)
 
       await fulfillOrder(customerEmail, productId)
     }
