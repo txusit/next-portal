@@ -11,7 +11,7 @@ clean:
 clean-portal: clean
 	docker-compose up --build portal
 
-portal:
+ :
 	docker-compose up portal
 
 # portal and Database

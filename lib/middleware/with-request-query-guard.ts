@@ -7,9 +7,14 @@ type MiddlewareWithoutParams = () => Middleware
 
 const withRequestQueryGuard: MiddlewareWithoutParams = () => {
   return (req: NextApiRequest, res: NextApiResponse) => {
-    if (!req.query) {
+    if (!req.query || isEmpty(req.query)) {
       throw new ApiError(HttpStatusCode.BadRequest, 'Missing request queries')
     }
   }
 }
+
+const isEmpty = (obj: any) => {
+  return Object.keys(obj).length === 0
+}
+
 export default withRequestQueryGuard

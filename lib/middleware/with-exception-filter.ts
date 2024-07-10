@@ -1,10 +1,10 @@
 import { getLogger } from '@/lib/helpers/server-side/log-util'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
-import mongoose from 'mongoose'
 import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next'
 import { ApiError } from 'next/dist/server/api-utils'
 import { ZodError } from 'zod'
+import { PostgrestError } from '@supabase/supabase-js'
 
 // wrap all api endpoint handlers with this method before exporting
 const withExceptionFilter = (
@@ -18,12 +18,26 @@ const withExceptionFilter = (
       return await handler(req, res)
     } catch (exception) {
       const { url, headers } = req
-
       let statusCode, message, stack
+
+      // Handle if exception is thrown, but exception object is null (Special Case?)
+      if (exception === null) {
+        statusCode = HttpStatusCode.InternalServerError
+        message =
+          'Exception was thrown, but exception object was null. no additional details about exception.'
+      }
+
       // Handle Specific Errors
       if (exception instanceof ZodError) {
         statusCode = HttpStatusCode.BadRequest
         message = exception.errors
+      }
+
+      // Handle Supabase errors
+      if (isPostgrestError(exception)) {
+        statusCode = HttpStatusCode.InternalServerError
+        message = exception as any
+        message['source'] = 'supabase'
       }
 
       // Handle generic API Errors if not handled by specific error handling above
@@ -111,4 +125,11 @@ function getExceptionStack(exception: unknown): string | undefined {
  */
 function isError(exception: unknown): exception is Error {
   return exception instanceof Error
+}
+
+// Helper function to check if an exception is a PostgrestError
+function isPostgrestError(error: any): error is PostgrestError {
+  return (
+    error && typeof error === 'object' && 'message' in error && 'hint' in error
+  )
 }

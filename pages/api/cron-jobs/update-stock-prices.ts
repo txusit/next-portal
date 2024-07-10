@@ -32,7 +32,7 @@ const handler = async (
 
     // Update stock prices by the batches
     for (let stockBatch of stockBatches) {
-      batchUpdateStockPrice(stockBatch)
+      await batchUpdateStockPrice(stockBatch)
     }
 
     res.status(HttpStatusCode.Ok).end()
@@ -49,7 +49,7 @@ const handler = async (
 }
 
 const getStockBatches = (stocks: Stock[]) => {
-  const updatedStockBatches = []
+  const stockBatches = []
 
   const batchCount = Math.ceil(stocks.length / SYMBOL_REQUEST_LIMIT)
 
@@ -60,10 +60,10 @@ const getStockBatches = (stocks: Stock[]) => {
         ? (i + 1) * SYMBOL_REQUEST_LIMIT
         : stocks.length
 
-    updatedStockBatches.push(stocks.slice(batchStart, batchEnd))
+    stockBatches.push(stocks.slice(batchStart, batchEnd))
   }
 
-  return updatedStockBatches
+  return stockBatches
 }
 
 const batchUpdateStockPrice = async (stocks: Stock[]) => {

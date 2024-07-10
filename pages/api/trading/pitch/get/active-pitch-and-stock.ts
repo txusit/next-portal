@@ -16,24 +16,33 @@ const handler = async (
       .from('meeting')
       .select('id')
       .eq('is_active', true)
-      .single()
+      .maybeSingle()
     if (fetchMeetingError) throw fetchMeetingError
+    if (!meeting) {
+      return res.status(HttpStatusCode.NoContent).end()
+    }
 
     // Get pitch using meeting id
     const { data: pitch, error: fetchPitchError } = await supabase
       .from('pitch')
       .select('stock_id, direction')
       .eq('meeting_id', meeting.id)
-      .single()
+      .maybeSingle()
     if (fetchPitchError) throw fetchPitchError
+    if (!pitch) {
+      return res.status(HttpStatusCode.NoContent).end()
+    }
 
     // Get stock using stock_id
     const { data: stock, error: fetchStockError } = await supabase
       .from('stock')
       .select('name')
       .eq('id', pitch.stock_id)
-      .single()
+      .maybeSingle()
     if (fetchStockError) throw fetchStockError
+    if (!stock) {
+      return res.status(HttpStatusCode.NoContent).end()
+    }
 
     res.status(HttpStatusCode.Ok).json({ payload: { pitch, stock } })
   }

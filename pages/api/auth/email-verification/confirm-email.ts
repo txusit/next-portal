@@ -15,7 +15,7 @@ const handler = async (
 ) => {
   const confirmEmail = async () => {
     const parsedBody = ConfirmEmailSchema.parse(req.body)
-    let { token } = parsedBody
+    const { token } = parsedBody
 
     // Retrieve payload from jwt token
     const payload = jwt.verify(

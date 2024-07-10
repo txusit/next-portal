@@ -37,7 +37,7 @@ const handler = async (
     if (!result.ok) {
       throw new ApiError(
         HttpStatusCode.ServiceUnavailable,
-        'Unable to send confirmation email'
+        'Unable to generate token and send password reset email'
       )
     }
 

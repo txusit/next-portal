@@ -1,6 +1,6 @@
 import NextAuth, { NextAuthOptions } from 'next-auth'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import { ResponseData, User as TUser } from '@/types'
+import { ResponseData } from '@/types'
 import axios, { HttpStatusCode } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
 import { ZodIssue } from 'zod'

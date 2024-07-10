@@ -5,34 +5,18 @@
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
-import { describe, beforeEach, it, expect } from '@jest/globals'
+import { describe, it, expect } from '@jest/globals'
 import { ApiError } from 'next/dist/server/api-utils'
 import { HttpStatusCode } from 'axios'
-import { RequestMethod, createRequest, createResponse } from 'node-mocks-http'
+import { RequestMethod, createMocks } from 'node-mocks-http'
 
 // Test Type: Unit Tests
 describe('withMethodsGuard', () => {
-  let req: NextApiRequest
-  let res: NextApiResponse
-  const OLD_ENV = process.env
-  OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
+  process.env.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
-  beforeEach(() => {
-    process.env = { ...OLD_ENV } // Make a copy
-  })
-
-  afterAll(() => {
-    process.env = OLD_ENV // Restore old environment
-  })
-
-  const mockRequestResponse = (
-    method: RequestMethod = 'GET'
-  ): { req: NextApiRequest; res: NextApiResponse } => {
-    req = createRequest({
-      method: method,
-    })
-    res = createResponse()
-
+  const mockRequestResponse = (method: RequestMethod = 'GET') => {
+    const { req, res }: { req: NextApiRequest; res: NextApiResponse } =
+      createMocks({ method })
     return { req, res }
   }
 
@@ -40,12 +24,10 @@ describe('withMethodsGuard', () => {
     const { req, res } = mockRequestResponse()
 
     const checkHttpMethod = withMethodsGuard(['GET'])
-    try {
+
+    expect(() => {
       checkHttpMethod(req, res)
-    } catch (error) {
-      // Should not be reached
-      expect(error).toBe(undefined)
-    }
+    }).not.toThrow()
   })
 
   // Generic Error Handling
@@ -59,6 +41,7 @@ describe('withMethodsGuard', () => {
     )
 
     const checkHttpMethod = withMethodsGuard(['GET'])
+
     expect(() => {
       checkHttpMethod(req, res)
     }).toThrowError(expectedError)

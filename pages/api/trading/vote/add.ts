@@ -17,6 +17,14 @@ const handler = async (
     const parsedBody = AddVoteSchema.parse(req.body)
     const { email, direction, price } = parsedBody
 
+    // Check for invalid input of hold and a non-zero price
+    if (direction == 'hold' && price == 0) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        `Invalid input for vote. A vote cannot have a \'hold\' direction while also having a non-zero price of: ${price}.`
+      )
+    }
+
     // fetch member id
     const { data: member, error: fetchMemberError } = await supabase
       .from('member')
@@ -25,7 +33,7 @@ const handler = async (
       .single()
     if (fetchMemberError) throw fetchMemberError
 
-    // fetch meeting id
+    // fetch active meeting id
     const { data: meeting, error: fetchMeetingError } = await supabase
       .from('meeting')
       .select('id')

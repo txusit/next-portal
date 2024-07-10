@@ -1,10 +1,15 @@
 import { ZodError, boolean, z } from 'zod'
 
+export const PasswordSchema = z
+  .string()
+  .min(6, { message: 'Must be 6 or more characters long' })
+export type Password = z.infer<typeof PasswordSchema>
+
 export const SignUpSchema = z.object({
   firstName: z.string().nonempty({ message: 'Must not be empty' }),
   lastName: z.string().nonempty({ message: 'Must not be empty' }),
   email: z.string().email(),
-  password: z.string().min(6, { message: 'Must be 6 or more characters long' }),
+  password: PasswordSchema,
 })
 export type SignUp = z.infer<typeof SignUpSchema>
 
@@ -28,7 +33,7 @@ export type SendPasswordResetEmail = z.infer<
 
 export const ResetPasswordSchema = z.object({
   token: z.string().nonempty(),
-  password: z.string().nonempty(),
+  password: PasswordSchema,
 })
 export type ResetPassword = z.infer<typeof ResetPasswordSchema>
 

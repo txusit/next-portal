@@ -1,54 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ZodIssue } from 'zod'
 
-export type User = {
-  _id?: string
-  email: string
-  fullName: string
-  isConfirmed: boolean
-  membership: string
-  creationTime: Date
-  attendedMeetingIds: string[]
-
-  // TODO: add additional fields like: EID, graduation year, college, role, etc
-}
-
-export type Meeting = {
-  _id?: string
-  userIds: string[]
-  meetingDate: Date
-  stockTicker: string
-  creationTime: Date
-  isActive: Boolean
-}
-
-export type Stock = {
-  _id?: string
-  name: string
-  ticker: string
-  price: number
-  creationTime: Date
-}
-
-export type Vote = {
-  _id?: string
-  userEmail: string
-  ticker: string
-  price: number
-  direction: string
-  creationTime: Date
-}
-
-export type Pitch = {
-  _id?: string
-  stockTicker: string
-  percentYes?: number
-  votesFor: number
-  votesAgainst: number
-  direction: string
-  creationTime: Date
-}
-
 export type JwtEmailToken = {
   member_id: string
 }

@@ -23,8 +23,8 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "__tests__/frontend/example.test.jsx",
+    "__tests__/pages/example.test.jsx",
     "types/database-schemas.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "cypress/**/*", "cypress.config.ts"]
 }

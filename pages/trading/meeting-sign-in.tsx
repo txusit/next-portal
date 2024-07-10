@@ -18,7 +18,7 @@ const MeetingSignInPage = (props: Props) => {
       }
 
       const response = await axios.get<ResponseData>(
-        `/api/trading/meeting/get/active-attendance/${email}`,
+        `/api/trading/meeting/get/active-meeting-attendance/${email}`,
         {
           validateStatus() {
             return true
@@ -41,7 +41,7 @@ const MeetingSignInPage = (props: Props) => {
     setIsMeetingAttended(true)
 
     const response = await axios.post<ResponseData>(
-      '/api/trading/meeting/update/active-attendance',
+      '/api/trading/meeting/update/active-meeting-attendance',
       {
         email: data?.user?.email,
       },

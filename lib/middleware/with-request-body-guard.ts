@@ -7,9 +7,14 @@ type MiddlewareWithoutParams = () => Middleware
 
 const withRequestBodyGuard: MiddlewareWithoutParams = () => {
   return (req: NextApiRequest, res: NextApiResponse) => {
-    if (!req.body) {
+    if (!req.body || isEmpty(req.body)) {
       throw new ApiError(HttpStatusCode.BadRequest, 'Missing request body')
     }
   }
 }
+
+const isEmpty = (obj: any) => {
+  return Object.keys(obj).length === 0
+}
+
 export default withRequestBodyGuard

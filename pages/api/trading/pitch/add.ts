@@ -24,6 +24,14 @@ const handler = async (
       .single()
     if (fetchMeetingError) throw fetchMeetingError
 
+    // Check for valid existing stockId
+    const { data: stock, error: fetchStockError } = await supabase
+      .from('stock')
+      .select('id')
+      .eq('id', stockId)
+      .single()
+    if (fetchStockError) throw fetchStockError
+
     // Add new pitch
     const newPitch: Pitch = {
       stock_id: stockId,
