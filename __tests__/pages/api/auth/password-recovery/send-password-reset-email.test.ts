@@ -7,7 +7,6 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { createRequest } from 'node-mocks-http'
-import User from '@/models/User'
 import { supabase } from '@/lib/helpers/supabase'
 
 // Set up module mocks

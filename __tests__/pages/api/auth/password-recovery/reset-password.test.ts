@@ -8,7 +8,6 @@ import handler from '@/pages/api/auth/password-recovery/reset-password'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { RequestMethod, createMocks, createRequest } from 'node-mocks-http'
-import User from '@/models/User'
 import * as jwt from 'jsonwebtoken'
 import { supabase } from '@/lib/helpers/supabase'
 
@@ -17,14 +16,14 @@ describe('confirmEmail', () => {
   // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
   beforeAll(async () => {
-    const testUser = new User({
-      fullName: 'test user',
-      email: 'test@example.com',
-      password: 'password123',
-      isConfirmed: false,
-      creationTime: new Date(),
-    })
-    await testUser.save()
+    // const testUser = new User({
+    //   fullName: 'test user',
+    //   email: 'test@example.com',
+    //   password: 'password123',
+    //   isConfirmed: false,
+    //   creationTime: new Date(),
+    // })
+    // await testUser.save()
   })
 
   beforeEach(async () => {
