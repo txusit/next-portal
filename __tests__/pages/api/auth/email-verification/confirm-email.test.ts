@@ -8,7 +8,6 @@ import handler from '@/pages/api/auth/email-verification/confirm-email'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { RequestMethod, createMocks, createRequest } from 'node-mocks-http'
-import User from '@/models/User'
 import * as jwt from 'jsonwebtoken'
 
 /**
@@ -37,13 +36,12 @@ describe('confirmEmail', () => {
   }
 
   it('should fail with error when token is invalid', async () => {
+    const token = 'invalid_token'
+
     // Configure Mocks
     const { req, res } = mockRequestResponse('PATCH')
-    req.url = 'http://localhost:3000/api/auth/email-verification/confirm-email'
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
-
-    const token = 'invalid_token'
     req.body = { token }
 
     // Run endpoint handler and check response

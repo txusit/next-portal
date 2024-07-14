@@ -58,7 +58,7 @@ describe('sendConfirmationEmail', () => {
     async () => {
       // Create new Member
       const email = '__TEST__member@gmail.com'
-      const password = 'test_password'
+      const password = '__TEST__password'
       const hashedPassword = await hash(password, 12)
       const memberData: Member = {
         email: email,
@@ -84,11 +84,13 @@ describe('sendConfirmationEmail', () => {
   )
 
   it('should fail with error when missing or invalid email', async () => {
+    const invalidRequestBody = {}
+
     // Configure Mocks
     const { req, res } = mockRequestResponse('POST')
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
-    req.body = {} // key test item
+    req.body = invalidRequestBody // key test item
 
     // Run endpoint handler and check response
     await handler(req, res)
@@ -125,9 +127,11 @@ describe('sendConfirmationEmail', () => {
   })
 
   it('should fail with error when confirmation email fails to send', async () => {
+    const sentActionEmail = false
+
     // Create new Member
     const email = '__TEST__member@gmail.com'
-    const password = 'test_password'
+    const password = '__TEST__password'
     const hashedPassword = await hash(password, 12)
     const memberData: Member = {
       email: email,
@@ -146,8 +150,7 @@ describe('sendConfirmationEmail', () => {
     req.body = { email }
     const mockSendEmail = sendActionEmail as jest.Mock
     mockSendEmail.mockReturnValueOnce({
-      // key test item
-      ok: false,
+      ok: sentActionEmail,
     })
 
     // Run endpoint handler and check response

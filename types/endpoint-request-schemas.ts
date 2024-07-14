@@ -1,5 +1,8 @@
 import { ZodError, boolean, z } from 'zod'
 
+export const UUIDSchema = z.string().uuid()
+export type UUIDSchema = z.infer<typeof UUIDSchema>
+
 export const PasswordSchema = z
   .string()
   .min(6, { message: 'Must be 6 or more characters long' })

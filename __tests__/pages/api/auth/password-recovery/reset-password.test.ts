@@ -7,40 +7,20 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import handler from '@/pages/api/auth/password-recovery/reset-password'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { RequestMethod, createMocks, createRequest } from 'node-mocks-http'
+import { RequestMethod, createMocks } from 'node-mocks-http'
 import * as jwt from 'jsonwebtoken'
 import { supabase } from '@/lib/helpers/supabase'
+import { Member } from '@/types/database-schemas'
+import { compare, hash } from 'bcryptjs'
 
 describe('confirmEmail', () => {
   // const OLD_ENV = process.env
   // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
-  beforeAll(async () => {
-    // const testUser = new User({
-    //   fullName: 'test user',
-    //   email: 'test@example.com',
-    //   password: 'password123',
-    //   isConfirmed: false,
-    //   creationTime: new Date(),
-    // })
-    // await testUser.save()
-  })
-
   beforeEach(async () => {
     // Make a copy of original process.env
     // process.env = { ...OLD_ENV }
 
-    // Reset MonboDB test User
-    // await User.findOneAndUpdate(
-    //   { email: 'test@example.com' },
-    //   {
-    //     fullName: 'test user',
-    //     email: 'test@example.com',
-    //     password: 'password123',
-    //     isConfirmed: true,
-    //     creationTime: new Date(),
-    //   }
-    // )
     await supabase.rpc('delete_test_resources')
   })
 
@@ -65,126 +45,170 @@ describe('confirmEmail', () => {
   }
 
   it('should reset password without errors', async () => {
-    expect(true)
-    // Construct token and encrypt password asymmetrically
-    // const asymEncryptPassword = encryptData('password123')
-    // const user = await User.findOne({ email: 'test@example.com' })
-    // const payload = { user_id: user._id }
-    // const token = jwt.sign(
-    //   payload,
-    //   process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-    //   {
-    //     expiresIn: '1d', // expires in 1 day
-    //   }
-    // )
+    // Create new Member
+    const email = '__TEST__member@gmail.com'
+    const password = '__TEST__password'
+    const hashedPassword = await hash(password, 12)
+    const memberData: Member = {
+      email: email,
+      first_name: '__TEST__John',
+      last_name: '__TEST__Doe',
+      password: hashedPassword,
+      is_confirmed: false,
+      membership_id: null,
+    }
+    const { data: member, error: fetchMemberError } = await supabase
+      .from('member')
+      .insert(memberData)
+      .select()
+      .single()
 
-    // // Configure Mocks
-    // req.method = 'PATCH'
-    // req.body = { token, asymEncryptPassword }
+    // Generate token from new member
+    const payload = { member_id: member.id }
+    const token = jwt.sign(
+      payload,
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
+      {
+        expiresIn: '1d', // expires in 1 day
+      }
+    )
 
-    // // Run endpoint handler and check response
-    // await handler(req, res)
-    // expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
-    // expect(res.json).toHaveBeenCalledWith(
-    //   expect.objectContaining({ message: 'successfully updated password' })
-    // )
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('PATCH')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    const newPassword = '__TEST__new_password'
+    req.body = { token, password: newPassword }
+
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
+
+    // Check if new password has been set properly
+    const { data: updatedMember, error: fetchUpdatedMemberError } =
+      await supabase
+        .from('member')
+        .select('password')
+        .eq('email', email)
+        .single()
+    expect(compare(newPassword, updatedMember?.password)).toBeTruthy()
   })
 
-  it('should fail with error when missing token and/or asymEncryptedPassword', async () => {
-    expect(true)
+  it('should fail with error when missing token and/or password', async () => {
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('PATCH')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {}
 
-    // // Configure Mocks
-    // req.method = 'PATCH'
-    // req.body = {} // key test item
-
-    // // Run endpoint handler and check response
-    // await handler(req, res)
-    // expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    // expect(res.json).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     message:
-    //       'Unable to reset password because of missing token and/or asymEncryptedPassword',
-    //   })
-    // )
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          message: 'Missing request body',
+        }),
+      })
+    )
   })
 
   it('should fail with error when token is invalid', async () => {
-    expect(true)
+    // Set token and password
+    const token = 'invalidtoken'
+    const password = '__TEST__password'
 
-    // // Construct token and encrypt password asymmetrically
-    // const asymEncryptPassword = encryptData('password123')
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('PATCH')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = { password, token } // key test item
 
-    // // Configure Mocks
-    // req.method = 'PATCH'
-    // req.body = { asymEncryptPassword, token: 'notavalidtoken' } // key test item
-
-    // // Run endpoint handler and check response
-    // await handler(req, res)
-    // expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Unauthorized)
-    // expect(res.json).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     message: 'verification of JWT Token failed',
-    //   })
-    // )
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.InternalServerError)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.objectContaining({ message: 'jwt malformed' }),
+      })
+    )
   })
 
-  it('should fail with error when token payload contains non ObjectId user_id ', async () => {
-    expect(true)
+  it('should fail with error when token payload contains non-UUID member id ', async () => {
+    // Set password
+    const password = '__TEST__password'
 
-    // // Construct token and encrypt password asymmetrically
-    // const asymEncryptPassword = encryptData('password123')
-    // const user_id = 'nonobjectiduserid'
-    // const payload = { user_id } // key test item
-    // const token = jwt.sign(
-    //   payload,
-    //   process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-    //   {
-    //     expiresIn: '1d', // expires in 1 day
-    //   }
-    // )
+    // Construt token
+    const member_id = 'nonUUIDmemberid'
+    const payload = { member_id } // key test item
+    const token = jwt.sign(
+      payload,
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
+      {
+        expiresIn: '1d', // expires in 1 day
+      }
+    )
 
-    // // Configure Mocks
-    // req.method = 'PATCH'
-    // req.body = { asymEncryptPassword, token }
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('PATCH')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = { password, token }
 
-    // // Run endpoint handler and check response
-    // await handler(req, res)
-    // expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    // expect(res.json).toHaveBeenCalledWith(
-    //   expect.objectContaining({
-    //     message: 'Unable to find user because user_id is not of type ObjectId',
-    //   })
-    // )
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          message: 'Password reset token contains invalid member id',
+        }),
+      })
+    )
   })
 
   it('should fail with error when no account is associated with user_id in token', async () => {
-    expect(true)
+    // Create new Member
+    const email = '__TEST__member@gmail.com'
+    const password = '__TEST__password'
+    const hashedPassword = await hash(password, 12)
+    const memberData: Member = {
+      email: email,
+      first_name: '__TEST__John',
+      last_name: '__TEST__Doe',
+      password: hashedPassword,
+      is_confirmed: false,
+      membership_id: null,
+    }
+    await supabase.from('member').insert(memberData)
 
-    //   // Construct token and encrypt password asymmetrically
-    //   const asymEncryptPassword = encryptData('password123')
-    //   const incorrectObjectId = 12312312312312312313112312
-    //   const user_id = new mongoose.Types.ObjectId(incorrectObjectId)
-    //   const payload = { user_id } // key test item
-    //   const token = jwt.sign(
-    //     payload,
-    //     process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
-    //     {
-    //       expiresIn: '1d', // expires in 1 day
-    //     }
-    //   )
+    // Generate token using invalid member id
+    const invalidMemberId = '00000000-0000-0000-0000-000000000000'
+    const payload = { member_id: invalidMemberId }
+    const token = jwt.sign(
+      payload,
+      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET as string,
+      {
+        expiresIn: '1d', // expires in 1 day
+      }
+    )
 
-    //   // Configure Mocks
-    //   req.method = 'PATCH'
-    //   req.body = { asymEncryptPassword, token }
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('PATCH')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    const newPassword = '__TEST__new_password'
+    req.body = { token, password: newPassword }
 
-    //   // Run endpoint handler and check response
-    //   await handler(req, res)
-    //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
-    //   expect(res.json).toHaveBeenCalledWith(
-    //     expect.objectContaining({
-    //       message:
-    //         'Unable to update password because there is no account associated with the _id provided',
-    //     })
-    //   )
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
+    expect(res.json).toHaveBeenCalledWith(
+      expect.objectContaining({
+        error: expect.objectContaining({
+          message: `Unable to update password because there is no account associated with the id provided: ${invalidMemberId}`,
+        }),
+      })
+    )
   })
 })

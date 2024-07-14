@@ -23,13 +23,12 @@ const handler = async (
       .from('member')
       .select('id, is_confirmed')
       .eq('email', email)
-      .single()
+      .maybeSingle()
     if (fetchMemberError) throw fetchMemberError
-    if (!member.is_confirmed) {
-      throw new ApiError(
-        HttpStatusCode.BadRequest,
-        'The email associated with this account has not been verified'
-      )
+
+    // If member does not exist or is unverified, respond with a generic message (For security purposes)
+    if (!member || !member.is_confirmed) {
+      return res.status(HttpStatusCode.Ok).end()
     }
 
     // Send password reset email
