@@ -1,25 +1,15 @@
-/**
- * @jest-environment node
- */
-// required-header-for-jest-test.js
+import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
-import { NextApiRequest, NextApiResponse } from 'next'
-import handler from '@/pages/api/auth/email-verification/confirm-email'
-import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { RequestMethod, createMocks, createRequest } from 'node-mocks-http'
-import User from '@/models/User'
-import * as jwt from 'jsonwebtoken'
+import { NextApiRequest, NextApiResponse } from 'next'
+import handler from '@/pages/api/dev/example-endpoint'
 
-/**
- * 1. SpyOn 3rd party library and replace method
- * 2. Consider switching to integration testing, search for mock up library for supabase
- */
-
-describe('confirmEmail', () => {
+describe('Example Endpoint', () => {
   process.env.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
   beforeEach(() => {
+    // Add this if supabase client is used in a test suite
     jest.mock('@/lib/helpers/supabase', () => ({
       supabase: {
         from: jest.fn(),
@@ -36,10 +26,10 @@ describe('confirmEmail', () => {
     return { req, res }
   }
 
-  it('should fail with error when token is invalid', async () => {
+  it('should pass/fail when action happens or under a given condition', async () => {
     // Configure Mocks
-    const { req, res } = mockRequestResponse('PATCH')
-    req.url = 'http://localhost:3000/api/auth/email-verification/confirm-email'
+    const { req, res } = mockRequestResponse() // Specify method type if not a GET endpoint
+    req.url = 'http://localhost:3000/api/dev/example-endpoint'
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
 
@@ -48,12 +38,10 @@ describe('confirmEmail', () => {
 
     // Run endpoint handler and check response
     await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'verification of JWT Token failed',
-        }),
+        payload: {},
       })
     )
   })

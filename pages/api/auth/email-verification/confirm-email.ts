@@ -8,6 +8,7 @@ import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { HttpStatusCode } from 'axios'
 import { ConfirmEmailSchema } from '@/types/endpoint-request-schemas'
 import { supabase } from '@/lib/helpers/supabase'
+import { ApiError } from 'next/dist/server/api-utils'
 
 const handler = async (
   req: NextApiRequest,
@@ -17,11 +18,19 @@ const handler = async (
     const parsedBody = ConfirmEmailSchema.parse(req.body)
     const { token } = parsedBody
 
-    // Retrieve payload from jwt token
-    const payload = jwt.verify(
-      token,
-      process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET!
-    ) as JwtEmailToken
+    // Validate and retrieve payload from jwt token
+    let payload
+    try {
+      payload = jwt.verify(
+        token,
+        process.env.NEXT_PUBLIC_EMAIL_TOKEN_SECRET!
+      ) as JwtEmailToken
+    } catch (error) {
+      throw new ApiError(
+        HttpStatusCode.BadRequest,
+        'verification of JWT Token failed'
+      )
+    }
 
     const { error: fetchAndUpdateMemberError } = await supabase
       .from('member')

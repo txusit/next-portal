@@ -4,108 +4,90 @@
 // required-header-for-jest-test.js
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
 import { NextApiRequest, NextApiResponse } from 'next'
-import handler from '@/pages/api/auth/SendConfirmationEmail'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { createRequest } from 'node-mocks-http'
-import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server'
-import User from '@/models/User'
-import { encryptData } from '@/lib/helpers/encryption-helpers'
-import { generateTokenAndSendActionEmail } from '@/lib/helpers/server-side/server-side-helpers'
+import { RequestMethod, createMocks } from 'node-mocks-http'
+import handler from '@/pages/api/auth/email-verification/send-confirmation-email'
+import { supabase } from '@/lib/helpers/supabase'
+import { hash } from 'bcryptjs'
+import { Member } from '@/types/database-schemas'
+import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 
 // Set up module mocks
-jest.mock('@/helpers/serverSideHelpers', () => {
+jest.mock('@/lib/helpers/server-side/send-action-email', () => {
   return {
-    generateTokenAndSendActionEmail: jest.fn().mockImplementation(function () {
+    sendActionEmail: jest.fn().mockImplementation(function () {
       return { ok: true }
     }),
   }
 })
 
 describe('sendConfirmationEmail', () => {
-  const OLD_ENV = process.env
-  OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
-  let mongoServer: MongoMemoryServer
-  let req: jest.Mocked<NextApiRequest>
-  let res: jest.Mocked<NextApiResponse>
-
-  beforeAll(async () => {
-    // Set up a test mongoDB server for these tests
-    mongoServer = await MongoMemoryServer.create()
-    const mongoUri = mongoServer.getUri()
-    await mongoose.connect(mongoUri, {
-      dbName: 'next-portal',
-      autoCreate: true,
-    })
-
-    const testUser = new User({
-      fullName: 'test user',
-      email: 'test@example.com',
-      password: 'password123',
-      isConfirmed: false,
-      creationTime: new Date(),
-    })
-    await testUser.save()
-  })
+  const SECONDS = 1000
+  // const OLD_ENV = process.env
+  // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
   beforeEach(async () => {
     // Make a copy of original process.env
-    process.env = { ...OLD_ENV }
+    // process.env = { ...OLD_ENV }
+    await supabase.rpc('delete_test_resources')
+  })
 
-    // Set up mock req and res objects
-    req = createRequest({
-      method: 'GET',
-    })
-
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    } as unknown as jest.Mocked<NextApiResponse>
-
-    // Reset MonboDB test User
-    await User.findOneAndUpdate(
-      { email: 'test@example.com' },
-      {
-        fullName: 'test user',
-        email: 'test@example.com',
-        password: 'password123',
-        isConfirmed: true,
-        creationTime: new Date(),
-      }
-    )
+  afterEach(async () => {
+    await supabase.rpc('delete_test_resources')
   })
 
   afterAll(async () => {
     // Restore old environment
-    process.env = OLD_ENV
+    // process.env = OLD_ENV
 
     jest.resetModules()
-
-    // Disconnect from DB
-    await mongoose.disconnect()
-    await mongoServer.stop()
   })
 
-  it('should send confirmation email without errors', async () => {
-    // Encrypt email asymmetrically
-    const asymEncryptEmail = encryptData('test@example.com')
+  const mockRequestResponse = (method: RequestMethod = 'GET') => {
+    const { req, res }: { req: NextApiRequest; res: NextApiResponse } =
+      createMocks({ method })
+    req.headers = {
+      'Content-Type': 'application/json',
+    }
+    return { req, res }
+  }
 
+  it(
+    'should send confirmation email without errors',
+    async () => {
+      // Create new Member
+      const email = '__TEST__member@gmail.com'
+      const password = 'test_password'
+      const hashedPassword = await hash(password, 12)
+      const memberData: Member = {
+        email: email,
+        first_name: '__TEST__John',
+        last_name: '__TEST__Doe',
+        password: hashedPassword,
+        is_confirmed: false,
+        membership_id: null,
+      }
+      await supabase.from('member').insert(memberData)
+
+      // Configure Mocks
+      const { req, res } = mockRequestResponse('POST')
+      res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+      res.json = jest.fn()
+      req.body = { email }
+
+      // Run endpoint handler and check response
+      await handler(req, res)
+      expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
+    },
+    60 * SECONDS
+  )
+
+  it('should fail with error when missing or invalid email', async () => {
     // Configure Mocks
-    req.method = 'POST'
-    req.body = { asymEncryptEmail }
-
-    // Run endpoint handler and check response
-    await handler(req, res)
-    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Accepted)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({ message: 'confirmation email sent' })
-    )
-  })
-
-  it('should fail with error when missing or invalid asymEncryptEmail', async () => {
-    // Configure Mocks
-    req.method = 'POST'
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
     req.body = {} // key test item
 
     // Run endpoint handler and check response
@@ -113,40 +95,58 @@ describe('sendConfirmationEmail', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message:
-          'Unable to send confirmation email because of missing or invalid asymEncryptEmail',
+        error: expect.objectContaining({
+          message: 'Missing request body',
+        }),
       })
     )
   })
 
   it('should fail with error when no user matches email provided', async () => {
     // Encrypt email asymmetrically
-    const asymEncryptEmail = encryptData('nomatchingemail@example.com')
+    const email = 'noMatchingEmail@gmail.com'
 
     // Configure Mocks
-    req.method = 'POST'
-    req.body = { asymEncryptEmail }
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = { email } // key test item
 
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message:
-          'Unable to send confirmation email because there is no account associated with the email provided',
+        error: expect.objectContaining({
+          message: `No members with email ${email} found`,
+        }),
       })
     )
   })
 
   it('should fail with error when confirmation email fails to send', async () => {
-    // Encrypt email asymmetrically
-    const asymEncryptEmail = encryptData('test@example.com')
+    // Create new Member
+    const email = '__TEST__member@gmail.com'
+    const password = 'test_password'
+    const hashedPassword = await hash(password, 12)
+    const memberData: Member = {
+      email: email,
+      first_name: '__TEST__John',
+      last_name: '__TEST__Doe',
+      password: hashedPassword,
+      is_confirmed: false,
+      membership_id: null,
+    }
+    await supabase.from('member').insert(memberData)
 
     // Configure Mocks
-    req.method = 'POST'
-    req.body = { asymEncryptEmail }
-    const mockSendEmail = generateTokenAndSendActionEmail as jest.Mock
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = { email }
+    const mockSendEmail = sendActionEmail as jest.Mock
     mockSendEmail.mockReturnValueOnce({
+      // key test item
       ok: false,
     })
 
@@ -155,7 +155,9 @@ describe('sendConfirmationEmail', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.ServiceUnavailable)
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: 'Unable to generate token and send confirmation email',
+        error: expect.objectContaining({
+          message: 'Unable to generate token and send confirmation email',
+        }),
       })
     )
   })

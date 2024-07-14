@@ -7,9 +7,8 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
 import { createRequest } from 'node-mocks-http'
-import mongoose from 'mongoose'
-import { MongoMemoryServer } from 'mongodb-memory-server'
 import User from '@/models/User'
+import { supabase } from '@/lib/helpers/supabase'
 
 // Set up module mocks
 jest.mock('@/helpers/serverSideHelpers', () => {
@@ -21,67 +20,36 @@ jest.mock('@/helpers/serverSideHelpers', () => {
 })
 
 describe('sendPasswordResetEmail', () => {
-  const OLD_ENV = process.env
-  OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
-  let mongoServer: MongoMemoryServer
-  let req: jest.Mocked<NextApiRequest>
-  let res: jest.Mocked<NextApiResponse>
+  // const OLD_ENV = process.env
+  // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
   beforeAll(async () => {
-    // Set up a test mongoDB server for these tests
-    mongoServer = await MongoMemoryServer.create()
-    const mongoUri = mongoServer.getUri()
-    await mongoose.connect(mongoUri, {
-      dbName: 'next-portal',
-      autoCreate: true,
-    })
-
-    const testUser = new User({
-      fullName: 'test user',
-      email: 'test@example.com',
-      password: 'password123',
-      isConfirmed: false,
-      creationTime: new Date(),
-    })
-    await testUser.save()
+    //   const testUser = new User({
+    //     fullName: 'test user',
+    //     email: 'test@example.com',
+    //     password: 'password123',
+    //     isConfirmed: false,
+    //     creationTime: new Date(),
+    //   })
+    //   await testUser.save()
   })
 
   beforeEach(async () => {
     // Make a copy of original process.env
-    process.env = { ...OLD_ENV }
+    // process.env = { ...OLD_ENV }
 
-    // Set up mock req and res objects
-    req = createRequest({
-      method: 'GET',
-    })
+    await supabase.rpc('delete_test_resources')
+  })
 
-    res = {
-      status: jest.fn().mockReturnThis(),
-      json: jest.fn(),
-    } as unknown as jest.Mocked<NextApiResponse>
-
-    // Reset MonboDB test User
-    await User.findOneAndUpdate(
-      { email: 'test@example.com' },
-      {
-        fullName: 'test user',
-        email: 'test@example.com',
-        password: 'password123',
-        isConfirmed: true,
-        creationTime: new Date(),
-      }
-    )
+  afterEach(async () => {
+    await supabase.rpc('delete_test_resources')
   })
 
   afterAll(async () => {
     // Restore old environment
-    process.env = OLD_ENV
+    // process.env = OLD_ENV
 
     jest.resetModules()
-
-    // Disconnect from DB
-    await mongoose.disconnect()
-    await mongoServer.stop()
   })
 
   it('should send password reset email without errors', async () => {

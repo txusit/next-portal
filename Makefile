@@ -11,7 +11,7 @@ clean:
 clean-portal: clean
 	docker-compose up --build portal
 
- :
+portal:
 	docker-compose up portal
 
 # portal and Database
@@ -27,6 +27,12 @@ clean-portal: clean
 
 # db:
 # 	docker-compose up db
+
+db:
+	supabase start
+
+db-stop:
+	supabase stop
 
 # Access Docker Container Shells
 portal-shell:

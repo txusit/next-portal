@@ -22,8 +22,13 @@ const handler = async (
       .from('member')
       .select('id, email')
       .eq('email', email)
-      .single()
+      .maybeSingle()
     if (fetchMemberError) throw fetchMemberError
+    if (!member)
+      throw new ApiError(
+        HttpStatusCode.NotFound,
+        `No members with email ${email} found`
+      )
 
     const result = await sendActionEmail(
       member.id,
