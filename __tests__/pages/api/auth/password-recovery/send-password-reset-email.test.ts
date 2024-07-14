@@ -6,10 +6,9 @@ import '@testing-library/jest-dom/extend-expect' // Import extend-expect for add
 import { NextApiRequest, NextApiResponse } from 'next'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { RequestMethod, createMocks, createRequest } from 'node-mocks-http'
+import { RequestMethod, createMocks } from 'node-mocks-http'
 import { supabase } from '@/lib/helpers/supabase'
 import handler from '@/pages/api/auth/password-recovery/send-password-reset-email'
-import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 import { Member } from '@/types/database-schemas'
 import { hash } from 'bcryptjs'
 

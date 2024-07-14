@@ -34,6 +34,10 @@ db:
 db-stop:
 	supabase stop
 
+# Create a new DB migration file for changes to schemas. Make sure to add RPC functions manually
+db-migration-new: 
+	supabase migration new ${name}
+
 # Access Docker Container Shells
 portal-shell:
 	docker exec -t -i next_portal_portal_container /bin/bash
