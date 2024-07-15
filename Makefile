@@ -42,6 +42,10 @@ db-migration-new:
 portal-shell:
 	docker exec -t -i next_portal_portal_container /bin/bash
 
+# Run Jest Unit and Integration Tests
+test:
+	npm run test
+
 # Open Jest Coverage Report
 open-jest-report:
 	open ./client/coverage/lcov-report/index.html
