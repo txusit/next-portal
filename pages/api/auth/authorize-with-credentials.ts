@@ -16,7 +16,7 @@ const handler = async (
 ) => {
   const authorizeWithCredentials = async () => {
     const parsedBody = AuthorizeWithCredentialsSchema.parse(req.body)
-    if (!parsedBody.isValidCredentials) {
+    if (!parsedBody.hasCredentials) {
       throw new ApiError(HttpStatusCode.Unauthorized, 'Credentials not valid')
     }
 
@@ -27,8 +27,12 @@ const handler = async (
       .from('member')
       .select('email, full_name, password, is_confirmed')
       .eq('email', email)
-      .single()
+      .maybeSingle()
     if (fetchMemberError) throw fetchMemberError
+    // No member with natching email throws same error as incorrect password for security
+    if (!member) {
+      throw new ApiError(HttpStatusCode.Unauthorized, 'Invalid credentials')
+    }
     if (!member.is_confirmed) {
       throw new ApiError(HttpStatusCode.Unauthorized, 'Email is not verified')
     }

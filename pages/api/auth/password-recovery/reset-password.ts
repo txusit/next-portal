@@ -37,23 +37,32 @@ const handler = async (
       )
     }
     const memberId = validationResult.data
+    console.log('memberid: ', memberId)
 
-    // Hash new password for storage
-    const hashedPassword = await hash(password, 12)
-
-    // Update member with new hashed password
-    const { data: member, error: updateMemberError } = await supabase
+    // Verify that member with memberId exists
+    const { data: member, error: fetchMemberError } = await supabase
       .from('member')
-      .update({ password: hashedPassword })
+      .select()
       .eq('id', memberId)
       .maybeSingle()
-    if (updateMemberError) throw updateMemberError
+    if (fetchMemberError) throw fetchMemberError
     if (!member) {
       throw new ApiError(
         HttpStatusCode.NotFound,
         `Unable to update password because there is no account associated with the id provided: ${memberId}`
       )
     }
+
+    // Hash new password for storage
+    const hashedPassword = await hash(password, 12)
+
+    // Update member with new hashed password
+    const { data: updatedMember, error: updateMemberError } = await supabase
+      .from('member')
+      .update({ password: hashedPassword })
+      .eq('id', memberId)
+      .maybeSingle()
+    if (updateMemberError) throw updateMemberError
 
     res.status(HttpStatusCode.Ok).end()
   }

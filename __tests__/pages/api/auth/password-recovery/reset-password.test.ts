@@ -63,6 +63,8 @@ describe('confirmEmail', () => {
       .select()
       .single()
 
+    console.log(member)
+
     // Generate token from new member
     const payload = { member_id: member.id }
     const token = jwt.sign(
@@ -104,13 +106,11 @@ describe('confirmEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'Missing request body',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Missing request body',
+      }),
+    })
   })
 
   it('should fail with error when token is invalid', async () => {
@@ -127,11 +127,9 @@ describe('confirmEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.InternalServerError)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({ message: 'jwt malformed' }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({ message: 'jwt malformed' }),
+    })
   })
 
   it('should fail with error when token payload contains non-UUID member id ', async () => {
@@ -158,13 +156,11 @@ describe('confirmEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'Password reset token contains invalid member id',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Password reset token contains invalid member id',
+      }),
+    })
   })
 
   it('should fail with error when no account is associated with user_id in token', async () => {
@@ -203,12 +199,10 @@ describe('confirmEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: `Unable to update password because there is no account associated with the id provided: ${invalidMemberId}`,
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: `Unable to update password because there is no account associated with the id provided: ${invalidMemberId}`,
+      }),
+    })
   })
 })

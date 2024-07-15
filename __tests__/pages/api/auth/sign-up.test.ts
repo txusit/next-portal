@@ -7,27 +7,35 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import handler from '@/pages/api/auth/sign-up'
 import { describe, beforeEach, it, expect } from '@jest/globals'
 import { HttpStatusCode } from 'axios'
-import { createRequest } from 'node-mocks-http'
-import { compare } from 'bcryptjs'
+import { compare, hash } from 'bcryptjs'
+import { supabase } from '@/lib/helpers/supabase'
+import { RequestMethod, createMocks } from 'node-mocks-http'
+import { SignUp } from '@/types/endpoint-request-schemas'
+import { Member } from '@/types/database-schemas'
+import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 
 // Set up module mocks
-jest.mock('@/helpers/serverSideHelpers', () => {
+jest.mock('@/lib/helpers/server-side/send-action-email', () => {
   return {
-    generateTokenAndSendActionEmail: jest.fn().mockImplementation(function () {
+    sendActionEmail: jest.fn().mockImplementation(function () {
       return { ok: true }
     }),
   }
 })
 
-describe('confirmEmail', () => {
+describe('signUp', () => {
   // const OLD_ENV = process.env
   // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
-
-  beforeAll(async () => {})
 
   beforeEach(async () => {
     // Make a copy of original process.env
     // process.env = { ...OLD_ENV }
+
+    await supabase.rpc('delete_test_resources')
+  })
+
+  afterEach(async () => {
+    await supabase.rpc('delete_test_resources')
   })
 
   afterAll(async () => {
@@ -37,170 +45,256 @@ describe('confirmEmail', () => {
     jest.resetModules()
   })
 
-  it.todo('convert to supabase')
-  // // PERFORM TESTS
-  // it('should sign up user without errors', async () => {
-  //   // encrypt user info asymmetrically
-  //   const asymEncryptFullName = encryptData('test user')
-  //   const asymEncryptEmail = encryptData('test@example.com')
-  //   const asymEncryptPassword = encryptData('password123')
+  const mockRequestResponse = (method: RequestMethod = 'GET') => {
+    const { req, res }: { req: NextApiRequest; res: NextApiResponse } =
+      createMocks({ method })
+    req.headers = {
+      'Content-Type': 'application/json',
+    }
+    return { req, res }
+  }
 
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword }
+  // PERFORM TESTS
+  it('should sign up user without errors', async () => {
+    // Set sign up data
+    const signUpData: SignUp = {
+      firstName: '__TEST__John',
+      lastName: '__TEST__Doe',
+      email: '__TEST__member@gmail.com',
+      password: '__TEST__password',
+    }
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Created)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({ message: 'User successfully created' })
-  //   )
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {
+      firstName: signUpData.firstName,
+      lastName: signUpData.lastName,
+      email: signUpData.email,
+      password: signUpData.password,
+    }
 
-  //   // Check if new user contains correct field values
-  //   const newUser = await User.findOne({ email: 'test@example.com' }).select(
-  //     '+password'
-  //   )
-  //   expect(newUser.fullName).toEqual('test user')
-  //   expect(newUser.email).toEqual('test@example.com')
-  //   expect(await compare('password123', newUser.password)).toBe(true)
-  //   expect(newUser.isConfirmed).toEqual(false)
-  // })
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Created)
 
-  // it('should fail with error when missing encrypted user information', async () => {
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = {} // key test item
+    // Retrieve new member and check if fields are set properly
+    const { data: member, error: fetchError } = await supabase
+      .from('member')
+      .select()
+      .eq('email', signUpData.email)
+      .maybeSingle()
+    expect(fetchError).toBeNull() // Supabase fetch query sanity check (unrelated to checking for data accuracy)
+    expect(member).toBeDefined()
+    expect(member.first_name).toEqual(signUpData.firstName)
+    expect(member.last_name).toEqual(signUpData.lastName)
+    expect(member.is_confirmed).toEqual(false)
+    expect(await compare(signUpData.password, member.password)).toBeTruthy()
+  })
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message: 'Unable to sign up because of missing user information',
-  //     })
-  //   )
-  // })
+  it('should fail with error when missing encrypted user information', async () => {
+    // Set sign up data
+    const emptySignUpData = {} // key test item
 
-  // it('should fail with error when user information is invalid', async () => {
-  //   // Construct encrypt invalid user info asymmetrically
-  //   const asymEncryptFullName = encryptData('')
-  //   const asymEncryptEmail = encryptData('')
-  //   const asymEncryptPassword = encryptData('')
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = emptySignUpData
 
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword } // key test item
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Missing request body',
+      }),
+    })
+  })
+  it('should fail with error when user information is invalid', async () => {
+    // Set sign up data
+    // key test item
+    const invalidSignUpData: SignUp = {
+      firstName: '',
+      lastName: '',
+      email: '',
+      password: '',
+    }
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message: 'Unable to sign up because of invalid user information',
-  //     })
-  //   )
-  // })
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {
+      firstName: invalidSignUpData.firstName,
+      lastName: invalidSignUpData.lastName,
+      email: invalidSignUpData.email,
+      password: invalidSignUpData.password,
+    }
 
-  // it('should fail with error when user already exists', async () => {
-  //   // Modify user document
-  //   const testUser = new User({
-  //     fullName: 'test user',
-  //     email: 'test@example.com',
-  //     password: 'password123',
-  //     isConfirmed: false,
-  //     creationTime: new Date(),
-  //   })
-  //   await testUser.save()
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: [
+          {
+            'code': 'too_small',
+            'exact': false,
+            'inclusive': true,
+            'message': 'Must not be empty',
+            'minimum': 1,
+            'path': ['firstName'],
+            'type': 'string',
+          },
+          {
+            'code': 'too_small',
+            'exact': false,
+            'inclusive': true,
+            'message': 'Must not be empty',
+            'minimum': 1,
+            'path': ['lastName'],
+            'type': 'string',
+          },
+          {
+            'code': 'invalid_string',
+            'message': 'Invalid email',
+            'path': ['email'],
+            'validation': 'email',
+          },
+          {
+            'code': 'too_small',
+            'exact': false,
+            'inclusive': true,
+            'message': 'Must be 6 or more characters long',
+            'minimum': 6,
+            'path': ['password'],
+            'type': 'string',
+          },
+        ],
+      }),
+    })
+  })
 
-  //   // Construct token and encrypt password asymmetrically
-  //   const asymEncryptFullName = encryptData('test user')
-  //   const asymEncryptEmail = encryptData('test@example.com')
-  //   const asymEncryptPassword = encryptData('password123')
+  it('should fail with error when password does not meet criteria', async () => {
+    const invalidPassword = '' // key test item
 
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword }
+    // Set sign up data
+    const signUpData: SignUp = {
+      firstName: '__TEST__John',
+      lastName: '__TEST__Doe',
+      email: '__TEST__member@gmail.com',
+      password: invalidPassword,
+    }
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Conflict)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message: 'Unable to sign up because user already exists',
-  //     })
-  //   )
-  // })
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {
+      firstName: signUpData.firstName,
+      lastName: signUpData.lastName,
+      email: signUpData.email,
+      password: signUpData.password,
+    }
 
-  // it('should fail with error when user already exists', async () => {
-  //   // Construct token and encrypt password asymmetrically
-  //   const asymEncryptFullName = encryptData('test user')
-  //   const asymEncryptEmail = encryptData('test@example.com')
-  //   const asymEncryptPassword = encryptData('short')
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: [
+          {
+            'code': 'too_small',
+            'exact': false,
+            'inclusive': true,
+            'message': 'Must be 6 or more characters long',
+            'minimum': 6,
+            'path': ['password'],
+            'type': 'string',
+          },
+        ],
+      }),
+    })
+  })
 
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword }
+  it('should fail with error when user already exists', async () => {
+    // Create new Member
+    const email = '__TEST__member@gmail.com'
+    const password = '__TEST__password'
+    const hashedPassword = await hash(password, 12)
+    const memberData: Member = {
+      email: email,
+      first_name: '__TEST__John',
+      last_name: '__TEST__Doe',
+      password: hashedPassword,
+      is_confirmed: false,
+      membership_id: null,
+    }
+    await supabase.from('member').insert(memberData)
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message:
-  //         'Unable to sign up because password should be 6 characters long',
-  //     })
-  //   )
-  // })
+    // Set sign up data
+    const signUpData: SignUp = {
+      firstName: '__TEST__John',
+      lastName: '__TEST__Doe',
+      email: '__TEST__member@gmail.com',
+      password: '__TEST__password',
+    }
 
-  // it('should fail with error when User.create throws error', async () => {
-  //   // Mock module function
-  //   const mockCreate = jest
-  //     .spyOn(User, 'create')
-  //     .mockImplementationOnce(() => Promise.reject('fail create'))
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {
+      firstName: signUpData.firstName,
+      lastName: signUpData.lastName,
+      email: signUpData.email,
+      password: signUpData.password,
+    }
 
-  //   // Encrypt user info asymmetrically
-  //   const asymEncryptFullName = encryptData('test user')
-  //   const asymEncryptEmail = encryptData('test@example.com')
-  //   const asymEncryptPassword = encryptData('password123')
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Conflict)
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Unable to sign up because member already exists',
+      }),
+    })
+  })
 
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword }
+  it('should fail with error when email fails to send', async () => {
+    const mockSendEmail = sendActionEmail as jest.Mock
+    mockSendEmail.mockReturnValueOnce({
+      ok: false,
+    })
 
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.InternalServerError)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message: 'Unable to sign up because error occured during User.create',
-  //     })
-  //   )
+    // Set sign up data
+    const signUpData: SignUp = {
+      firstName: '__TEST__John',
+      lastName: '__TEST__Doe',
+      email: '__TEST__member@gmail.com',
+      password: '__TEST__password',
+    }
 
-  //   mockCreate.mockRestore()
-  // })
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = {
+      firstName: signUpData.firstName,
+      lastName: signUpData.lastName,
+      email: signUpData.email,
+      password: signUpData.password,
+    }
 
-  // it('should fail with error when email fails to send', async () => {
-  //   const mockSendEmail = generateTokenAndSendActionEmail as jest.Mock
-  //   mockSendEmail.mockReturnValueOnce({
-  //     ok: false,
-  //   })
-
-  //   // Construct token and encrypt password asymmetrically
-  //   const asymEncryptFullName = encryptData('test user')
-  //   const asymEncryptEmail = encryptData('test@example.com')
-  //   const asymEncryptPassword = encryptData('password123')
-
-  //   // Configure Mocks
-  //   req.method = 'POST'
-  //   req.body = { asymEncryptFullName, asymEncryptEmail, asymEncryptPassword }
-
-  //   // Run endpoint handler and check response
-  //   await handler(req, res)
-  //   expect(res.status).toHaveBeenCalledWith(HttpStatusCode.ServiceUnavailable)
-  //   expect(res.json).toHaveBeenCalledWith(
-  //     expect.objectContaining({
-  //       message: 'Unable to send confirmation email',
-  //     })
-  //   )
-  // })
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.ServiceUnavailable)
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Unable to send confirmation email',
+      }),
+    })
+  })
 })

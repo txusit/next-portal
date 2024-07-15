@@ -90,13 +90,11 @@ describe('sendPasswordResetEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'Missing request body',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Missing request body',
+      }),
+    })
   })
 
   it('should fail with error when missing email', async () => {
@@ -111,20 +109,18 @@ describe('sendPasswordResetEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: [
-            expect.objectContaining({
-              'code': 'invalid_type',
-              'expected': 'string',
-              'message': 'Required',
-              'path': ['email'],
-            }),
-          ],
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: [
+          expect.objectContaining({
+            'code': 'invalid_type',
+            'expected': 'string',
+            'message': 'Required',
+            'path': ['email'],
+          }),
+        ],
+      }),
+    })
   })
 
   it('should say password reset sent even if user is not found', async () => {

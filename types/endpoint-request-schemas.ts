@@ -23,7 +23,7 @@ export const CredentialsSchema = z.object({
 export type Credentials = z.infer<typeof CredentialsSchema>
 
 export const AuthorizeWithCredentialsSchema = z.object({
-  isValidCredentials: z.boolean(),
+  hasCredentials: z.boolean(),
   credentials: CredentialsSchema,
 })
 

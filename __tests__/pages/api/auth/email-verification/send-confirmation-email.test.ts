@@ -23,7 +23,6 @@ jest.mock('@/lib/helpers/server-side/send-action-email', () => {
 })
 
 describe('sendConfirmationEmail', () => {
-  const SECONDS = 1000
   // const OLD_ENV = process.env
   // OLD_ENV.LOG_ENABLED = 'false' // Disable logging to prevent leaks
 
@@ -53,35 +52,31 @@ describe('sendConfirmationEmail', () => {
     return { req, res }
   }
 
-  it(
-    'should send confirmation email without errors',
-    async () => {
-      // Create new Member
-      const email = '__TEST__member@gmail.com'
-      const password = '__TEST__password'
-      const hashedPassword = await hash(password, 12)
-      const memberData: Member = {
-        email: email,
-        first_name: '__TEST__John',
-        last_name: '__TEST__Doe',
-        password: hashedPassword,
-        is_confirmed: false,
-        membership_id: null,
-      }
-      await supabase.from('member').insert(memberData)
+  it('should send confirmation email without errors', async () => {
+    // Create new Member
+    const email = '__TEST__member@gmail.com'
+    const password = '__TEST__password'
+    const hashedPassword = await hash(password, 12)
+    const memberData: Member = {
+      email: email,
+      first_name: '__TEST__John',
+      last_name: '__TEST__Doe',
+      password: hashedPassword,
+      is_confirmed: false,
+      membership_id: null,
+    }
+    await supabase.from('member').insert(memberData)
 
-      // Configure Mocks
-      const { req, res } = mockRequestResponse('POST')
-      res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
-      res.json = jest.fn()
-      req.body = { email }
+    // Configure Mocks
+    const { req, res } = mockRequestResponse('POST')
+    res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
+    res.json = jest.fn()
+    req.body = { email }
 
-      // Run endpoint handler and check response
-      await handler(req, res)
-      expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
-    },
-    60 * SECONDS
-  )
+    // Run endpoint handler and check response
+    await handler(req, res)
+    expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
+  })
 
   it('should fail with error when missing or invalid email', async () => {
     const invalidRequestBody = {}
@@ -95,13 +90,11 @@ describe('sendConfirmationEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'Missing request body',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Missing request body',
+      }),
+    })
   })
 
   it('should fail with error when no user matches email provided', async () => {
@@ -117,13 +110,11 @@ describe('sendConfirmationEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.NotFound)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: `No members with email ${email} found`,
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: `No members with email ${email} found`,
+      }),
+    })
   })
 
   it('should fail with error when confirmation email fails to send', async () => {
@@ -156,12 +147,10 @@ describe('sendConfirmationEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.ServiceUnavailable)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'Unable to generate token and send confirmation email',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'Unable to generate token and send confirmation email',
+      }),
+    })
   })
 })

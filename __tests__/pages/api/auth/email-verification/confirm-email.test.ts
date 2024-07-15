@@ -47,12 +47,10 @@ describe('confirmEmail', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        error: expect.objectContaining({
-          message: 'verification of JWT Token failed',
-        }),
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      error: expect.objectContaining({
+        message: 'verification of JWT Token failed',
+      }),
+    })
   })
 })

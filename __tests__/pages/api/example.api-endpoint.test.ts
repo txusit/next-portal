@@ -39,10 +39,8 @@ describe('Example Endpoint', () => {
     // Run endpoint handler and check response
     await handler(req, res)
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.Ok)
-    expect(res.json).toHaveBeenCalledWith(
-      expect.objectContaining({
-        payload: {},
-      })
-    )
+    expect(res.json).toHaveBeenCalledWith({
+      payload: {},
+    })
   })
 })

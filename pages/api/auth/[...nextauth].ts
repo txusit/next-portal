@@ -20,13 +20,14 @@ export const authOptions: NextAuthOptions = {
 
       async authorize(credentials) {
         // Check if credentials exists
-        const isValidCredentials = credentials ? true : false
+        // hasCredentials is used to delay any faulty credential errors to be thrown in a exceptionFilter-wrapped context
+        const hasCredentials = credentials ? true : false
 
         // Perform authorization logic and get 'user' from result
         const response = await axios.post<ResponseData>(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/auth/authorize-with-credentials`,
           {
-            isValidCredentials,
+            hasCredentials,
             credentials,
           },
           {
