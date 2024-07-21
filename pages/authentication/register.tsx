@@ -1,14 +1,16 @@
 import React from 'react'
-import { InferGetServerSidePropsType, NextPage } from 'next'
+import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
+import { UserRegisterForm } from './(components)/user-register-form'
+import AuthenticationPageLayout from './layout'
 
-export default function ExamplePage({
+export default function SignUpPage({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <React.Fragment>
-      <h1>Example Page</h1>
-    </React.Fragment>
+    <AuthenticationPageLayout auth_page={'Sign Up'}>
+      <UserRegisterForm />
+    </AuthenticationPageLayout>
   )
 }
 

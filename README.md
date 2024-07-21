@@ -1,5 +1,8 @@
 ## Style Conventions
 
+Variable:
+lower-kebab-case
+
 Components:
 PascalCase
 
