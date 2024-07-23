@@ -18,13 +18,13 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 
-export type PortfolioDataPoint = {
-  portfolio_value: Number
+export type StockDataPoint = {
+  stock_value: Number
   date: string
 }
 
-export type PortfolioPerformanceProps = {
-  data: PortfolioDataPoint[]
+export type StockPerformanceProps = {
+  data: StockDataPoint[]
 }
 
 const chartConfig = {
@@ -41,7 +41,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function PortfolioPerformance(props: PortfolioPerformanceProps) {
+export function StockPerformance(props: StockPerformanceProps) {
   const { theme: mode } = useTheme()
   const [config] = useConfig()
 

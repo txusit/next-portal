@@ -2,7 +2,7 @@ import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from './(components)/team-switcher'
+import TeamSwitcher from '@/components/team-switcher'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,
@@ -11,28 +11,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { MainNav } from './(components)/main-nav'
-import { Search } from './(components)/search'
-import { UserNav } from './(components)/user-nav'
-import { CalendarDateRangePicker } from './(components)/date-range-picker'
-import {
-  Legend,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { TopNav } from '@/components/top-nav'
+import { Search } from '@/components/search'
+import { UserNav } from '@/components/user-nav'
+import { CalendarDateRangePicker } from '@/components/date-range-picker'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
 import { themes } from '@/registry/themes'
-import { RecentSales } from './(components)/recent-sales'
+import { RecentSales } from './components/recent-sales'
 import { RootLayout } from '@/components/root-layout'
-import {
-  PortfolioDataPoint,
-  PortfolioPerformance,
-} from './(components)/portfolio-performance'
+import { PortfolioDataPoint } from '@/types'
+import { PortfolioPerformance } from './components/portfolio-performance'
 
 const data: PortfolioDataPoint[] = [
   {
@@ -108,7 +97,7 @@ export const DashboardPage = ({
           <div className='border-b'>
             <div className='flex h-16 items-center px-4'>
               <TeamSwitcher />
-              <MainNav className='mx-6' />
+              <TopNav className='mx-6' />
               <div className='ml-auto flex items-center space-x-4'>
                 <Search />
                 <UserNav />
@@ -133,7 +122,7 @@ export const DashboardPage = ({
                 </TabsTrigger>
               </TabsList>
 
-              {/* Dashboard Overview */}
+              {/* Dashboard Overview Tab */}
               <TabsContent value='overview' className='space-y-4'>
                 <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
                   <Card>

@@ -23,6 +23,10 @@ for unknown error types, throw new ApiError(statusCode, "unknown error message o
 
 Relay error by throwing new ApiError
 
+## Project File Structure Conventions
+
+https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md
+
 ## Supabase Instances
 
 Production

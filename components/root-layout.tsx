@@ -1,11 +1,11 @@
-import React from 'react'
+import React, { ComponentProps, ReactNode } from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
 } from './ui/resizable'
 import { TooltipProvider } from './ui/tooltip'
-import { getServerSideProps } from '@/pages/dashboard'
+// import { getServerSideProps } from '@/pages/dashboard.page'
 import { InferGetServerSidePropsType } from 'next'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
@@ -13,6 +13,7 @@ import { Separator } from '@/components/ui/separator'
 import {
   BadgeCheck,
   Calendar,
+  ClipboardCheck,
   FolderLock,
   Inbox,
   LayoutDashboard,
@@ -22,13 +23,19 @@ import { cn } from '@/lib/utils'
 import { themes } from '@/registry/themes'
 import { Nav } from '@/components/nav'
 
+interface RootLayoutProps {
+  defaultLayout?: number[]
+  defaultCollapsed?: boolean
+  navCollapsedSize?: number
+  children?: any
+}
+
 export const RootLayout = ({
-  publicEnv, // Retrieved from getServerSideProps
   defaultLayout = [265, 440],
   defaultCollapsed = false,
-  navCollapsedSize,
+  navCollapsedSize = 4,
   children,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: RootLayoutProps) => {
   const { theme: mode } = useTheme()
   const [config] = useConfig()
 
@@ -89,6 +96,12 @@ export const RootLayout = ({
                   title: 'Resources',
                   label: '',
                   icon: FolderLock,
+                  variant: 'ghost',
+                },
+                {
+                  title: 'Check-In',
+                  label: '',
+                  icon: ClipboardCheck,
                   variant: 'ghost',
                 },
               ]}

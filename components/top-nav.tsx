@@ -2,7 +2,7 @@ import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 
-export function MainNav({
+export function TopNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
@@ -12,25 +12,25 @@ export function MainNav({
       {...props}
     >
       <Link
-        href='/examples/dashboard'
+        href='/dashboard'
         className='text-sm font-medium transition-colors hover:text-primary'
       >
         Dashboard
       </Link>
       <Link
-        href='/examples/dashboard'
+        href='/trading/positions'
         className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
       >
         Positions
       </Link>
       <Link
-        href='/examples/dashboard'
+        href='/trading/pitch-vote'
         className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
       >
         Pitch Vote
       </Link>
       <Link
-        href='/examples/dashboard'
+        href='/trading/rankings'
         className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
       >
         Rankings

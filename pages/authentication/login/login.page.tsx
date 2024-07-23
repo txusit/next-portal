@@ -1,7 +1,7 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { UserLoginForm } from './(components)/user-login-form'
+import { UserLoginForm } from './components/user-login-form'
 import AuthenticationPageLayout from './layout'
 
 export default function LoginPage({

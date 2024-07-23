@@ -1,6 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ZodIssue } from 'zod'
 
+export type PortfolioDataPoint = {
+  portfolio_value: Number
+  date: string
+}
+
+export type PortfolioPerformanceProps = {
+  data: PortfolioDataPoint[]
+}
+
 export type JwtEmailToken = {
   member_id: string
 }
