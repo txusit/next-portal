@@ -54,7 +54,7 @@ export const RootLayout = ({
           }}
           className='min-h-screen items-stretch'
         >
-          {/* Nav Bar */}
+          {/* Side Nav Bar */}
           <ResizablePanel
             defaultSize={defaultLayout[0]}
             collapsedSize={navCollapsedSize}
@@ -87,18 +87,21 @@ export const RootLayout = ({
               isCollapsed={isCollapsed}
               links={[
                 {
+                  href: '/dashboard',
                   title: 'Dashboard',
                   label: '',
                   icon: LayoutDashboard,
                   variant: 'default',
                 },
                 {
+                  href: '#',
                   title: 'Resources',
                   label: '',
                   icon: FolderLock,
                   variant: 'ghost',
                 },
                 {
+                  href: '#',
                   title: 'Check-In',
                   label: '',
                   icon: ClipboardCheck,
@@ -111,24 +114,28 @@ export const RootLayout = ({
               isCollapsed={isCollapsed}
               links={[
                 {
+                  href: '#',
                   title: 'Events',
                   label: '',
                   icon: Calendar,
                   variant: 'ghost',
                 },
                 {
+                  href: '#',
                   title: 'Announcements',
                   label: '4',
                   icon: Inbox,
                   variant: 'ghost',
                 },
                 {
+                  href: '/membership',
                   title: 'Membership',
                   label: 'Paid/Free',
                   icon: BadgeCheck,
                   variant: 'ghost',
                 },
                 {
+                  href: '#',
                   title: 'Settings',
                   label: '',
                   icon: Settings,

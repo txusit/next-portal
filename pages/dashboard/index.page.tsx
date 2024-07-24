@@ -58,11 +58,11 @@ const data: PortfolioDataPoint[] = [
   },
 ]
 
-export const DashboardPage = ({
+export default function DashboardPage({
   publicEnv, // Retrieved from getServerSideProps
   defaultLayout = [265, 440],
   defaultCollapsed = false,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { theme: mode } = useTheme()
   const [config] = useConfig()
 
@@ -261,8 +261,6 @@ export const DashboardPage = ({
     </RootLayout>
   )
 }
-
-export default DashboardPage
 
 // Retrieves NEXT_PUBLIC_ prefixed environment variables
 export { getServerSideProps }

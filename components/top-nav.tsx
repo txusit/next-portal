@@ -1,40 +1,53 @@
 import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
+import { useRouter } from 'next/router'
+
+const links = [
+  {
+    href: '/dashboard',
+    title: 'Dashboard',
+  },
+  {
+    href: '/trading/positions',
+    title: 'Positions',
+  },
+  {
+    href: '/trading/pitch-vote',
+    title: 'Pitch Vote',
+  },
+  {
+    href: '/trading/rankings',
+    title: 'Rankings',
+  },
+]
 
 export function TopNav({
   className,
   ...props
 }: React.HTMLAttributes<HTMLElement>) {
+  const router = useRouter()
+  const currentRoute = router.pathname
+
+  const activeVariant =
+    'text-sm font-medium transition-colors hover:text-primary'
+  const inactiveVariant =
+    'text-sm font-medium transition-colors hover:text-primary text-muted-foreground'
+
   return (
     <nav
       className={cn('flex items-center space-x-4 lg:space-x-6', className)}
       {...props}
     >
-      <Link
-        href='/dashboard'
-        className='text-sm font-medium transition-colors hover:text-primary'
-      >
-        Dashboard
-      </Link>
-      <Link
-        href='/trading/positions'
-        className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
-      >
-        Positions
-      </Link>
-      <Link
-        href='/trading/pitch-vote'
-        className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
-      >
-        Pitch Vote
-      </Link>
-      <Link
-        href='/trading/rankings'
-        className='text-sm font-medium text-muted-foreground transition-colors hover:text-primary'
-      >
-        Rankings
-      </Link>
+      {links.map((link, index) => {
+        const isActive = currentRoute === link.href
+        const variant = isActive ? activeVariant : inactiveVariant
+        return (
+          <Link key={index} href={link.href} className={variant}>
+            {link.title}
+          </Link>
+        )
+      })}
     </nav>
   )
 }

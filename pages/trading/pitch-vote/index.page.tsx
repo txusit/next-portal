@@ -67,11 +67,11 @@ function DemoContainer({
   )
 }
 
-export const DashboardPage = ({
+export default function PitchVotePage({
   publicEnv, // Retrieved from getServerSideProps
   defaultLayout = [265, 440],
   defaultCollapsed = false,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const { theme: mode } = useTheme()
   const [config] = useConfig()
 
@@ -131,7 +131,7 @@ export const DashboardPage = ({
                 </DemoContainer>
               </div>
 
-              {/* <div className='col-span-2 grid items-start gap-6 lg:col-span-1'></div> */}
+              {/* <div className='col-span-2 grid items-start gap-6 lg:col-span-2'></div> */}
 
               <div className='col-span-2 grid items-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1'>
                 {/* Voting Form */}
@@ -151,8 +151,6 @@ export const DashboardPage = ({
     </RootLayout>
   )
 }
-
-export default DashboardPage
 
 // Retrieves NEXT_PUBLIC_ prefixed environment variables
 export { getServerSideProps }

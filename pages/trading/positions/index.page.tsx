@@ -30,7 +30,7 @@ const data: PositionWithCalculated[] = [
   },
 ]
 
-export default function PositionsPage({
+export default function PositionPage({
   publicEnv, // Retrieved from getServerSideProps
   defaultLayout = [265, 440],
   defaultCollapsed = false,
