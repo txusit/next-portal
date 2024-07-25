@@ -21,7 +21,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import { DataTablePagination } from '@/components/data-table-pagination'
+import { DataTablePagination } from '@/components/common/data-table/data-table-pagination'
 import { PositionDataTableToolbar } from './position-data-table-toolbar'
 import React from 'react'
 

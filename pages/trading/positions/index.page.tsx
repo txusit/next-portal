@@ -2,16 +2,17 @@ import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from '@/components/team-switcher'
-import { Search } from '@/components/search'
-import { UserNav } from '@/components/user-nav'
+import TeamSwitcher from '@/components/common/team-switcher'
+import { Search } from '@/components/common/search'
+import { UserNav } from '@/components/shared/user-nav'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
 import { themes } from '@/registry/themes'
-import { RootLayout } from '@/components/root-layout'
+import { RootLayout } from '@/components/shared/root-layout'
 import { columns, PositionWithCalculated } from './components/position-columns'
 import { PositionDataTable } from './components/position-data-table'
-import { TopNav } from '@/components/top-nav'
+import { TopNav } from '@/components/shared/top-nav'
+import { topNavLinkData } from '@/config/nav'
 
 const data: PositionWithCalculated[] = [
   {
@@ -43,51 +44,11 @@ export default function PositionPage({
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
   return (
-    <RootLayout>
-      <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-        {/* Mobile View */}
-        <div className='md:hidden'>
-          {/* <Image
-                src='/examples/dashboard-light.png'
-                width={1280}
-                height={866}
-                alt='Dashboard'
-                className='block dark:hidden'
-              />
-              <Image
-                src='/examples/dashboard-dark.png'
-                width={1280}
-                height={866}
-                alt='Dashboard'
-                className='hidden dark:block'
-              /> */}
-        </div>
-
-        {/* Desktop View */}
-        <div className='hidden flex-col md:flex'>
-          {/* Top Nav Section */}
-          <div className='border-b'>
-            <div className='flex h-16 items-center px-4'>
-              <TeamSwitcher />
-              <TopNav className='mx-6' />
-              <div className='ml-auto flex items-center space-x-4'>
-                <Search />
-                <UserNav />
-              </div>
-            </div>
-          </div>
-
-          {/*  Section Content */}
-          <div className='flex-1 space-y-4 p-8 pt-6'>
-            <div className='flex items-center justify-between space-y-2'>
-              <h2 className='text-3xl font-bold tracking-tight'>
-                Manage Positions
-              </h2>
-            </div>
-            <PositionDataTable columns={columns} data={data} />
-          </div>
-        </div>
-      </ResizablePanel>
+    <RootLayout topNavLinks={topNavLinkData.dashboard}>
+      <div className='flex items-center justify-between space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>Manage Positions</h2>
+      </div>
+      <PositionDataTable columns={columns} data={data} />
     </RootLayout>
   )
 }

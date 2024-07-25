@@ -1,22 +1,21 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from '@/components/common/team-switcher'
-import { Search } from '@/components/common/search'
-import { UserNav } from '@/components/shared/user-nav'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
 import { themes } from '@/registry/themes'
 import { RootLayout } from '@/components/shared/root-layout'
 import { PortfolioDataPoint } from '@/types'
 import { cn } from '@/lib/utils'
-import { PitchInfoCard } from '../../../components/common/stock/pitch-info-card'
-import { StockPerformanceCard } from './components/stock-performance-card'
-import { VotingCard } from './components/voting-card'
-import { TeamInfoCard } from '../../../components/common/stock/team-info-card'
-import { TopNav } from '@/components/shared/top-nav'
-import { topNavLinkData } from '@/config/nav'
+import { PitchInfoCard } from '@/components/common/stock/pitch-info-card'
+import { MeetingInfoCard } from './components/meeting-info-card'
+import { CheckInCard } from './components/check-in-card'
+import { SpeakerCard } from './components/speaker-card'
+import { TeamInfoCard } from '@/components/common/stock/team-info-card'
+// import { PitchInfoCard } from './components/pitch-info-card'
+// import { StockPerformanceCard } from './components/stock-performance-card'
+// import { VotingCard } from './components/voting-card'
+// import { TeamInfoCard } from './components/team-info-card'
 
 const data: PortfolioDataPoint[] = [
   {
@@ -68,7 +67,7 @@ function DemoContainer({
   )
 }
 
-export default function PitchVotePage({
+export default function AttendancePage({
   publicEnv, // Retrieved from getServerSideProps
   defaultLayout = [265, 440],
   defaultCollapsed = false,
@@ -81,31 +80,40 @@ export default function PitchVotePage({
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
   return (
-    <RootLayout topNavLinks={topNavLinkData.dashboard}>
+    <RootLayout>
+      <div className='flex items-center justify-between space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>
+          Meeting Information
+        </h2>
+      </div>
       <div className='hidden items-start justify-center gap-6 rounded-lg p-8 md:grid lg:grid-cols-2 xl:grid-cols-3'>
         <div className='col-span-2 grid items-start gap-6 lg:col-span-2'>
-          {/* Pitch Info */}
+          {/* Meeting Info */}
           <DemoContainer>
-            <PitchInfoCard />
+            <MeetingInfoCard />
           </DemoContainer>
 
           {/* <div className='col-span-2 grid items-start gap-6 lg:col-span-1'></div> */}
 
-          {/* Stock Performance */}
+          {/* Stock Info */}
           <DemoContainer>
-            <StockPerformanceCard />
+            <PitchInfoCard />
           </DemoContainer>
         </div>
 
         {/* <div className='col-span-2 grid items-start gap-6 lg:col-span-2'></div> */}
 
         <div className='col-span-2 grid items-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1'>
-          {/* Voting Form */}
+          {/* Check In Form */}
           <DemoContainer>
-            <VotingCard />
+            <CheckInCard />
           </DemoContainer>
 
-          {/* Team Info */}
+          {/* Special Guests/Speakers */}
+          <DemoContainer>
+            <SpeakerCard />
+          </DemoContainer>
+
           <DemoContainer>
             <TeamInfoCard />
           </DemoContainer>

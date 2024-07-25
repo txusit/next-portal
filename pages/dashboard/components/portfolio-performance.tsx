@@ -70,6 +70,7 @@ export function PortfolioPerformance(props: PortfolioPerformanceProps) {
           axisLine={false}
           tickMargin={8}
           minTickGap={32}
+          interval={'preserveStartEnd'}
           tickFormatter={(value) => {
             const date = new Date(value)
             return date.toLocaleDateString('en-US', {

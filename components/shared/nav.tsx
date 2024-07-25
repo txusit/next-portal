@@ -11,15 +11,18 @@ import {
 import { useState } from 'react'
 import { useRouter } from 'next/router'
 
+export interface SideNavLink {
+  href: string
+  navGroupHrefs: Set<string>
+  title: string
+  label?: string
+  icon: LucideIcon
+  variant: 'default' | 'ghost'
+}
+
 interface NavProps {
   isCollapsed: boolean
-  links: {
-    href: string
-    title: string
-    label?: string
-    icon: LucideIcon
-    variant: 'default' | 'ghost'
-  }[]
+  links: SideNavLink[]
 }
 
 export function Nav({ links, isCollapsed }: NavProps) {
@@ -33,7 +36,8 @@ export function Nav({ links, isCollapsed }: NavProps) {
     >
       <nav className='grid gap-1 px-2 group-[[data-collapsed=true]]:justify-center group-[[data-collapsed=true]]:px-2'>
         {links.map((link, index) => {
-          const isActive = currentRoute === link.href
+          const isActive =
+            currentRoute === link.href || link.navGroupHrefs.has(currentRoute)
           const variant = isActive ? 'default' : 'ghost'
 
           return isCollapsed ? (

@@ -2,7 +2,7 @@ import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { UserRegisterForm } from './components/user-register-form'
-import AuthenticationPageLayout from './layout'
+import AuthenticationPageLayout from '../layout'
 
 export default function SignUpPage({
   publicEnv, // Retrieved from getServerSideProps

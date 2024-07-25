@@ -1,32 +1,29 @@
-import React, { ComponentProps, ReactNode } from 'react'
+import React from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup,
-} from './ui/resizable'
-import { TooltipProvider } from './ui/tooltip'
+} from '@/components/ui/resizable'
+import { TooltipProvider } from '@/components/ui/tooltip'
 // import { getServerSideProps } from '@/pages/dashboard.page'
 import { InferGetServerSidePropsType } from 'next'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
 import { Separator } from '@/components/ui/separator'
-import {
-  BadgeCheck,
-  Calendar,
-  ClipboardCheck,
-  FolderLock,
-  Inbox,
-  LayoutDashboard,
-  Settings,
-} from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { themes } from '@/registry/themes'
-import { Nav } from '@/components/nav'
+import { Nav } from '@/components/shared/nav'
+import { UserNav } from '@/components/shared/user-nav'
+import { Search } from '@/components/common/search'
+import { TopNav, TopNavLink } from '@/components/shared/top-nav'
+import TeamSwitcher from '@/components/common/team-switcher'
+import { sideNavLinkData } from '@/config/nav'
 
 interface RootLayoutProps {
   defaultLayout?: number[]
   defaultCollapsed?: boolean
   navCollapsedSize?: number
+  topNavLinks?: TopNavLink[]
   children?: any
 }
 
@@ -34,6 +31,7 @@ export const RootLayout = ({
   defaultLayout = [265, 440],
   defaultCollapsed = false,
   navCollapsedSize = 4,
+  topNavLinks = [],
   children,
 }: RootLayoutProps) => {
   const { theme: mode } = useTheme()
@@ -83,73 +81,54 @@ export const RootLayout = ({
               <h1>Next Portal</h1>
             </div>
             <Separator />
-            <Nav
-              isCollapsed={isCollapsed}
-              links={[
-                {
-                  href: '/dashboard',
-                  title: 'Dashboard',
-                  label: '',
-                  icon: LayoutDashboard,
-                  variant: 'default',
-                },
-                {
-                  href: '#',
-                  title: 'Resources',
-                  label: '',
-                  icon: FolderLock,
-                  variant: 'ghost',
-                },
-                {
-                  href: '#',
-                  title: 'Check-In',
-                  label: '',
-                  icon: ClipboardCheck,
-                  variant: 'ghost',
-                },
-              ]}
-            />
+            <Nav isCollapsed={isCollapsed} links={sideNavLinkData.top} />
             <Separator />
-            <Nav
-              isCollapsed={isCollapsed}
-              links={[
-                {
-                  href: '#',
-                  title: 'Events',
-                  label: '',
-                  icon: Calendar,
-                  variant: 'ghost',
-                },
-                {
-                  href: '#',
-                  title: 'Announcements',
-                  label: '4',
-                  icon: Inbox,
-                  variant: 'ghost',
-                },
-                {
-                  href: '/membership',
-                  title: 'Membership',
-                  label: 'Paid/Free',
-                  icon: BadgeCheck,
-                  variant: 'ghost',
-                },
-                {
-                  href: '#',
-                  title: 'Settings',
-                  label: '',
-                  icon: Settings,
-                  variant: 'ghost',
-                },
-              ]}
-            />
+            <Nav isCollapsed={isCollapsed} links={sideNavLinkData.bottom} />
           </ResizablePanel>
 
           {/* Resize Nav Bar Drag Handle */}
           <ResizableHandle withHandle />
 
           {/* Page Content */}
-          {children}
+          <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+            {/* Mobile View */}
+            <div className='md:hidden'>
+              {/* <Image
+                src='/examples/dashboard-light.png'
+                width={1280}
+                height={866}
+                alt='Dashboard'
+                className='block dark:hidden'
+              />
+              <Image
+                src='/examples/dashboard-dark.png'
+                width={1280}
+                height={866}
+                alt='Dashboard'
+                className='hidden dark:block'
+              /> */}
+            </div>
+
+            {/* Desktop View */}
+            <div className='hidden flex-col md:flex'>
+              {/* Top Nav Section */}
+              <div className='border-b'>
+                <div className='flex h-16 items-center px-4'>
+                  <TeamSwitcher />
+                  {topNavLinks && (
+                    <TopNav className='mx-6' links={topNavLinks} />
+                  )}
+                  <div className='ml-auto flex items-center space-x-4'>
+                    <Search />
+                    <UserNav />
+                  </div>
+                </div>
+              </div>
+
+              {/*  Section Content */}
+              <div className='flex-1 space-y-4 p-8 pt-6'>{children}</div>
+            </div>
+          </ResizablePanel>
         </ResizablePanelGroup>
       </TooltipProvider>
     </div>

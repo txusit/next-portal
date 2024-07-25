@@ -1,6 +1,6 @@
 import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
-import { DataTableColumnHeader } from '@/components/data-table-column-header'
+import { DataTableColumnHeader } from '@/components/common/data-table/data-table-column-header'
 import { RankingDataTableRowActions } from './ranking-data-table-row-actions'
 
 // Add new Database table?

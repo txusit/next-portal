@@ -1,12 +1,12 @@
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
 import { SessionProvider } from 'next-auth/react'
-import { SiteFooter } from '@/components/site-footer'
-import { SiteHeader } from '@/components/site-header'
+// import { SiteFooter } from '@/components/shared/site-footer'
+// import { SiteHeader } from '@/components/shared/site-header'
 
 // Set global font
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from '@/components/providers'
+import { ThemeProvider } from '@/components/shared/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function App({ Component, pageProps }: AppProps) {

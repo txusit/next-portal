@@ -27,6 +27,9 @@ Relay error by throwing new ApiError
 
 https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md
 
+components/common - are feature-specific but shared among multiple pages within that feature.
+components/shared - are generic and used globally across the app.
+
 ## Supabase Instances
 
 Production

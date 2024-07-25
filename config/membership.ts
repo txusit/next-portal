@@ -1,4 +1,4 @@
-import { Icons } from '@/components/icons'
+import { Icons } from '@/components/shared/icons'
 
 export const membershipConfig = {
   fall: {

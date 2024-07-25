@@ -2,7 +2,7 @@ import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from '@/components/team-switcher'
+import TeamSwitcher from '@/components/common/team-switcher'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,
@@ -11,17 +11,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { TopNav } from '@/components/top-nav'
-import { Search } from '@/components/search'
-import { UserNav } from '@/components/user-nav'
-import { CalendarDateRangePicker } from '@/components/date-range-picker'
+import { TopNav } from '@/components/shared/top-nav'
+import { Search } from '@/components/common/search'
+import { UserNav } from '@/components/shared/user-nav'
+import { CalendarDateRangePicker } from '@/components/common/data-table/date-range-picker'
 import { useTheme } from 'next-themes'
 import { useConfig } from '@/lib/hooks/use-config'
 import { themes } from '@/registry/themes'
 import { RecentSales } from './components/recent-sales'
-import { RootLayout } from '@/components/root-layout'
+import { RootLayout } from '@/components/shared/root-layout'
 import { PortfolioDataPoint } from '@/types'
 import { PortfolioPerformance } from './components/portfolio-performance'
+import { topNavLinkData } from '@/config/nav'
 
 const data: PortfolioDataPoint[] = [
   {
@@ -71,193 +72,153 @@ export default function DashboardPage({
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
   return (
-    <RootLayout>
-      <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
-        {/* Mobile View */}
-        <div className='md:hidden'>
-          {/* <Image
-                src='/examples/dashboard-light.png'
-                width={1280}
-                height={866}
-                alt='Dashboard'
-                className='block dark:hidden'
-              />
-              <Image
-                src='/examples/dashboard-dark.png'
-                width={1280}
-                height={866}
-                alt='Dashboard'
-                className='hidden dark:block'
-              /> */}
+    <RootLayout topNavLinks={topNavLinkData.dashboard}>
+      <div className='flex items-center justify-between space-y-2'>
+        <h2 className='text-3xl font-bold tracking-tight'>Dashboard</h2>
+        <div className='flex items-center space-x-2'>
+          <CalendarDateRangePicker />
         </div>
+      </div>
+      <Tabs defaultValue='overview' className='space-y-4'>
+        {/* Dashboard Navigation */}
+        <TabsList>
+          <TabsTrigger value='overview'>Overview</TabsTrigger>
+          <TabsTrigger value='details' disabled>
+            Details
+          </TabsTrigger>
+        </TabsList>
 
-        {/* Desktop View */}
-        <div className='hidden flex-col md:flex'>
-          {/* Top Nav Section */}
-          <div className='border-b'>
-            <div className='flex h-16 items-center px-4'>
-              <TeamSwitcher />
-              <TopNav className='mx-6' />
-              <div className='ml-auto flex items-center space-x-4'>
-                <Search />
-                <UserNav />
-              </div>
-            </div>
-          </div>
-
-          {/*  Section Content */}
-          <div className='flex-1 space-y-4 p-8 pt-6'>
-            <div className='flex items-center justify-between space-y-2'>
-              <h2 className='text-3xl font-bold tracking-tight'>Dashboard</h2>
-              <div className='flex items-center space-x-2'>
-                <CalendarDateRangePicker />
-              </div>
-            </div>
-            <Tabs defaultValue='overview' className='space-y-4'>
-              {/* Dashboard Navigation */}
-              <TabsList>
-                <TabsTrigger value='overview'>Overview</TabsTrigger>
-                <TabsTrigger value='details' disabled>
-                  Details
-                </TabsTrigger>
-              </TabsList>
-
-              {/* Dashboard Overview Tab */}
-              <TabsContent value='overview' className='space-y-4'>
-                <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
-                  <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                      <CardTitle className='text-sm font-medium'>
-                        Current Portfolio Value
-                      </CardTitle>
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        className='h-4 w-4 text-muted-foreground'
-                      >
-                        <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
-                      </svg>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='text-2xl font-bold'>$45,231.89</div>
-                      <p className='text-xs text-muted-foreground'>
-                        +20.1% from last month
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                      <CardTitle className='text-sm font-medium'>
-                        Daily Profit/Loss
-                      </CardTitle>
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        className='h-4 w-4 text-muted-foreground'
-                      >
-                        <polyline points='23 6 13.5 15.5 8.5 10.5 1 18'></polyline>
-                        <polyline points='17 6 23 6 23 12'></polyline>
-                      </svg>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='text-2xl font-bold'>+2350</div>
-                      <p className='text-xs text-muted-foreground'>
-                        +180.1% from last month
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                      <CardTitle className='text-sm font-medium'>
-                        Returns
-                      </CardTitle>
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        className='h-4 w-4 text-muted-foreground'
-                      >
-                        <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
-                      </svg>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='text-2xl font-bold'>+12,234</div>
-                      <p className='text-xs text-muted-foreground'>
-                        +19% from last month
-                      </p>
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                      <CardTitle className='text-sm font-medium'>
-                        Cash Balance
-                      </CardTitle>
-                      <svg
-                        xmlns='http://www.w3.org/2000/svg'
-                        viewBox='0 0 24 24'
-                        fill='none'
-                        stroke='currentColor'
-                        strokeLinecap='round'
-                        strokeLinejoin='round'
-                        strokeWidth='2'
-                        className='h-4 w-4 text-muted-foreground'
-                      >
-                        <rect width='20' height='14' x='2' y='5' rx='2' />
-                        <path d='M2 10h20' />
-                      </svg>
-                    </CardHeader>
-                    <CardContent>
-                      <div className='text-2xl font-bold'>$573</div>
-                      {/* <p className="text-xs text-muted-foreground">
+        {/* Dashboard Overview Tab */}
+        <TabsContent value='overview' className='space-y-4'>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-4'>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>
+                  Current Portfolio Value
+                </CardTitle>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  className='h-4 w-4 text-muted-foreground'
+                >
+                  <path d='M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6' />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>$45,231.89</div>
+                <p className='text-xs text-muted-foreground'>
+                  +20.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>
+                  Daily Profit/Loss
+                </CardTitle>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  className='h-4 w-4 text-muted-foreground'
+                >
+                  <polyline points='23 6 13.5 15.5 8.5 10.5 1 18'></polyline>
+                  <polyline points='17 6 23 6 23 12'></polyline>
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>+2350</div>
+                <p className='text-xs text-muted-foreground'>
+                  +180.1% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>Returns</CardTitle>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  className='h-4 w-4 text-muted-foreground'
+                >
+                  <path d='M22 12h-4l-3 9L9 3l-3 9H2' />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>+12,234</div>
+                <p className='text-xs text-muted-foreground'>
+                  +19% from last month
+                </p>
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
+                <CardTitle className='text-sm font-medium'>
+                  Cash Balance
+                </CardTitle>
+                <svg
+                  xmlns='http://www.w3.org/2000/svg'
+                  viewBox='0 0 24 24'
+                  fill='none'
+                  stroke='currentColor'
+                  strokeLinecap='round'
+                  strokeLinejoin='round'
+                  strokeWidth='2'
+                  className='h-4 w-4 text-muted-foreground'
+                >
+                  <rect width='20' height='14' x='2' y='5' rx='2' />
+                  <path d='M2 10h20' />
+                </svg>
+              </CardHeader>
+              <CardContent>
+                <div className='text-2xl font-bold'>$573</div>
+                {/* <p className="text-xs text-muted-foreground">
                           +201 since last hour
                         </p> */}
-                    </CardContent>
-                  </Card>
-                </div>
-                <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
-                  <Card className='col-span-4'>
-                    <CardHeader>
-                      <CardTitle>Portfolio Balance</CardTitle>
-                    </CardHeader>
-                    <CardContent className='pl-2'>
-                      {/* Replace bar chart with line graph */}
-                      {/* <Overview /> */}
-                      <PortfolioPerformance data={data} />
-                    </CardContent>
-                  </Card>
-                  <Card className='col-span-3'>
-                    <CardHeader>
-                      <CardTitle>Top Performing Stocks</CardTitle>
-                      <CardDescription>
-                        The five highest performing stocks in your portfolio.
-                      </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <RecentSales />
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-
-              {/* Dashboard Details */}
-              {/* TabContent TODO */}
-            </Tabs>
+              </CardContent>
+            </Card>
           </div>
-        </div>
-      </ResizablePanel>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-7'>
+            <Card className='col-span-4'>
+              <CardHeader>
+                <CardTitle>Portfolio Balance</CardTitle>
+              </CardHeader>
+              <CardContent className='px-6'>
+                {/* Replace bar chart with line graph */}
+                {/* <Overview /> */}
+                <PortfolioPerformance data={data} />
+              </CardContent>
+            </Card>
+            <Card className='col-span-3'>
+              <CardHeader>
+                <CardTitle>Top Performing Stocks</CardTitle>
+                <CardDescription>
+                  The five highest performing stocks in your portfolio.
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <RecentSales />
+              </CardContent>
+            </Card>
+          </div>
+        </TabsContent>
+
+        {/* Dashboard Details */}
+        {/* TabContent TODO */}
+      </Tabs>
     </RootLayout>
   )
 }
