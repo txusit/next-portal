@@ -1,3 +1,4 @@
+import { Icons } from '@/components/shared/icons'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -15,6 +16,8 @@ interface MemberCardProps {
 }
 
 export function MembershipCard({ semester }: MemberCardProps) {
+  const IconComponent = membershipConfig[semester].iconType
+
   return (
     <Card className='text-center'>
       <CardHeader className='space-y-1'>
@@ -27,7 +30,8 @@ export function MembershipCard({ semester }: MemberCardProps) {
       </CardHeader>
       <CardContent className='grid gap-4'>
         <Label className='flex flex-col space-y-1 items-center'>
-          {membershipConfig[semester].icon}
+          <IconComponent className={membershipConfig[semester].iconClass} />
+          {/* Normally like this <Icons.calendar_half className='mb-3 h-20 w-20' /> */}
           <div className='text-4xl font-bold py-5'>
             ${membershipConfig[semester].display_price}
           </div>
