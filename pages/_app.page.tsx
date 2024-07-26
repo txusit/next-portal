@@ -6,7 +6,10 @@ import { SessionProvider } from 'next-auth/react'
 
 // Set global font
 import { Inter } from 'next/font/google'
-import { ThemeProvider } from '@/components/shared/providers'
+import {
+  NavigationProvider,
+  ThemeProvider,
+} from '@/components/shared/providers'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -20,23 +23,25 @@ export default function App({ Component, pageProps }: AppProps) {
         enableSystem
         disableTransitionOnChange
       >
-        <div vaul-drawer-wrapper=''>
-          <div className='relative flex min-h-screen flex-col bg-background'>
-            {/* <SiteHeader /> */}
-            <main className='flex-1'>
-              <Component {...pageProps} />
-            </main>
-            {/* <SiteFooter /> */}
+        <NavigationProvider>
+          <div vaul-drawer-wrapper=''>
+            <div className='relative flex min-h-screen flex-col bg-background'>
+              {/* <SiteHeader /> */}
+              <main className='flex-1'>
+                <Component {...pageProps} />
+              </main>
+              {/* <SiteFooter /> */}
+            </div>
           </div>
-        </div>
 
-        {/* Extra stuff from shadcn ui repo */}
-        {/* <TailwindIndicator />
+          {/* Extra stuff from shadcn ui repo */}
+          {/* <TailwindIndicator />
         <ThemeSwitcher />
         <Analytics />
         <NewYorkToaster />
         <DefaultToaster />
         <NewYorkSonner /> */}
+        </NavigationProvider>
       </ThemeProvider>
     </SessionProvider>
   )
