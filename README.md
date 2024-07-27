@@ -1,7 +1,10 @@
 ## Style Conventions
 
-Variable:
-lower-kebab-case
+Variable (backend):
+lower_snake_case
+
+Variable (frontend)
+camelCase
 
 Components:
 PascalCase

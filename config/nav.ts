@@ -96,7 +96,7 @@ export const sideNavLinkData: SideNavLinkData = {
       variant: 'ghost',
     },
     {
-      href: '/settings/profile',
+      href: '/settings/account',
       navGroupHrefs: new Set(),
       title: 'Settings',
       label: '',

@@ -28,14 +28,9 @@ import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
 
 const profileFormSchema = z.object({
-  username: z
-    .string()
-    .min(2, {
-      message: 'Username must be at least 2 characters.',
-    })
-    .max(30, {
-      message: 'Username must not be longer than 30 characters.',
-    }),
+  first_name: z.string(),
+  last_name: z.string(),
+  grad_year: z.number().int().gte(1900).lte(2100),
   email: z
     .string({
       required_error: 'Please select an email to display.',
@@ -55,11 +50,8 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<ProfileFormValues> = {
-  bio: 'I own a computer.',
-  urls: [
-    { value: 'https://shadcn.com' },
-    { value: 'http://twitter.com/shadcn' },
-  ],
+  bio: '',
+  urls: [{ value: 'https://linkedin.com' }],
 }
 
 export function ProfileForm() {
@@ -75,6 +67,8 @@ export function ProfileForm() {
   })
 
   function onSubmit(data: ProfileFormValues) {
+    console.log('submit hit')
+
     toast({
       title: 'You submitted the following values:',
       description: (
@@ -85,10 +79,76 @@ export function ProfileForm() {
     })
   }
 
+  // Generate list of years
+  const current_year = new Date().getFullYear()
+  const number_of_years = current_year - 2000 + 10
+  const year_options = Array.from(
+    { length: number_of_years },
+    (_, i) => i + 2000
+  ).reverse()
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
+          control={form.control}
+          name='first_name'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>First Name</FormLabel>
+              <FormControl>
+                <Input placeholder='John' {...field} />
+              </FormControl>
+              {/* <FormDescription>This is your first name.</FormDescription> */}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='last_name'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Last Name</FormLabel>
+              <FormControl>
+                <Input placeholder='Doe' {...field} />
+              </FormControl>
+              {/* <FormDescription>This is your last name.</FormDescription> */}
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name='grad_year'
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Graduation Year</FormLabel>
+              <Select
+                onValueChange={(value) => field.onChange(parseInt(value))}
+              >
+                <FormControl>
+                  <SelectTrigger>
+                    <SelectValue placeholder='Select your graduation year' />
+                  </SelectTrigger>
+                </FormControl>
+                <SelectContent>
+                  {year_options.map((year, index) => (
+                    <SelectItem key={index} value={year.toString()}>
+                      {year}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <FormDescription>
+                You can manage verified email addresses in your{' '}
+                <Link href='/examples/forms'>email settings</Link>.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        {/* <FormField
           control={form.control}
           name='username'
           render={({ field }) => (
@@ -104,7 +164,7 @@ export function ProfileForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name='email'

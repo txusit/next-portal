@@ -3,10 +3,14 @@ import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { UserLoginForm } from './components/user-login-form'
 import AuthenticationPageLayout from '../layout'
+import { useRouter } from 'next/router'
+import { signIn } from 'next-auth/react'
 
 export default function LoginPage({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+
+
   return (
     <AuthenticationPageLayout auth_page={'Login'}>
       <UserLoginForm />

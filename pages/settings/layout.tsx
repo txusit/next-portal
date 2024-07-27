@@ -33,12 +33,15 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const router = useRouter()
 
   const handleBack = () => {
+    console.log('back clicked')
     const lastNonSettingsPage = sessionStorage.getItem('lastNonSettingsPage')
+    console.log('last page got: ', lastNonSettingsPage)
     if (lastNonSettingsPage) {
       router.replace(lastNonSettingsPage)
     } else {
       router.replace('/dashboard')
     }
+    console.log('router replaced')
   }
 
   return (
