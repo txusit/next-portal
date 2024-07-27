@@ -8,17 +8,34 @@ export const PasswordSchema = z
   .min(6, { message: 'Must be 6 or more characters long' })
 export type Password = z.infer<typeof PasswordSchema>
 
+export const UsernameSchema = z
+  .string()
+  .min(3, 'Username must be at least 3 characters long')
+  .max(20, 'Username must be at most 20 characters long')
+  .regex(
+    /^[a-zA-Z0-9._]+$/,
+    'Username can only contain letters, numbers, underscores, and periods'
+  )
+  .regex(
+    /^(?!.*[_.]{2}).*$/,
+    'Username cannot contain consecutive underscores or periods'
+  )
+  .regex(/^(?![_.]).*$/, 'Username cannot start with an underscore or period')
+  .regex(/^(?!.*[_.]$).*$/, 'Username cannot end with an underscore or period')
+
 export const SignUpSchema = z.object({
-  firstName: z.string().nonempty({ message: 'Must not be empty' }),
-  lastName: z.string().nonempty({ message: 'Must not be empty' }),
+  firstName: z.string().min(1, { message: 'Must not be empty' }),
+  lastName: z.string().min(1, { message: 'Must not be empty' }),
+  gradYear: z.number().int(),
+  username: UsernameSchema,
   email: z.string().email(),
   password: PasswordSchema,
 })
 export type SignUp = z.infer<typeof SignUpSchema>
 
 export const CredentialsSchema = z.object({
-  email: z.string().nonempty({ message: 'Must not be empty' }),
-  password: z.string().nonempty({ message: 'Must not be empty' }),
+  email: z.string().min(1, { message: 'Must not be empty' }),
+  password: z.string().min(1, { message: 'Must not be empty' }),
 })
 export type Credentials = z.infer<typeof CredentialsSchema>
 
@@ -35,21 +52,21 @@ export type SendPasswordResetEmail = z.infer<
 >
 
 export const ResetPasswordSchema = z.object({
-  token: z.string().nonempty(),
+  token: z.string().min(1),
   password: PasswordSchema,
 })
 export type ResetPassword = z.infer<typeof ResetPasswordSchema>
 
 export const SendConfirmationEmailSchema = z.object({
-  email: z.string().nonempty(),
+  email: z.string().email(),
 })
 
 export const ConfirmEmailSchema = z.object({
-  token: z.string().nonempty(),
+  token: z.string().min(1),
 })
 
 export const CheckoutSessionSchema = z.object({
-  selectedPriceId: z.string().nonempty(),
+  selectedPriceId: z.string().min(1),
   email: z.string().email(),
 })
 export type CheckoutSession = z.infer<typeof CheckoutSessionSchema>
@@ -67,13 +84,13 @@ export const AddMeetingSchema = z.object({
 })
 
 export const AddPitchSchema = z.object({
-  stockId: z.string().nonempty(),
+  stockId: z.string().min(1),
   direction: z.enum(['long', 'short', 'hold']),
 })
 export type AddPitch = z.infer<typeof AddPitchSchema>
 
 export const AddStockSchema = z.object({
-  name: z.string().nonempty(),
+  name: z.string().min(1),
   ticker: z.string().min(1).max(5),
 })
 export type AddStock = z.infer<typeof AddStockSchema>

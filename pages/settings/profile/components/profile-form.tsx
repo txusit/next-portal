@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { z } from 'zod'
 
-import { cn } from '@/lib/utils'
+import { cn, getGradYears } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import {
   Form,
@@ -26,16 +26,13 @@ import {
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 const profileFormSchema = z.object({
-  first_name: z.string(),
-  last_name: z.string(),
-  grad_year: z.number().int().gte(1900).lte(2100),
-  email: z
-    .string({
-      required_error: 'Please select an email to display.',
-    })
-    .email(),
+  firstName: z.string(),
+  lastName: z.string(),
+  gradYear: z.number().int(),
   bio: z.string().max(160).min(4),
   urls: z
     .array(
@@ -50,16 +47,38 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>
 
 // This can come from your database or API.
 const defaultValues: Partial<ProfileFormValues> = {
+  firstName: '',
+  lastName: '',
   bio: '',
   urls: [{ value: 'https://linkedin.com' }],
 }
 
 export function ProfileForm() {
+  const { data: session, status } = useSession()
+  const [gradYear, setGradYear] = useState<string>('')
+  const [bio, setBio] = useState<string>('')
+
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),
     defaultValues,
     mode: 'onChange',
   })
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const name = session!.user!.name || ''
+      const [firstName, lastName] = name.split(' ')
+      // setGradYear()
+      // setBio()
+
+      const newDefaultValues: Partial<ProfileFormValues> = {
+        ...defaultValues,
+        firstName,
+        lastName,
+      }
+      form.reset(newDefaultValues)
+    }
+  }, [session, status, form])
 
   const { fields, append } = useFieldArray({
     name: 'urls',
@@ -80,19 +99,14 @@ export function ProfileForm() {
   }
 
   // Generate list of years
-  const current_year = new Date().getFullYear()
-  const number_of_years = current_year - 2000 + 10
-  const year_options = Array.from(
-    { length: number_of_years },
-    (_, i) => i + 2000
-  ).reverse()
+  const years = getGradYears()
 
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
         <FormField
           control={form.control}
-          name='first_name'
+          name='firstName'
           render={({ field }) => (
             <FormItem>
               <FormLabel>First Name</FormLabel>
@@ -106,7 +120,7 @@ export function ProfileForm() {
         />
         <FormField
           control={form.control}
-          name='last_name'
+          name='lastName'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Last Name</FormLabel>
@@ -120,7 +134,7 @@ export function ProfileForm() {
         />
         <FormField
           control={form.control}
-          name='grad_year'
+          name='gradYear'
           render={({ field }) => (
             <FormItem>
               <FormLabel>Graduation Year</FormLabel>
@@ -133,7 +147,7 @@ export function ProfileForm() {
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  {year_options.map((year, index) => (
+                  {years.map((year, index) => (
                     <SelectItem key={index} value={year.toString()}>
                       {year}
                     </SelectItem>
@@ -165,7 +179,7 @@ export function ProfileForm() {
             </FormItem>
           )}
         /> */}
-        <FormField
+        {/* <FormField
           control={form.control}
           name='email'
           render={({ field }) => (
@@ -190,7 +204,7 @@ export function ProfileForm() {
               <FormMessage />
             </FormItem>
           )}
-        />
+        /> */}
         <FormField
           control={form.control}
           name='bio'

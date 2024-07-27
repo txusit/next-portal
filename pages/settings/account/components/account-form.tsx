@@ -17,6 +17,9 @@ import {
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
 import { PasswordSchema } from '@/types/endpoint-request-schemas'
+import { Separator } from '@/components/ui/separator'
+import { useSession } from 'next-auth/react'
+import { useEffect } from 'react'
 
 const accountFormSchemas = {
   username: z.object({
@@ -30,7 +33,10 @@ const accountFormSchemas = {
       }),
   }),
   email: z.object({ email: z.string().email() }),
-  password: z.object({ password: PasswordSchema }),
+  password: z.object({
+    password: PasswordSchema,
+    confirmPassword: PasswordSchema,
+  }),
 }
 
 type UsernameFormValues = z.infer<typeof accountFormSchemas.username>
@@ -65,6 +71,21 @@ export function AccountForm() {
     resolver: zodResolver(accountFormSchemas.password),
     defaultValues: defaultPasswordValues,
   })
+
+  const { data: session, status } = useSession()
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const email = session!.user!.email || ''
+      // setGradYear()
+      // setBio()
+
+      const newDefaultEmailValues: Partial<EmailFormValues> = {
+        ...defaultEmailValues,
+        email,
+      }
+      emailForm.reset(newDefaultEmailValues)
+    }
+  }, [session, status, emailForm])
 
   function onUsernameSubmit(data: UsernameFormValues) {
     toast({
@@ -104,7 +125,7 @@ export function AccountForm() {
       <Form {...usernameForm}>
         <form
           onSubmit={usernameForm.handleSubmit(onUsernameSubmit)}
-          className='space-y-8 space-x-4 flex flex-row'
+          className='space-y-4'
         >
           <FormField
             control={usernameForm.control}
@@ -112,24 +133,30 @@ export function AccountForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Username</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter new username' {...field} />
-                </FormControl>
-                <FormDescription>
-                  This will update the username associated with your account.
-                </FormDescription>
-                <FormMessage />
+                <div className='flex flex-row space-x-2'>
+                  <div className='w-full'>
+                    <FormControl>
+                      <Input placeholder='Enter new username' {...field} />
+                    </FormControl>
+                    {/* <FormDescription>
+                  Update the username associated with your account.
+                </FormDescription> */}
+                    <FormMessage />
+                  </div>
+                  <Button type='submit'>Update</Button>
+                </div>
               </FormItem>
             )}
           />
-          <Button type='submit'>Update</Button>
         </form>
       </Form>
+
+      {/* <Separator /> */}
 
       <Form {...emailForm}>
         <form
           onSubmit={emailForm.handleSubmit(onEmailSubmit)}
-          className='space-y-8 space-x-4 flex flex-row'
+          className='space-y-4'
         >
           <FormField
             control={emailForm.control}
@@ -137,24 +164,28 @@ export function AccountForm() {
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder='Enter new email' {...field} />
-                </FormControl>
-                <FormDescription>
-                  This will update the email associated with your account.
-                </FormDescription>
-                <FormMessage />
+                <div className='flex flex-row space-x-2'>
+                  <div className='w-full'>
+                    <FormControl>
+                      <Input placeholder='Enter new email' {...field} />
+                    </FormControl>
+                    {/* <FormDescription>
+                  Update the username associated with your account.
+                </FormDescription> */}
+                    <FormMessage />
+                  </div>
+                  <Button type='submit'>Update</Button>
+                </div>
               </FormItem>
             )}
           />
-          <Button type='submit'>Update</Button>
         </form>
       </Form>
 
       <Form {...passwordForm}>
         <form
           onSubmit={passwordForm.handleSubmit(onPasswordSubmit)}
-          className='space-y-8 space-x-4 flex flex-row'
+          className='space-y-4 pt-4'
         >
           <FormField
             control={passwordForm.control}
@@ -165,14 +196,26 @@ export function AccountForm() {
                 <FormControl>
                   <Input placeholder='*********' {...field} />
                 </FormControl>
-                <FormDescription>
-                  This will send a password reset link to your account email.
-                </FormDescription>
+                {/* <FormDescription>Enter new account password</FormDescription> */}
                 <FormMessage />
               </FormItem>
             )}
           />
-          <Button type='submit'>Send Email</Button>
+          <FormField
+            control={passwordForm.control}
+            name='confirmPassword'
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Confirm Password</FormLabel>
+                <FormControl>
+                  <Input placeholder='*********' {...field} />
+                </FormControl>
+                {/* <FormDescription>Confirm new account password</FormDescription> */}
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Button type='submit'>Send Reset Password Email</Button>
         </form>
       </Form>
     </>

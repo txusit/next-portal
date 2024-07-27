@@ -1,15 +1,15 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { UserLoginForm } from './components/user-login-form'
+import { ResetPasswordForm } from './components/reset-password-form'
 import AuthenticationPageLayout from '../layout'
 
-export default function LoginPage({
+export default function ResetPasswordPage({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   return (
-    <AuthenticationPageLayout auth_page={'Login'}>
-      <UserLoginForm />
+    <AuthenticationPageLayout auth_page={'Sign Up'}>
+      <ResetPasswordForm />
     </AuthenticationPageLayout>
   )
 }

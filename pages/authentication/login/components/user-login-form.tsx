@@ -1,8 +1,5 @@
-'use client'
-
 import * as React from 'react'
 
-import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
@@ -29,11 +26,8 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
 
   async function handleLogin(event: React.SyntheticEvent) {
     event.preventDefault()
-    console.log('submitted login', email, password)
-
     setIsLoading(true)
 
-    // Your login logic...
     const result = await signIn('credentials', {
       email,
       password,
@@ -42,7 +36,6 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
     })
 
     if (result?.error) {
-      // Handle the error appropriately
       console.error('Login error:', result.error)
       toast({
         title: 'Login Error',
@@ -60,7 +53,6 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
       router.push(url)
     }
 
-    console.log('finished await')
     // setTimeout(() => {
     setIsLoading(false)
     // }, 3000)
@@ -92,7 +84,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
           <div className='flex items-center'>
             <Label htmlFor='password'>Password</Label>
             <Link
-              href='/forgot-password'
+              href='/authentication/forgot-password'
               className='ml-auto inline-block text-sm underline'
             >
               Forgot your password?

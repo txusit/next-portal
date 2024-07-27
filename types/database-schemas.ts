@@ -10,6 +10,7 @@
 // export type Vote = Database['public']['Tables']['vote']['Row']
 
 import { z } from 'zod'
+import { UsernameSchema } from './endpoint-request-schemas'
 
 export const AttendanceRecordSchema = z.object({
   id: z.string().optional(),
@@ -19,10 +20,12 @@ export const AttendanceRecordSchema = z.object({
 
 export const MemberSchema = z.object({
   id: z.string().optional(),
-  first_name: z.string().nonempty(),
-  last_name: z.string().nonempty(),
+  first_name: z.string().min(1),
+  last_name: z.string().min(1),
   full_name: z.string().optional(),
-  email: z.string().nonempty(),
+  grad_year: z.number().int(),
+  username: UsernameSchema,
+  email: z.string().email(),
   password: z.string().min(6, { message: 'Must be 6 or more characters long' }),
   is_confirmed: z.boolean(),
   membership_id: z.string().nullable(),

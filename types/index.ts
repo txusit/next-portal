@@ -23,7 +23,7 @@ export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
 
 export type Maybe<T> = T | null | undefined
 
-type ErrorData = {
+export type ErrorData = {
   statusCode: number
   message: string | ZodIssue[]
   path: string
