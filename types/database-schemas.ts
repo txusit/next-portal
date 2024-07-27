@@ -10,7 +10,7 @@
 // export type Vote = Database['public']['Tables']['vote']['Row']
 
 import { z } from 'zod'
-import { UsernameSchema } from './endpoint-request-schemas'
+import { UsernameSchema } from './common-schemas'
 
 export const AttendanceRecordSchema = z.object({
   id: z.string().optional(),

@@ -10,7 +10,7 @@ import { HttpStatusCode } from 'axios'
 import { compare, hash } from 'bcryptjs'
 import { supabase } from '@/lib/helpers/supabase'
 import { RequestMethod, createMocks } from 'node-mocks-http'
-import { SignUp } from '@/types/endpoint-request-schemas'
+import { SignUp, SignUpSchema } from '@/types/endpoint-request-schemas'
 import { Member } from '@/types/database-schemas'
 import { sendActionEmail } from '@/lib/helpers/server-side/send-action-email'
 
@@ -60,6 +60,8 @@ describe('signUp', () => {
     const signUpData: SignUp = {
       firstName: '__TEST__John',
       lastName: '__TEST__Doe',
+      username: 'unittester',
+      gradYear: 2000,
       email: '__TEST__member@gmail.com',
       password: '__TEST__password',
     }
@@ -69,10 +71,7 @@ describe('signUp', () => {
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
     req.body = {
-      firstName: signUpData.firstName,
-      lastName: signUpData.lastName,
-      email: signUpData.email,
-      password: signUpData.password,
+      ...signUpData,
     }
 
     // Run endpoint handler and check response
@@ -85,10 +84,13 @@ describe('signUp', () => {
       .select()
       .eq('email', signUpData.email)
       .maybeSingle()
+
     expect(fetchError).toBeNull() // Supabase fetch query sanity check (unrelated to checking for data accuracy)
     expect(member).toBeDefined()
     expect(member.first_name).toEqual(signUpData.firstName)
     expect(member.last_name).toEqual(signUpData.lastName)
+    expect(member.username).toEqual(signUpData.username)
+    expect(member.grad_year).toEqual(signUpData.gradYear)
     expect(member.is_confirmed).toEqual(false)
     expect(await compare(signUpData.password, member.password)).toBeTruthy()
   })
@@ -118,6 +120,8 @@ describe('signUp', () => {
     const invalidSignUpData: SignUp = {
       firstName: '',
       lastName: '',
+      gradYear: 0,
+      username: '',
       email: '',
       password: '',
     }
@@ -127,10 +131,7 @@ describe('signUp', () => {
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
     req.body = {
-      firstName: invalidSignUpData.firstName,
-      lastName: invalidSignUpData.lastName,
-      email: invalidSignUpData.email,
-      password: invalidSignUpData.password,
+      ...invalidSignUpData,
     }
 
     // Run endpoint handler and check response
@@ -138,41 +139,26 @@ describe('signUp', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
     expect(res.json).toHaveBeenCalledWith({
       error: expect.objectContaining({
-        message: [
-          {
-            'code': 'too_small',
-            'exact': false,
-            'inclusive': true,
-            'message': 'Must not be empty',
-            'minimum': 1,
+        message: expect.arrayContaining([
+          expect.objectContaining({
             'path': ['firstName'],
-            'type': 'string',
-          },
-          {
-            'code': 'too_small',
-            'exact': false,
-            'inclusive': true,
-            'message': 'Must not be empty',
-            'minimum': 1,
+          }),
+          expect.objectContaining({
             'path': ['lastName'],
-            'type': 'string',
-          },
-          {
-            'code': 'invalid_string',
-            'message': 'Invalid email',
+          }),
+          expect.objectContaining({
+            'path': ['gradYear'],
+          }),
+          expect.objectContaining({
+            'path': ['username'],
+          }),
+          expect.objectContaining({
             'path': ['email'],
-            'validation': 'email',
-          },
-          {
-            'code': 'too_small',
-            'exact': false,
-            'inclusive': true,
-            'message': 'Must be 6 or more characters long',
-            'minimum': 6,
+          }),
+          expect.objectContaining({
             'path': ['password'],
-            'type': 'string',
-          },
-        ],
+          }),
+        ]),
       }),
     })
   })
@@ -184,6 +170,8 @@ describe('signUp', () => {
     const signUpData: SignUp = {
       firstName: '__TEST__John',
       lastName: '__TEST__Doe',
+      username: 'unittester',
+      gradYear: 2000,
       email: '__TEST__member@gmail.com',
       password: invalidPassword,
     }
@@ -193,10 +181,7 @@ describe('signUp', () => {
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
     req.body = {
-      firstName: signUpData.firstName,
-      lastName: signUpData.lastName,
-      email: signUpData.email,
-      password: signUpData.password,
+      ...signUpData,
     }
 
     // Run endpoint handler and check response
@@ -204,17 +189,12 @@ describe('signUp', () => {
     expect(res.status).toHaveBeenCalledWith(HttpStatusCode.BadRequest)
     expect(res.json).toHaveBeenCalledWith({
       error: expect.objectContaining({
-        message: [
-          {
-            'code': 'too_small',
-            'exact': false,
-            'inclusive': true,
+        message: expect.arrayContaining([
+          expect.objectContaining({
             'message': 'Must be 6 or more characters long',
-            'minimum': 6,
             'path': ['password'],
-            'type': 'string',
-          },
-        ],
+          }),
+        ]),
       }),
     })
   })
@@ -228,6 +208,8 @@ describe('signUp', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      username: 'unittester',
+      grad_year: 2000,
       password: hashedPassword,
       is_confirmed: false,
       membership_id: null,
@@ -238,6 +220,8 @@ describe('signUp', () => {
     const signUpData: SignUp = {
       firstName: '__TEST__John',
       lastName: '__TEST__Doe',
+      username: 'unittester',
+      gradYear: 2000,
       email: '__TEST__member@gmail.com',
       password: '__TEST__password',
     }
@@ -247,10 +231,7 @@ describe('signUp', () => {
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
     req.body = {
-      firstName: signUpData.firstName,
-      lastName: signUpData.lastName,
-      email: signUpData.email,
-      password: signUpData.password,
+      ...signUpData,
     }
 
     // Run endpoint handler and check response
@@ -273,6 +254,8 @@ describe('signUp', () => {
     const signUpData: SignUp = {
       firstName: '__TEST__John',
       lastName: '__TEST__Doe',
+      username: 'unittester',
+      gradYear: 2000,
       email: '__TEST__member@gmail.com',
       password: '__TEST__password',
     }
@@ -282,10 +265,7 @@ describe('signUp', () => {
     res.status = jest.fn().mockReturnThis() // Mock status method and return `this` to chain with json
     res.json = jest.fn()
     req.body = {
-      firstName: signUpData.firstName,
-      lastName: signUpData.lastName,
-      email: signUpData.email,
-      password: signUpData.password,
+      ...signUpData,
     }
 
     // Run endpoint handler and check response

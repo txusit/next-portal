@@ -6,13 +6,11 @@ import withMiddleware from '@/lib/middleware/with-middleware'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { HttpStatusCode } from 'axios'
-import {
-  ResetPasswordSchema,
-  UUIDSchema,
-} from '@/types/endpoint-request-schemas'
+import { ResetPasswordSchema } from '@/types/endpoint-request-schemas'
 import { supabase } from '@/lib/helpers/supabase'
 import { hash } from 'bcryptjs'
 import { ApiError } from 'next/dist/server/api-utils'
+import { UUIDSchema } from '@/types/common-schemas'
 
 const handler = async (
   req: NextApiRequest,
