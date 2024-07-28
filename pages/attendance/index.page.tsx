@@ -1,11 +1,7 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { useTheme } from 'next-themes'
-import { useConfig } from '@/lib/hooks/use-config'
-import { themes } from '@/registry/themes'
 import { RootLayout } from '@/components/shared/root-layout'
-import { PortfolioDataPoint } from '@/types'
 import { cn } from '@/lib/utils'
 import { PitchInfoCard } from '@/components/common/stock/pitch-info-card'
 import { MeetingInfoCard } from './components/meeting-info-card'
@@ -16,41 +12,6 @@ import { TeamInfoCard } from '@/components/common/stock/team-info-card'
 // import { StockPerformanceCard } from './components/stock-performance-card'
 // import { VotingCard } from './components/voting-card'
 // import { TeamInfoCard } from './components/team-info-card'
-
-const data: PortfolioDataPoint[] = [
-  {
-    portfolio_value: 10400,
-    date: new Date('2024-01-01').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 14405,
-    date: new Date('2024-01-02').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 9400,
-    date: new Date('2024-01-03').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 8200,
-    date: new Date('2024-01-04').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 7000,
-    date: new Date('2024-01-05').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 9600,
-    date: new Date('2024-01-06').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 11244,
-    date: new Date('2024-01-07').toISOString().split('T')[0],
-  },
-  {
-    portfolio_value: 26475,
-    date: new Date('2024-01-08').toISOString().split('T')[0],
-  },
-]
 
 function DemoContainer({
   className,
@@ -72,10 +33,10 @@ export default function AttendancePage({
   defaultLayout = [265, 440],
   defaultCollapsed = false,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { theme: mode } = useTheme()
-  const [config] = useConfig()
+  // const { theme: mode } = useTheme()
+  // const [config] = useConfig()
 
-  const theme = themes.find((theme) => theme.name === config.theme)
+  // const theme = themes.find((theme) => theme.name === config.theme)
 
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 

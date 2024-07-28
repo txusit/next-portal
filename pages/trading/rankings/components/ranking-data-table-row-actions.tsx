@@ -1,5 +1,3 @@
-'use client'
-
 import { DotsHorizontalIcon } from '@radix-ui/react-icons'
 import { Row } from '@tanstack/react-table'
 
@@ -8,12 +6,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { RankingSchema } from './ranking-columns'
-
-// import { labels } from '../data/data'
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>
@@ -22,7 +16,7 @@ interface DataTableRowActionsProps<TData> {
 export function RankingDataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const task = RankingSchema.parse(row.original)
+  // const task = RankingSchema.parse(row.original)
 
   return (
     <DropdownMenu>

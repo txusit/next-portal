@@ -10,9 +10,9 @@ import { fetchMarketPrices } from '@/lib/helpers/server-side/market-data-helpers
 import { AddStockSchema } from '@/types/endpoint-request-schemas'
 import { supabase } from '@/lib/helpers/supabase'
 import { Stock } from '@/types/database-schemas'
-import { getLogger } from '@/lib/helpers/server-side/log-util'
+// import { getLogger } from '@/lib/helpers/server-side/log-util'
 
-const logger = getLogger()
+// const logger = getLogger()
 
 const handler = async (
   req: NextApiRequest,

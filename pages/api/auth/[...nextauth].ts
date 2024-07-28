@@ -3,7 +3,6 @@ import CredentialsProvider from 'next-auth/providers/credentials'
 import { ResponseData } from '@/types'
 import axios, { HttpStatusCode } from 'axios'
 import { ApiError } from 'next/dist/server/api-utils'
-import { ZodIssue } from 'zod'
 import { Member } from '@/types/database-schemas'
 
 export const authOptions: NextAuthOptions = {

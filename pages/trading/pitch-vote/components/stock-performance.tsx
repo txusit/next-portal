@@ -5,13 +5,6 @@ import { useTheme } from 'next-themes'
 import { themes } from '@/registry/themes'
 import { CartesianGrid, Line, LineChart, XAxis } from 'recharts'
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
-import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,

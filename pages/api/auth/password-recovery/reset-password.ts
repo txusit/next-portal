@@ -55,7 +55,7 @@ const handler = async (
     const hashedPassword = await hash(password, 12)
 
     // Update member with new hashed password
-    const { data: updatedMember, error: updateMemberError } = await supabase
+    const { data: __updatedMember, error: updateMemberError } = await supabase
       .from('member')
       .update({ password: hashedPassword })
       .eq('id', memberId)

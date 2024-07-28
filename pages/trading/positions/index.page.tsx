@@ -1,17 +1,9 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from '@/components/common/team-switcher'
-import { Search } from '@/components/common/search'
-import { UserNav } from '@/components/shared/user-nav'
-import { useTheme } from 'next-themes'
-import { useConfig } from '@/lib/hooks/use-config'
-import { themes } from '@/registry/themes'
 import { RootLayout } from '@/components/shared/root-layout'
 import { columns, PositionWithCalculated } from './components/position-columns'
 import { PositionDataTable } from './components/position-data-table'
-import { TopNav } from '@/components/shared/top-nav'
 import { topNavLinkData } from '@/config/nav'
 
 const data: PositionWithCalculated[] = [
@@ -36,10 +28,10 @@ export default function PositionPage({
   defaultLayout = [265, 440],
   defaultCollapsed = false,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { theme: mode } = useTheme()
-  const [config] = useConfig()
+  // const { theme: mode } = useTheme()
+  // const [config] = useConfig()
 
-  const theme = themes.find((theme) => theme.name === config.theme)
+  // const theme = themes.find((theme) => theme.name === config.theme)
 
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 

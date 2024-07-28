@@ -27,7 +27,7 @@ import {
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from '@/components/ui/use-toast'
 import { useSession } from 'next-auth/react'
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 const profileFormSchema = z.object({
   firstName: z.string(),
@@ -55,8 +55,8 @@ const defaultValues: Partial<ProfileFormValues> = {
 
 export function ProfileForm() {
   const { data: session, status } = useSession()
-  const [gradYear, setGradYear] = useState<string>('')
-  const [bio, setBio] = useState<string>('')
+  // const [gradYear, setGradYear] = useState<string>('')
+  // const [bio, setBio] = useState<string>('')
 
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileFormSchema),

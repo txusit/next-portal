@@ -1,10 +1,9 @@
-import Image from 'next/image'
-
 import { Separator } from '@/components/ui/separator'
 import { SidebarNav } from '@/components/common/settings/sidebar-nav'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
+import React from 'react'
 
 const sidebarNavItems = [
   {

@@ -1,11 +1,8 @@
 import React from 'react'
-import Head from 'next/head'
-import styles from '@/styles/Home.module.css'
-import Link from 'next/link'
-import { useSession } from 'next-auth/react'
+// import { useSession } from 'next-auth/react'
 
 const HomePage = () => {
-  const { data: session } = useSession()
+  // const { data: session } = useSession()
 
   return (
     <React.Fragment>

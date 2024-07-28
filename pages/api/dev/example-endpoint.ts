@@ -1,7 +1,6 @@
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
 import withMiddleware from '@/lib/middleware/with-middleware'
-import withRequestBodyGuard from '@/lib/middleware/with-request-body-guard'
 import { ResponseData } from '@/types'
 import { HttpStatusCode } from 'axios'
 import { NextApiRequest, NextApiResponse } from 'next'
