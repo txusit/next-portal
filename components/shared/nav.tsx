@@ -9,6 +9,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip'
 import { useRouter } from 'next/router'
+import { useSidebarStore } from '@/lib/state/navStore'
 
 export interface SideNavLink {
   href: string
@@ -20,13 +21,14 @@ export interface SideNavLink {
 }
 
 interface NavProps {
-  isCollapsed: boolean
   links: SideNavLink[]
 }
 
-export function Nav({ links, isCollapsed }: NavProps) {
+export function Nav({ links }: NavProps) {
   const router = useRouter()
   const currentRoute = router.pathname
+
+  const isCollapsed = useSidebarStore((state) => state.isCollapsed)
 
   return (
     <div
