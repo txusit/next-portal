@@ -117,7 +117,7 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
       </div>
       <div className='mt-4 text-center text-sm'>
         have an account?{' '}
-        <Link href='/authentication/register' className='underline'>
+        <Link href={`/authentication/login`} className='underline'>
           Login
         </Link>
       </div>

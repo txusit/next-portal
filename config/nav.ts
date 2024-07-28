@@ -10,6 +10,8 @@ import {
   Settings,
 } from 'lucide-react'
 
+export const defaultUrl = '/dashboard'
+
 interface TopNavLinkData {
   dashboard: TopNavLink[]
 }
