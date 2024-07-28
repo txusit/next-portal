@@ -35,6 +35,7 @@ db-stop:
 	supabase stop
 
 # Create a new DB migration file for changes to schemas. Make sure to add RPC functions manually
+# make db-migration-new -name="username and grad_year added to Member"
 db-migration-new: 
 	supabase migration new ${name}
 
