@@ -4,7 +4,6 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React from 'react'
-import { toast } from '@/components/ui/use-toast'
 
 const sidebarNavItems = [
   {
