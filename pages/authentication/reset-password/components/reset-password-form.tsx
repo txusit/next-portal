@@ -85,6 +85,12 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
     router.push('/authentication/login')
   }
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !isLoading) {
+      handleSignUp(event)
+    }
+  }
+
   return (
     <>
       <div className='grid gap-2 text-center'>
@@ -100,6 +106,7 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
             id='password'
             type='password'
             value={password}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setPassword(e.target.value)
             }}
@@ -112,6 +119,7 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
             id='confirm-password'
             type='password'
             value={confirmPassword}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setConfirmPassword(e.target.value)
             }}

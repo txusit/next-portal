@@ -81,6 +81,12 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
     }
   }, [countdown])
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !isLoading) {
+      handleSendResetEmail(event)
+    }
+  }
+
   return (
     <>
       <div className='grid gap-2 text-center'>
@@ -97,6 +103,7 @@ export function ForgotPasswordForm({ className, ...props }: UserAuthFormProps) {
             type='email'
             placeholder='m@example.com'
             value={email}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setEmail(e.target.value)
             }}
