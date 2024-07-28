@@ -35,9 +35,9 @@ db-stop:
 	supabase stop
 
 # Create a new DB migration file for changes to schemas. Make sure to add RPC functions manually
-# make db-migration-new -name="username and grad_year added to Member"
+# make db-migration-new name="added_username_and_grad_year_to_member"
 db-migration-new: 
-	supabase migration new ${name}
+	supabase db diff -f ${name}
 
 # Access Docker Container Shells
 portal-shell:
