@@ -1,39 +1,41 @@
 // middleware.ts
 import { getToken } from 'next-auth/jwt'
-import { withAuth } from 'next-auth/middleware'
-import { NextResponse } from 'next/server'
+import { NextRequestWithAuth, withAuth } from 'next-auth/middleware'
+import { NextFetchEvent, NextResponse } from 'next/server'
 
-export default withAuth(
-  // `withAuth` augments your `Request` with the user's token.
-  async function middleware(req) {
-    const session = await getToken({ req, secret })
-    const { pathname } = req.nextUrl
+// `withAuth` augments your `Request` with the user's token.
+export default async function middleware(
+  req: NextRequestWithAuth,
+  event: NextFetchEvent
+) {
+  const token = await getToken({ req })
+  const isAuthenticated = !!token
 
-    const authenticationPaths = '^/authentication/.*'
-    const regex = new RegExp(authenticationPaths)
+  // Redirect authenticated user away from authentication pages
+  if (req.nextUrl.pathname.startsWith('/authentication') && isAuthenticated) {
+    return NextResponse.redirect(new URL('/dashboard', req.url))
+  }
 
-    if (session && regex.test(pathname)) {
-      return NextResponse.redirect(new URL('/dashboard', req.url))
-    }
+  // Allow unauthenticated user on authentication pages
+  if (req.nextUrl.pathname.startsWith('/authentication') && !isAuthenticated) {
+    return
+  }
 
-    return NextResponse.next()
-  },
-  {
+  const authMiddleware = await withAuth({
     pages: {
       signIn: '/authentication/login', // Custom login page
     },
+
     callbacks: {
       authorized: ({ token }) => {
         // token?.role === 'user'
         return token != null
       },
     },
-  }
-)
+  })
 
-const secret = process.env.NEXTAUTH_SECRET
-
-// export async function middleware(req: NextRequest) {}
+  return authMiddleware(req, event)
+}
 
 export const config = {
   matcher: [

@@ -226,7 +226,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
       </div>
       <div className='mt-4 text-center text-sm'>
         Already have an account?{' '}
-        <Link href='/authentication/login' className='underline'>
+        <Link href={`/authentication/login`} className='underline'>
           Login
         </Link>
       </div>

@@ -5,20 +5,15 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Icons } from '@/components/shared/icons'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { signIn } from 'next-auth/react'
 import { toast } from '@/components/ui/use-toast'
+import { defaultUrl } from '@/config/nav'
+import { useRouter } from 'next/router'
 
 interface UserAuthFormProps extends React.HTMLAttributes<HTMLDivElement> {}
 
 export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
   const router = useRouter()
-  const { callbackUrl } = router.query
-
-  const defaultUrl = '/dashboard'
-  const url = Array.isArray(callbackUrl)
-    ? callbackUrl[0]
-    : callbackUrl || defaultUrl
 
   const [isLoading, setIsLoading] = React.useState<boolean>(false)
   const [email, setEmail] = React.useState<string>('')
@@ -32,7 +27,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
       email,
       password,
       redirect: false,
-      callbackUrl: url,
+      callbackUrl: defaultUrl,
     })
 
     if (result?.error) {
@@ -50,7 +45,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
     }
 
     if (result?.ok) {
-      router.push(url)
+      router.push(defaultUrl)
     }
 
     // setTimeout(() => {
@@ -84,7 +79,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
           <div className='flex items-center'>
             <Label htmlFor='password'>Password</Label>
             <Link
-              href='/authentication/forgot-password'
+              href={`/authentication/forgot-password`}
               className='ml-auto inline-block text-sm underline'
             >
               Forgot your password?
@@ -115,7 +110,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
       </div>
       <div className='mt-4 text-center text-sm'>
         Don&apos;t have an account?{' '}
-        <Link href='/authentication/register' className='underline'>
+        <Link href={`/authentication/register`} className='underline'>
           Sign up
         </Link>
       </div>
