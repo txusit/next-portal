@@ -1,4 +1,3 @@
-import { Icons } from '@/components/shared/icons'
 import { Button } from '@/components/ui/button'
 import {
   Card,
@@ -9,7 +8,6 @@ import {
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { membershipConfig } from '@/config/membership'
-import axios from 'axios'
 
 interface MemberCardProps {
   semester: 'fall' | 'spring' | 'year'
@@ -43,6 +41,6 @@ export function MembershipCard({ semester }: MemberCardProps) {
 }
 
 // Popup for confirmation, then run this method
-function stripeCheckout(priceId: string, email: string) {
-  // axios.post('/api/stripe/checkout_sessions', {priceId, email})
-}
+// function stripeCheckout(priceId: string, email: string) {
+//   // axios.post('/api/stripe/checkout_sessions', {priceId, email})
+// }

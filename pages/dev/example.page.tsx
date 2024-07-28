@@ -1,5 +1,5 @@
 import React from 'react'
-import { InferGetServerSidePropsType, NextPage } from 'next'
+import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 
 export default function ExamplePage({

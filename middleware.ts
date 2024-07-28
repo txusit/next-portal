@@ -1,7 +1,7 @@
 // middleware.ts
 import { getToken } from 'next-auth/jwt'
 import { withAuth } from 'next-auth/middleware'
-import { NextRequest, NextResponse } from 'next/server'
+import { NextResponse } from 'next/server'
 
 export default withAuth(
   // `withAuth` augments your `Request` with the user's token.

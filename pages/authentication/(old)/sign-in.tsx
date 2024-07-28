@@ -35,7 +35,7 @@ const SignInPage: NextPage = ({
 
     // Handle login response
     if (loginRes && !loginRes.ok) {
-      setMessage(loginRes.error)
+      setMessage(loginRes.error || '')
     } else {
       router.push('/')
     }

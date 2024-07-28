@@ -1,8 +1,6 @@
 import React from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
-import { ResizablePanel } from '@/components/ui/resizable'
-import TeamSwitcher from '@/components/common/team-switcher'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Card,
@@ -11,13 +9,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { TopNav } from '@/components/shared/top-nav'
-import { Search } from '@/components/common/search'
-import { UserNav } from '@/components/shared/user-nav'
 import { CalendarDateRangePicker } from '@/components/common/data-table/date-range-picker'
-import { useTheme } from 'next-themes'
-import { useConfig } from '@/lib/hooks/use-config'
-import { themes } from '@/registry/themes'
 import { RecentSales } from './components/recent-sales'
 import { RootLayout } from '@/components/shared/root-layout'
 import { PortfolioDataPoint } from '@/types'
@@ -64,10 +56,10 @@ export default function DashboardPage({
   defaultLayout = [265, 440],
   defaultCollapsed = false,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-  const { theme: mode } = useTheme()
-  const [config] = useConfig()
+  // const { theme: mode } = useTheme()
+  // const [config] = useConfig()
 
-  const theme = themes.find((theme) => theme.name === config.theme)
+  // const theme = themes.find((theme) => theme.name === config.theme)
 
   // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 

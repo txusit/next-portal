@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { cn } from '@/lib/utils'
 import { useRouter } from 'next/router'
+import React from 'react'
 
 export interface TopNavLink {
   href: string

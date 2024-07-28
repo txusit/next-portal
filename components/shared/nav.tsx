@@ -8,7 +8,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import { useState } from 'react'
 import { useRouter } from 'next/router'
 
 export interface SideNavLink {

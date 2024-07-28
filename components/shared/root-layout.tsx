@@ -6,12 +6,8 @@ import {
 } from '@/components/ui/resizable'
 import { TooltipProvider } from '@/components/ui/tooltip'
 // import { getServerSideProps } from '@/pages/dashboard.page'
-import { InferGetServerSidePropsType } from 'next'
-import { useTheme } from 'next-themes'
-import { useConfig } from '@/lib/hooks/use-config'
 import { Separator } from '@/components/ui/separator'
 import { cn } from '@/lib/utils'
-import { themes } from '@/registry/themes'
 import { Nav } from '@/components/shared/nav'
 import { UserNav } from '@/components/shared/user-nav'
 import { Search } from '@/components/common/search'
@@ -34,10 +30,10 @@ export const RootLayout = ({
   topNavLinks = [],
   children,
 }: RootLayoutProps) => {
-  const { theme: mode } = useTheme()
-  const [config] = useConfig()
+  // const { theme: mode } = useTheme()
+  // const [config] = useConfig()
 
-  const theme = themes.find((theme) => theme.name === config.theme)
+  // const theme = themes.find((theme) => theme.name === config.theme)
 
   const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
   return (

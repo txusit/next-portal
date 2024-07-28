@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { atom, Provider as JotaiProvider, useAtom } from 'jotai'
+import { Provider as JotaiProvider } from 'jotai'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 import { ThemeProviderProps } from 'next-themes/dist/types'
 

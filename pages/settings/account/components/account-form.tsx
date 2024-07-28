@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
@@ -16,8 +15,7 @@ import {
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
 import { toast } from '@/components/ui/use-toast'
-import { PasswordSchema } from '@/types/endpoint-request-schemas'
-import { Separator } from '@/components/ui/separator'
+import { PasswordSchema } from '@/types/common-schemas'
 import { useSession } from 'next-auth/react'
 import { useEffect } from 'react'
 

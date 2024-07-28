@@ -11,7 +11,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
-import { PositionWithCalculatedSchema } from './position-columns'
+// import { PositionWithCalculatedSchema } from './position-columns'
 
 // import { labels } from '../data/data'
 
@@ -22,7 +22,7 @@ interface DataTableRowActionsProps<TData> {
 export function PositionDataTableRowActions<TData>({
   row,
 }: DataTableRowActionsProps<TData>) {
-  const task = PositionWithCalculatedSchema.parse(row.original)
+  // const task = PositionWithCalculatedSchema.parse(row.original)
 
   return (
     <DropdownMenu>

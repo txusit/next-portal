@@ -2,7 +2,6 @@ import {
   Card,
   CardContent,
   CardDescription,
-  CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
@@ -43,19 +42,19 @@ const data = [
   },
 ]
 
-const chartConfig = {
-  views: {
-    label: 'Page Views',
-  },
-  desktop: {
-    label: 'Desktop',
-    color: 'hsl(var(--chart-1))',
-  },
-  mobile: {
-    label: 'Mobile',
-    color: 'hsl(var(--chart-2))',
-  },
-}
+// const chartConfig = {
+//   views: {
+//     label: 'Page Views',
+//   },
+//   desktop: {
+//     label: 'Desktop',
+//     color: 'hsl(var(--chart-1))',
+//   },
+//   mobile: {
+//     label: 'Mobile',
+//     color: 'hsl(var(--chart-2))',
+//   },
+// }
 
 export function StockPerformanceCard() {
   // const { theme: mode } = useTheme()

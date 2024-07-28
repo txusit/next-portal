@@ -21,7 +21,7 @@ const handler = async (
     if (direction == 'hold' && price == 0) {
       throw new ApiError(
         HttpStatusCode.BadRequest,
-        `Invalid input for vote. A vote cannot have a \'hold\' direction while also having a non-zero price of: ${price}.`
+        `Invalid input for vote. A vote cannot have a 'hold' direction while also having a non-zero price of: ${price}.`
       )
     }
 
@@ -66,7 +66,7 @@ const handler = async (
       .eq('meeting_id', meeting.id)
       .eq('pitch_id', pitch.id)
       .single()
-    if (fetchPitchError) throw fetchPitchError
+    if (fetchVoteError) throw fetchVoteError
     if (vote) {
       throw new ApiError(HttpStatusCode.Conflict, 'Already voted for pitch')
     }

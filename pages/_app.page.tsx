@@ -1,6 +1,6 @@
 import '@/styles/globals.css'
 import type { AppProps } from 'next/app'
-import { SessionProvider, useSession } from 'next-auth/react'
+import { SessionProvider } from 'next-auth/react'
 // import { SiteFooter } from '@/components/shared/site-footer'
 // import { SiteHeader } from '@/components/shared/site-header'
 
@@ -11,6 +11,7 @@ import {
   ThemeProvider,
 } from '@/components/shared/providers'
 import { Toaster } from '@/components/ui/toaster'
+import { cn } from '@/lib/utils'
 const inter = Inter({ subsets: ['latin'] })
 
 export default function App({ Component, pageProps }: AppProps) {
@@ -28,7 +29,7 @@ export default function App({ Component, pageProps }: AppProps) {
           <div vaul-drawer-wrapper=''>
             <div className='relative flex min-h-screen flex-col bg-background'>
               {/* <SiteHeader /> */}
-              <main className='flex-1'>
+              <main className={cn('flex-1', inter.className)}>
                 <Component {...pageProps} />
               </main>
               {/* <SiteFooter /> */}

@@ -25,7 +25,7 @@ const handler = async (
     if (fetchMeetingError) throw fetchMeetingError
 
     // Check for valid existing stockId
-    const { data: stock, error: fetchStockError } = await supabase
+    const { data: __stock, error: fetchStockError } = await supabase
       .from('stock')
       .select('id')
       .eq('id', stockId)

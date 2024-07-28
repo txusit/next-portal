@@ -17,7 +17,7 @@ const withExceptionFilter = (
     try {
       return await handler(req, res)
     } catch (exception) {
-      const { url, headers } = req
+      const { url, headers: __headers } = req
       let statusCode, message, stack
 
       // Handle if exception is thrown, but exception object is null (Special Case?)
