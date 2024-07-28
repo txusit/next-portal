@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React from 'react'
+import { toast } from '@/components/ui/use-toast'
 
 const sidebarNavItems = [
   {
@@ -30,17 +31,14 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const router = useRouter()
+  const lastNonSettingsPage = sessionStorage.getItem('lastNonSettingsPage')
 
   const handleBack = () => {
-    console.log('back clicked')
-    const lastNonSettingsPage = sessionStorage.getItem('lastNonSettingsPage')
-    console.log('last page got: ', lastNonSettingsPage)
     if (lastNonSettingsPage) {
       router.replace(lastNonSettingsPage)
     } else {
       router.replace('/dashboard')
     }
-    console.log('router replaced')
   }
 
   return (
@@ -63,8 +61,8 @@ export default function SettingsLayout({ children }: SettingsLayoutProps) {
       </div> */}
       <div className='hidden space-y-6 p-10 pb-16 md:block'>
         <div className='flex flex-row space-x-4 items-center'>
-          <Button variant='ghost' size='icon'>
-            <ChevronLeft onClick={handleBack} className='h-4 w-4' />
+          <Button onClick={handleBack} variant='ghost' size='icon'>
+            <ChevronLeft className='h-4 w-4' />
           </Button>
           <div className='space-y-0.5'>
             <h2 className='text-2xl font-bold tracking-tight'>Settings</h2>
