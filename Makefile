@@ -35,12 +35,17 @@ db-stop:
 	supabase stop
 
 # Create a new DB migration file for changes to schemas. Make sure to add RPC functions manually
+# make db-migration-new -name="username and grad_year added to Member"
 db-migration-new: 
 	supabase migration new ${name}
 
 # Access Docker Container Shells
 portal-shell:
 	docker exec -t -i next_portal_portal_container /bin/bash
+
+# Run Jest Unit and Integration Tests
+test:
+	npm run test
 
 # Open Jest Coverage Report
 open-jest-report:

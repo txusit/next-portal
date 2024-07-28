@@ -1,6 +1,15 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ZodIssue } from 'zod'
 
+export type PortfolioDataPoint = {
+  portfolio_value: Number
+  date: string
+}
+
+export type PortfolioPerformanceProps = {
+  data: PortfolioDataPoint[]
+}
+
 export type JwtEmailToken = {
   member_id: string
 }
@@ -14,7 +23,7 @@ export type Middleware = (req: NextApiRequest, res: NextApiResponse) => unknown
 
 export type Maybe<T> = T | null | undefined
 
-type ErrorData = {
+export type ErrorData = {
   statusCode: number
   message: string | ZodIssue[]
   path: string

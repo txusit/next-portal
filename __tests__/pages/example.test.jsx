@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect' // Import extend-expect for additional matchers
-import Example from '@/components/ExampleComponent'
+import Example from '@/components/example-component'
 
 describe('Home', () => {
   it('renders a heading', () => {

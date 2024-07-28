@@ -18,7 +18,7 @@ const handler = async (
 ) => {
   const signUp = async () => {
     const parsedBody = SignUpSchema.parse(req.body)
-    const { firstName, lastName, email, password } = parsedBody
+    const { firstName, lastName, gradYear, username, email, password } = parsedBody
 
     const isUniqueMember = await checkDuplicate(email)
     if (!isUniqueMember) {
@@ -35,6 +35,8 @@ const handler = async (
       email,
       first_name: firstName,
       last_name: lastName,
+      grad_year: gradYear,
+      username,
       password: hashedPassword,
       is_confirmed: false,
       membership_id: null,

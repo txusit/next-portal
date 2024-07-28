@@ -1,5 +1,11 @@
 ## Style Conventions
 
+Variable (backend):
+lower_snake_case
+
+Variable (frontend)
+camelCase
+
 Components:
 PascalCase
 
@@ -19,6 +25,13 @@ narrow error type using instanceof:
 for unknown error types, throw new ApiError(statusCode, "unknown error message of some sort")
 
 Relay error by throwing new ApiError
+
+## Project File Structure Conventions
+
+https://github.com/alan2207/bulletproof-react/blob/master/docs/project-structure.md
+
+components/common - are feature-specific but shared among multiple pages within that feature.
+components/shared - are generic and used globally across the app.
 
 ## Supabase Instances
 
