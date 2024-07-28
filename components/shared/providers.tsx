@@ -4,6 +4,7 @@ import { ThemeProviderProps } from 'next-themes/dist/types'
 
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { useRouter } from 'next/router'
+import { useNavStore } from '@/lib/state/navStore'
 
 export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
   return (
@@ -19,6 +20,7 @@ interface NavigationProviderProps {
 
 export function NavigationProvider({ children }: NavigationProviderProps) {
   const router = useRouter()
+  const { setLastNonSettingsPage } = useNavStore()
 
   // Storing most recent non-settings page for future redirects
   React.useEffect(() => {
@@ -27,7 +29,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
       const currentRoute = router.pathname
 
       if (!settingsPattern.test(url) && !settingsPattern.test(currentRoute)) {
-        sessionStorage.setItem('lastNonSettingsPage', currentRoute)
+        setLastNonSettingsPage(currentRoute)
       }
     }
 
@@ -36,7 +38,7 @@ export function NavigationProvider({ children }: NavigationProviderProps) {
     return () => {
       router.events.off('routeChangeComplete', handleRouteChange)
     }
-  }, [router])
+  }, [router, setLastNonSettingsPage])
 
   // Load method for performing redirect
   React.useEffect(() => {

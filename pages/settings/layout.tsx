@@ -3,8 +3,8 @@ import { SidebarNav } from '@/components/common/settings/sidebar-nav'
 import { Button } from '@/components/ui/button'
 import { ChevronLeft } from 'lucide-react'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { defaultUrl } from '@/config/nav'
+import React from 'react'
+import { useNavStore } from '@/lib/state/navStore'
 
 const sidebarNavItems = [
   {
@@ -31,14 +31,7 @@ interface SettingsLayoutProps {
 
 export default function SettingsLayout({ children }: SettingsLayoutProps) {
   const router = useRouter()
-  const [lastNonSettingsPage, setLastNonSettingsPage] =
-    useState<string>(defaultUrl)
-
-  useEffect(() => {
-    setLastNonSettingsPage(
-      sessionStorage.getItem('lastNonSettingsPage') || defaultUrl
-    )
-  }, [])
+  const { lastNonSettingsPage } = useNavStore()
 
   const handleBack = () => {
     router.replace(lastNonSettingsPage)

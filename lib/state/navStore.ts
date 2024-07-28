@@ -1,3 +1,4 @@
+import { defaultUrl } from '@/config/nav'
 import { create } from 'zustand'
 
 interface SidebarState {
@@ -14,11 +15,13 @@ export const useSidebarStore = create<SidebarState>((set) => ({
   setSidebarSize: (sidebarSize) => set(() => ({ sidebarSize: sidebarSize })),
 }))
 
-interface TestState {
-  val: number
-  increaseVal: () => void
+interface NavState {
+  lastNonSettingsPage: string
+  setLastNonSettingsPage: (value: string) => void
 }
-export const useTestStore = create<TestState>((set) => ({
-  val: 0,
-  increaseVal: () => set((state) => ({ val: state.val + 1 })),
+
+export const useNavStore = create<NavState>((set) => ({
+  lastNonSettingsPage: defaultUrl,
+  setLastNonSettingsPage: (lastNonSettingsPage) =>
+    set(() => ({ lastNonSettingsPage: lastNonSettingsPage })),
 }))
