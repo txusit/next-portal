@@ -45,12 +45,32 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
     }
 
     if (result?.ok) {
+      toast({
+        title: 'Login Success',
+        description: (
+          <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+            <code className='text-white'>
+              {JSON.stringify(
+                'Login was successful, redirecting to dashboard...',
+                null,
+                2
+              )}
+            </code>
+          </pre>
+        ),
+      })
       router.push(defaultUrl)
     }
 
     // setTimeout(() => {
     setIsLoading(false)
     // }, 3000)
+  }
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !isLoading) {
+      handleLogin(event)
+    }
   }
 
   return (
@@ -69,6 +89,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
             type='email'
             placeholder='m@example.com'
             value={email}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setEmail(e.target.value)
             }}
@@ -89,6 +110,7 @@ export function UserLoginForm({ className, ...props }: UserAuthFormProps) {
             id='password'
             type='password'
             value={password}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setPassword(e.target.value)
             }}

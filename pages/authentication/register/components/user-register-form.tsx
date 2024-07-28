@@ -102,6 +102,12 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
 
   const years = getGradYears()
 
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === 'Enter' && !isLoading) {
+      handleSignUp(event)
+    }
+  }
+
   return (
     <>
       <div className='grid gap-2 text-center'>
@@ -119,6 +125,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
               type='text'
               placeholder='John'
               value={firstName}
+              onKeyDown={handleKeyDown}
               onChange={(e) => {
                 setFirstName(e.target.value)
               }}
@@ -132,6 +139,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
               type='text'
               placeholder='Doe'
               value={lastName}
+              onKeyDown={handleKeyDown}
               onChange={(e) => {
                 setLastName(e.target.value)
               }}
@@ -166,6 +174,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
             type='text'
             placeholder='JohnDoe02'
             value={username}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setUsername(e.target.value)
             }}
@@ -180,6 +189,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
             type='email'
             placeholder='m@example.com'
             value={email}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setEmail(e.target.value)
             }}
@@ -193,6 +203,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
             id='password'
             type='password'
             value={password}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setPassword(e.target.value)
             }}
@@ -205,6 +216,7 @@ export function UserRegisterForm({ className, ...props }: UserAuthFormProps) {
             id='confirm-password'
             type='password'
             value={confirmPassword}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               setConfirmPassword(e.target.value)
             }}
