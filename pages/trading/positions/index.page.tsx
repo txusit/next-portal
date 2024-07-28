@@ -25,15 +25,11 @@ const data: PositionWithCalculated[] = [
 
 export default function PositionPage({
   publicEnv, // Retrieved from getServerSideProps
-  defaultLayout = [265, 440],
-  defaultCollapsed = false,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   // const { theme: mode } = useTheme()
   // const [config] = useConfig()
 
   // const theme = themes.find((theme) => theme.name === config.theme)
-
-  // const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
 
   return (
     <RootLayout topNavLinks={topNavLinkData.dashboard}>

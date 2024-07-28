@@ -14,18 +14,15 @@ import { Search } from '@/components/common/search'
 import { TopNav, TopNavLink } from '@/components/shared/top-nav'
 import TeamSwitcher from '@/components/common/team-switcher'
 import { sideNavLinkData } from '@/config/nav'
+import { useSidebarStore } from '@/lib/state/navStore'
 
 interface RootLayoutProps {
-  defaultLayout?: number[]
-  defaultCollapsed?: boolean
   navCollapsedSize?: number
   topNavLinks?: TopNavLink[]
   children?: any
 }
 
 export const RootLayout = ({
-  defaultLayout = [265, 440],
-  defaultCollapsed = false,
   navCollapsedSize = 4,
   topNavLinks = [],
   children,
@@ -35,7 +32,9 @@ export const RootLayout = ({
 
   // const theme = themes.find((theme) => theme.name === config.theme)
 
-  const [isCollapsed, setIsCollapsed] = React.useState(defaultCollapsed)
+  const { isCollapsed, setIsCollapsed, sidebarSize, setSidebarSize } =
+    useSidebarStore((state) => state)
+
   return (
     <div className='hidden flex-col md:flex'>
       <TooltipProvider delayDuration={0}>
@@ -50,18 +49,27 @@ export const RootLayout = ({
         >
           {/* Side Nav Bar */}
           <ResizablePanel
-            defaultSize={defaultLayout[0]}
+            defaultSize={sidebarSize}
             collapsedSize={navCollapsedSize}
             collapsible={true}
             minSize={15}
             maxSize={20}
+            onResize={(size) => {
+              setSidebarSize(size)
+            }}
             onCollapse={() => {
               setIsCollapsed(true)
-              document.cookie = 'react-resizable-panels:collapsed=true'
+              console.log(isCollapsed)
+              document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+                true
+              )}`
             }}
             onExpand={() => {
               setIsCollapsed(false)
-              document.cookie = 'react-resizable-panels:collapsed=false'
+              console.log(isCollapsed)
+              document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
+                false
+              )}`
             }}
             className={cn(
               isCollapsed &&
@@ -77,16 +85,16 @@ export const RootLayout = ({
               <h1>Next Portal</h1>
             </div>
             <Separator />
-            <Nav isCollapsed={isCollapsed} links={sideNavLinkData.top} />
+            <Nav links={sideNavLinkData.top} />
             <Separator />
-            <Nav isCollapsed={isCollapsed} links={sideNavLinkData.bottom} />
+            <Nav links={sideNavLinkData.bottom} />
           </ResizablePanel>
 
           {/* Resize Nav Bar Drag Handle */}
           <ResizableHandle withHandle />
 
           {/* Page Content */}
-          <ResizablePanel defaultSize={defaultLayout[1]} minSize={30}>
+          <ResizablePanel minSize={30}>
             {/* Mobile View */}
             <div className='md:hidden'>
               {/* <Image
