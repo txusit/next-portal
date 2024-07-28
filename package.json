@@ -3,6 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "preinstall": "find . -type d -name \"*\\(old\\)\" -exec mv {} {}_exclude \\;",
+    "postinstall": "find . -type d -name \"*_exclude\" -exec bash -c 'mv \"$0\" \"${0%_exclude}\"' {} \\;",
+    "ci": "npm ci",
     "dev": "node_modules/next/dist/bin/next dev",
     "build": "node_modules/next/dist/bin/next build",
     "start": "node_modules/next/dist/bin/next start",
