@@ -59,9 +59,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -99,9 +100,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -137,9 +139,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -192,9 +195,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -230,9 +234,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: isConfirmed,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -272,9 +277,10 @@ describe('authorizeWithCredentials', () => {
       email: credentials.email,
       first_name: firstName,
       last_name: LastName,
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 

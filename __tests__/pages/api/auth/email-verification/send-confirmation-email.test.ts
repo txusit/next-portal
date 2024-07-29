@@ -61,9 +61,10 @@ describe('sendConfirmationEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -128,9 +129,10 @@ describe('sendConfirmationEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 

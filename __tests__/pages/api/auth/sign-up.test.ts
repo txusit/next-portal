@@ -212,7 +212,6 @@ describe('signUp', () => {
       grad_year: 2000,
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 

@@ -53,9 +53,10 @@ describe('confirmEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
     const { data: member, error: fetchMemberError } = await supabase
       .from('member')
@@ -172,9 +173,10 @@ describe('confirmEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 

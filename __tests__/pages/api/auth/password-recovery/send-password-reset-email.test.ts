@@ -61,9 +61,10 @@ describe('sendPasswordResetEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: true,
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
@@ -148,9 +149,10 @@ describe('sendPasswordResetEmail', () => {
       email: email,
       first_name: '__TEST__John',
       last_name: '__TEST__Doe',
+      grad_year: 2000,
+      username: 'johndoe02',
       password: hashedPassword,
       is_confirmed: isConfirmed, // key test item
-      membership_id: null,
     }
     await supabase.from('member').insert(memberData)
 
