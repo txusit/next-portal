@@ -27,7 +27,7 @@ export function ResetPasswordForm({ className, ...props }: UserAuthFormProps) {
     // Check for matching passwords
     if (password !== confirmPassword) {
       toast({
-        title: 'Sign Up Error',
+        title: 'Rest Password Error',
         description: (
           <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
             <code className='text-white'>

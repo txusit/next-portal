@@ -86,8 +86,6 @@ export function ProfileForm() {
   })
 
   function onSubmit(data: ProfileFormValues) {
-    console.log('submit hit')
-
     toast({
       title: 'You submitted the following values:',
       description: (

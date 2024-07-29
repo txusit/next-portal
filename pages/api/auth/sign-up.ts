@@ -18,7 +18,8 @@ const handler = async (
 ) => {
   const signUp = async () => {
     const parsedBody = SignUpSchema.parse(req.body)
-    const { firstName, lastName, gradYear, username, email, password } = parsedBody
+    const { firstName, lastName, gradYear, username, email, password } =
+      parsedBody
 
     const isUniqueMember = await checkDuplicate(email)
     if (!isUniqueMember) {
@@ -39,7 +40,6 @@ const handler = async (
       username,
       password: hashedPassword,
       is_confirmed: false,
-      membership_id: null,
     }
 
     const { data: newMember, error: insertMemberError } = await supabase

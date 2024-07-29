@@ -33,7 +33,6 @@ export default function ForgotPasswordPage({
           },
         }
       )
-      console.log('response.status:', response.status)
 
       if (response.status !== HttpStatusCode.Ok) {
         const error = response.data.error

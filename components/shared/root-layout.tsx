@@ -59,14 +59,12 @@ export const RootLayout = ({
             }}
             onCollapse={() => {
               setIsCollapsed(true)
-              console.log(isCollapsed)
               document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
                 true
               )}`
             }}
             onExpand={() => {
               setIsCollapsed(false)
-              console.log(isCollapsed)
               document.cookie = `react-resizable-panels:collapsed=${JSON.stringify(
                 false
               )}`
