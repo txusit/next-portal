@@ -51,7 +51,7 @@ export const ConfirmEmailSchema = z.object({
 })
 
 export const CheckoutSessionSchema = z.object({
-  selectedPriceId: z.string().min(1),
+  priceId: z.string().min(1),
   email: EmailSchema,
 })
 export type CheckoutSession = z.infer<typeof CheckoutSessionSchema>
@@ -86,3 +86,13 @@ export const AddVoteSchema = z.object({
   price: z.number().min(0),
 })
 export type AddVote = z.infer<typeof AddVoteSchema>
+
+export const GetPaidSemesterSchema = z.object({
+  email: EmailSchema,
+})
+export type GetPaidSemester = z.infer<typeof GetPaidSemesterSchema>
+
+export const GetIsPaidMemberSchema = z.object({
+  email: EmailSchema,
+})
+export type GetIsPaidMember = z.infer<typeof GetIsPaidMemberSchema>

@@ -1,9 +1,15 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { RootLayout } from '@/components/shared/root-layout'
 import { cn } from '@/lib/utils'
 import { MembershipCard } from './components/membership-card'
+import { useSession } from 'next-auth/react'
+import { Semester } from '@/types/common-schemas'
+import { GetPaidSemester } from '@/types/endpoint-request-schemas'
+import { ResponseData } from '@/types'
+import axios, { HttpStatusCode } from 'axios'
+import { toast } from '@/components/ui/use-toast'
 
 function DemoContainer({
   className,
@@ -27,6 +33,47 @@ export default function MembershipPage({
   // const [config] = useConfig()
 
   // const theme = themes.find((theme) => theme.name === config.theme)
+  const [paidSemesters, setPaidSemesters] = useState<Semester[]>([])
+  const { data: session, status } = useSession()
+
+  useEffect(() => {
+    async function checkPaidStatus() {
+      if (status === 'authenticated') {
+        const params: GetPaidSemester = {
+          email: session.user!.email!,
+        }
+
+        const response = await axios.get<ResponseData>(
+          '/api/membership/get/paid-semesters',
+          {
+            params,
+            validateStatus() {
+              return true
+            },
+          }
+        )
+
+        if (response.status !== HttpStatusCode.Ok) {
+          console.error('Paid Semesters Fetch Error:', response.data.error)
+          toast({
+            title: 'Paid Semester Fetch Error',
+            description: (
+              <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+                <code className='text-white'>
+                  {JSON.stringify(response.data.error, null, 2)}
+                </code>
+              </pre>
+            ),
+          })
+        }
+
+        if (response.status === HttpStatusCode.Ok) {
+          setPaidSemesters(response.data.payload || [])
+        }
+      }
+    }
+    checkPaidStatus()
+  }, [session, status])
 
   return (
     <RootLayout>
@@ -39,20 +86,20 @@ export default function MembershipPage({
         <div className='col-span-2 grid items-start gap-6 lg:col-span-1'>
           {/* Pitch Info */}
           <DemoContainer>
-            <MembershipCard semester={'fall'} />
+            <MembershipCard paidSemesters={paidSemesters} semester={'fall'} />
           </DemoContainer>
         </div>
 
         <div className='col-span-2 grid items-start gap-6 lg:col-span-1'>
           <DemoContainer>
-            <MembershipCard semester={'spring'} />
+            <MembershipCard paidSemesters={paidSemesters} semester={'spring'} />
           </DemoContainer>
         </div>
 
         <div className='col-span-2 grid items-start gap-6 lg:col-span-2 lg:grid-cols-2 xl:col-span-1 xl:grid-cols-1'>
           {/* Voting Form */}
           <DemoContainer>
-            <MembershipCard semester={'year'} />
+            <MembershipCard paidSemesters={paidSemesters} semester={'year'} />
           </DemoContainer>
         </div>
       </div>

@@ -93,7 +93,7 @@ export const sideNavLinkData: SideNavLinkData = {
       href: '/membership',
       navGroupHrefs: new Set(),
       title: 'Membership',
-      label: 'Paid/Free',
+      label: '', // Paid/Free
       icon: BadgeCheck,
       variant: 'ghost',
     },

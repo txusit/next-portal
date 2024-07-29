@@ -9,7 +9,7 @@ import { getLogger } from '@/lib/helpers/server-side/log-util'
 import withMiddleware from '@/lib/middleware/with-middleware'
 import withExceptionFilter from '@/lib/middleware/with-exception-filter'
 import withMethodsGuard from '@/lib/middleware/with-methods-guard'
-import { supabase } from '@/lib/helpers/supabase'
+import { createNewPeriod, supabase } from '@/lib/helpers/supabase'
 import { PaymentRecord } from '@/types/database-schemas'
 
 const cors = Cors({
@@ -103,20 +103,33 @@ const fulfillOrder = async (customerEmail: string, priceId: string) => {
   if (fetchMembershipError) throw fetchMembershipError
   logger.debug(`membership id: ${membership.id}`)
 
-  // Update member membership
-  const { data: member, error: updateMemberError } = await supabase
+  // Get member with email
+  const { data: member, error: fetchMemberError } = await supabase
     .from('member')
-    .update({ membership_id: membership.id })
-    .eq('email', customerEmail)
     .select()
+    .eq('email', customerEmail)
     .single()
-  if (updateMemberError) throw updateMemberError
+  if (fetchMemberError) throw fetchMemberError
   logger.debug(`member id: ${member.id}`)
 
-  // Add new payment
+  // Get or create current subscription period
+  const currentDate = new Date()
+  let { data: period, error: fetchPeriodError } = await supabase
+    .from('period')
+    .select()
+    .gte('start_date', currentDate.toISOString())
+    .lte('end_date', currentDate.toISOString())
+    .maybeSingle()
+  if (fetchPeriodError) throw fetchPeriodError
+  if (!period) {
+    period = await createNewPeriod()
+  }
+
+  // Add new payment record
   const paymentRecord: PaymentRecord = {
     member_id: member.id,
     membership_id: membership.id,
+    period_id: period.id,
   }
   const { error: insertPaymentRecordError } = await supabase
     .from('payment_record')

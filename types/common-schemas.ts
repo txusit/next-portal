@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+export const SemesterSchema = z.enum(['fall', 'spring', 'year'])
+export type Semester = z.infer<typeof SemesterSchema>
+
 export const GradYearSchema = z.number().int().gte(2000).lte(2100)
 export const NameSchema = z.string().min(1)
 export const EmailSchema = z.string().email()

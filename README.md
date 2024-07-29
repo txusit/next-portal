@@ -56,3 +56,12 @@ CI/CD
 
 - Hosted in "local machine" by Github actions
 - Holds data created during test runs in the deployment pipeline
+
+## Local Stripe
+
+1. stripe login
+2. stripe listen --forward-to localhost:3000/api/stripe/webhooks
+
+## Staging Stripe
+
+1. check for expired api keys and roll new ones if necessary in stripe dev dashboard (test mode ON)

@@ -17,9 +17,9 @@ const handler = async (
 ) => {
   const checkoutSession = async () => {
     const parsedBody = CheckoutSessionSchema.parse(req.body)
-    const { selectedPriceId, email } = parsedBody
+    const { priceId, email } = parsedBody
 
-    if (await isMembershipAlreadyPurchased(email, selectedPriceId)) {
+    if (await isMembershipAlreadyPurchased(email, priceId)) {
       throw new ApiError(
         HttpStatusCode.Conflict,
         'Unable to purchase because current membership covers the selected membership'
@@ -31,7 +31,7 @@ const handler = async (
       line_items: [
         {
           // Provide the exact Price ID (for example, pr_1234) of the product you want to sell
-          price: selectedPriceId,
+          price: priceId,
           quantity: 1,
         },
       ],

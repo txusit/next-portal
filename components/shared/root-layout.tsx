@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   ResizableHandle,
   ResizablePanel,
@@ -15,6 +15,12 @@ import { TopNav, TopNavLink } from '@/components/shared/top-nav'
 import TeamSwitcher from '@/components/common/team-switcher'
 import { sideNavLinkData } from '@/config/nav'
 import { useSidebarStore } from '@/lib/state/navStore'
+import { useSession } from 'next-auth/react'
+import { GetIsPaidMember } from '@/types/endpoint-request-schemas'
+import axios, { HttpStatusCode } from 'axios'
+import { ResponseData } from '@/types'
+import { toast } from '../ui/use-toast'
+import { isPaidMember } from '@/lib/helpers/supabase'
 
 interface RootLayoutProps {
   navCollapsedSize?: number
@@ -31,6 +37,56 @@ export const RootLayout = ({
   // const [config] = useConfig()
 
   // const theme = themes.find((theme) => theme.name === config.theme)
+  const [navData, setNavData] = useState(sideNavLinkData)
+  const { data: session, status } = useSession()
+
+  useEffect(() => {
+    async function checkPaidStatus() {
+      if (status === 'authenticated') {
+        const params: GetIsPaidMember = {
+          email: session.user!.email!,
+        }
+
+        const response = await axios.get<ResponseData>(
+          '/api/membership/get/is-paid-member',
+          {
+            params,
+            validateStatus() {
+              return true
+            },
+          }
+        )
+
+        if (response.status !== HttpStatusCode.Ok) {
+          console.error('Paid Semesters Fetch Error:', response.data.error)
+          toast({
+            title: 'Paid Semester Fetch Error',
+            description: (
+              <pre className='mt-2 w-[340px] rounded-md bg-slate-950 p-4'>
+                <code className='text-white'>
+                  {JSON.stringify(response.data.error, null, 2)}
+                </code>
+              </pre>
+            ),
+          })
+        }
+
+        const isPaidMember = response.data.payload || false
+
+        if (response.status === HttpStatusCode.Ok) {
+          let newNavDataBottom = sideNavLinkData.bottom.map((linkData) => {
+            if (linkData.href === '/membership') {
+              linkData.label = isPaidMember ? 'Paid' : 'Free'
+            }
+            return linkData
+          })
+
+          setNavData({ ...sideNavLinkData, bottom: newNavDataBottom })
+        }
+      }
+    }
+    checkPaidStatus()
+  }, [session, status])
 
   const { isCollapsed, setIsCollapsed, sidebarSize, setSidebarSize } =
     useSidebarStore((state) => state)

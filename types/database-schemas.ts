@@ -28,7 +28,14 @@ export const MemberSchema = z.object({
   email: z.string().email(),
   password: z.string().min(6, { message: 'Must be 6 or more characters long' }),
   is_confirmed: z.boolean(),
-  membership_id: z.string().nullable(),
+  created_at: z.string().optional(),
+})
+
+export const PeriodSchema = z.object({
+  id: z.string().optional(),
+  name: z.string(),
+  start_date: z.string().date(),
+  end_date: z.string().date(),
   created_at: z.string().optional(),
 })
 
@@ -75,11 +82,13 @@ export const PaymentRecordSchema = z.object({
   id: z.string().optional(),
   membership_id: z.string(),
   member_id: z.string(),
+  period_id: z.string().date(),
   created_at: z.string().optional(),
 })
 
 export type AttendanceRecord = z.infer<typeof AttendanceRecordSchema>
 export type Member = z.infer<typeof MemberSchema>
+export type Period = z.infer<typeof PeriodSchema>
 export type Meeting = z.infer<typeof MeetingSchema>
 export type Membership = z.infer<typeof MembershipSchema>
 export type Pitch = z.infer<typeof PitchSchema>
