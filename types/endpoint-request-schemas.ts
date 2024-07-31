@@ -96,3 +96,8 @@ export const GetIsPaidMemberSchema = z.object({
   email: EmailSchema,
 })
 export type GetIsPaidMember = z.infer<typeof GetIsPaidMemberSchema>
+
+export const GetStockPositionSchema = z.object({
+  stockId: z.string().min(1),
+})
+export type GetStockPosition = z.infer<typeof GetStockPositionSchema>

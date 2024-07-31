@@ -6,8 +6,45 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
+import { handleFetchError, isEmpty } from '@/lib/utils'
+import { ResponseData } from '@/types'
+import { GetStockPosition } from '@/types/endpoint-request-schemas'
+import axios, { HttpStatusCode } from 'axios'
+import { useEffect, useState } from 'react'
+
+interface StockPitch {
+  pitch: {
+    stock_id: string
+    direction: string
+    description: string
+  }
+  stock: {
+    name: string
+    ticker: string
+    price: string
+  }
+}
 
 export function PitchInfoCard() {
+  const [stockPitch, setStockPitch] = useState<StockPitch>()
+  const [isInvested, setIsInvested] = useState<boolean>(false)
+
+  useEffect(() => {
+    async function getStockPitchInfo() {
+      const stockPitchData = await fetchStockPitch()
+      if (stockPitchData) {
+        setStockPitch(stockPitchData)
+        console.log('stockPitchData:', stockPitchData)
+        const stockPosition = await fetchStockPosition(stockPitchData.stock.id)
+        if (stockPosition && !isEmpty(stockPosition)) {
+          setIsInvested(true)
+        }
+      }
+    }
+
+    getStockPitchInfo()
+  }, [])
+
   return (
     <Card>
       <CardHeader className='space-y-1'>
@@ -37,49 +74,101 @@ export function PitchInfoCard() {
             </span>
           </div>
         </div> */}
-        <Label className='flex flex-col space-y-1'>
-          <span>Stock Name</span>
-          <span className='font-normal leading-snug text-muted-foreground'>
-            NVIDIA Corp
-          </span>
-        </Label>
         <div className='grid grid-cols-3'>
+          <Label className='flex flex-col space-y-1'>
+            <span>Stock Name</span>
+            <span className='font-normal leading-snug text-muted-foreground'>
+              {stockPitch?.stock.name}
+            </span>
+          </Label>
           <Label className='flex flex-col space-y-1'>
             <span>Ticker</span>
             <span className='font-normal leading-snug text-muted-foreground'>
-              NVDA
+              {stockPitch?.stock.ticker}
             </span>
           </Label>
           <Label className='flex flex-col space-y-1'>
             <span>Direction</span>
             <span className='font-normal leading-snug text-muted-foreground'>
-              Long
+              {stockPitch?.pitch.direction}
+            </span>
+          </Label>
+        </div>
+        <div className='grid grid-cols-3'>
+          <Label className='flex flex-col space-y-1'>
+            <span>Current Price</span>
+            <span className='font-normal leading-snug text-muted-foreground'>
+              {stockPitch?.stock.price}
             </span>
           </Label>
           <Label className='flex flex-col space-y-1'>
             <span>Invested</span>
             <span className='font-normal leading-snug text-muted-foreground'>
-              No
+              {isInvested ? 'yes' : 'no'}
             </span>
           </Label>
         </div>
         <Label className='flex flex-col space-y-1'>
           <span>Description</span>
           <span className='font-normal leading-snug text-muted-foreground'>
-            NVIDIA has established itself as a leader in the semiconductor
-            industry, renowned for its cutting-edge graphics processing units
-            (GPUs) and artificial intelligence (AI) technology. With the rapid
-            expansion of AI, gaming, and data center markets, NVIDIA&apos;s
-            innovative products are in high demand. The company&apos;s strong
-            financial performance, consistent revenue growth, and strategic
-            acquisitions position it well for sustained long-term growth.
-            Additionally, NVIDIA&apos;s advancements in autonomous vehicles and
-            cloud computing further bolster its potential. Investing in a long
-            position now could offer substantial returns as the company
-            continues to capitalize on emerging technology trends.
+            {stockPitch?.pitch.description}
           </span>
         </Label>
       </CardContent>
     </Card>
   )
+}
+
+async function fetchStockPitch() {
+  try {
+    const response = await axios.get<ResponseData>(
+      '/api/trading/pitch/get/active-stock-pitch',
+      {
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Stock Pitch Fetch Error', response.data.error)
+      return null
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Stock pitch fetch error:', error)
+    handleFetchError('Stock Pitch Fetch Error', error)
+    return null
+  }
+}
+
+async function fetchStockPosition(stockId: string) {
+  console.log('stockId:', stockId)
+  try {
+    const params: GetStockPosition = {
+      stockId,
+    }
+
+    const response = await axios.get<ResponseData>(
+      '/api/trading/vote/get/position',
+      {
+        params,
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Position Fetch Error', response.data.error)
+      return null
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Position fetch error:', error)
+    handleFetchError('Position Fetch Error', error)
+    return null
+  }
 }

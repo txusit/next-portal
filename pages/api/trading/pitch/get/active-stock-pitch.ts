@@ -11,7 +11,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   // Get active meeting id
-  const getActivePitch = async () => {
+  const getActiveStockPitch = async () => {
     const { data: meeting, error: fetchMeetingError } = await supabase
       .from('meeting')
       .select('id')
@@ -25,7 +25,7 @@ const handler = async (
     // Get pitch using meeting id
     const { data: pitch, error: fetchPitchError } = await supabase
       .from('pitch')
-      .select('stock_id, direction')
+      .select('stock_id, direction, description')
       .eq('meeting_id', meeting.id)
       .maybeSingle()
     if (fetchPitchError) throw fetchPitchError
@@ -36,7 +36,7 @@ const handler = async (
     // Get stock using stock_id
     const { data: stock, error: fetchStockError } = await supabase
       .from('stock')
-      .select('name')
+      .select('id, name, ticker, price')
       .eq('id', pitch.stock_id)
       .maybeSingle()
     if (fetchStockError) throw fetchStockError
@@ -50,7 +50,7 @@ const handler = async (
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
-    getActivePitch
+    getActiveStockPitch
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location

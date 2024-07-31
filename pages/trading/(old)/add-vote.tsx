@@ -20,7 +20,7 @@ export const PitchVotePage = ({
   useEffect(() => {
     const fetchActiveStock = async () => {
       const response = await axios.get<ResponseData>(
-        '/api/trading/pitch/get/active-pitch-and-stock',
+        '/api/trading/pitch/get/active-stock-pitch',
         {
           validateStatus() {
             return true
