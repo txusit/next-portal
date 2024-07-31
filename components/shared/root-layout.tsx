@@ -20,7 +20,6 @@ import { GetIsPaidMember } from '@/types/endpoint-request-schemas'
 import axios, { HttpStatusCode } from 'axios'
 import { ResponseData } from '@/types'
 import { toast } from '../ui/use-toast'
-import { isPaidMember } from '@/lib/helpers/supabase'
 
 interface RootLayoutProps {
   navCollapsedSize?: number
@@ -139,9 +138,9 @@ export const RootLayout = ({
               <h1>Next Portal</h1>
             </div>
             <Separator />
-            <Nav links={sideNavLinkData.top} />
+            <Nav links={navData.top} />
             <Separator />
-            <Nav links={sideNavLinkData.bottom} />
+            <Nav links={navData.bottom} />
           </ResizablePanel>
 
           {/* Resize Nav Bar Drag Handle */}
