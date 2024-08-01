@@ -1,5 +1,6 @@
 import { ZodError, boolean, z } from 'zod'
 import {
+  DirectionSchema,
   EmailSchema,
   GradYearSchema,
   NameSchema,
@@ -70,7 +71,7 @@ export const AddMeetingSchema = z.object({
 
 export const AddPitchSchema = z.object({
   stockId: z.string().min(1),
-  direction: z.enum(['long', 'short', 'hold']),
+  direction: DirectionSchema,
 })
 export type AddPitch = z.infer<typeof AddPitchSchema>
 
@@ -82,8 +83,9 @@ export type AddStock = z.infer<typeof AddStockSchema>
 
 export const AddVoteSchema = z.object({
   email: EmailSchema,
-  direction: z.enum(['long', 'short', 'hold']),
+  direction: DirectionSchema,
   price: z.number().min(0),
+  notes: z.string(),
 })
 export type AddVote = z.infer<typeof AddVoteSchema>
 
@@ -101,3 +103,8 @@ export const GetStockPositionSchema = z.object({
   stockId: z.string().min(1),
 })
 export type GetStockPosition = z.infer<typeof GetStockPositionSchema>
+
+export const GetPortfolioSchema = z.object({
+  email: EmailSchema,
+})
+export type GetPortfolio = z.infer<typeof GetPortfolioSchema>

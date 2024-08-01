@@ -30,3 +30,6 @@ export const UsernameSchema = z
   )
   .regex(/^(?![_.]).*$/, 'Username cannot start with an underscore or period')
   .regex(/^(?!.*[_.]$).*$/, 'Username cannot end with an underscore or period')
+
+export const DirectionSchema = z.enum(['long', 'short', 'hold', 'abstain'])
+export type Direction = z.infer<typeof DirectionSchema>

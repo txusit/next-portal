@@ -23,6 +23,11 @@ export function isEmpty(obj: any) {
   return Object.keys(obj).length === 0
 }
 
+export const USDollar = new Intl.NumberFormat('en-US', {
+  style: 'currency',
+  currency: 'USD',
+})
+
 export function handleFetchError(title: string, error: any) {
   toast({
     title,

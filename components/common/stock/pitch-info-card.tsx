@@ -34,7 +34,6 @@ export function PitchInfoCard() {
       const stockPitchData = await fetchStockPitch()
       if (stockPitchData) {
         setStockPitch(stockPitchData)
-        console.log('stockPitchData:', stockPitchData)
         const stockPosition = await fetchStockPosition(stockPitchData.stock.id)
         if (stockPosition && !isEmpty(stockPosition)) {
           setIsInvested(true)
@@ -144,7 +143,6 @@ async function fetchStockPitch() {
 }
 
 async function fetchStockPosition(stockId: string) {
-  console.log('stockId:', stockId)
   try {
     const params: GetStockPosition = {
       stockId,

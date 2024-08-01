@@ -10,7 +10,7 @@
 // export type Vote = Database['public']['Tables']['vote']['Row']
 
 import { z } from 'zod'
-import { UsernameSchema } from './common-schemas'
+import { DirectionSchema, UsernameSchema } from './common-schemas'
 
 export const AttendanceRecordSchema = z.object({
   id: z.string().optional(),
@@ -56,7 +56,7 @@ export const PitchSchema = z.object({
   id: z.string().optional(),
   stock_id: z.string(),
   meeting_id: z.string(),
-  direction: z.enum(['long', 'short', 'hold']),
+  direction: DirectionSchema,
   created_at: z.string().optional(),
 })
 
@@ -73,8 +73,11 @@ export const VoteSchema = z.object({
   meeting_id: z.string(),
   member_id: z.string(),
   pitch_id: z.string(),
-  direction: z.enum(['long', 'short', 'hold']),
+  stock_id: z.string(),
+  portfolio_id: z.string(),
+  direction: DirectionSchema,
   price: z.number(),
+  notes: z.string(),
   created_at: z.string().optional(),
 })
 

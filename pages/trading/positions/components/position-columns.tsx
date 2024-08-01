@@ -2,12 +2,13 @@ import { ColumnDef } from '@tanstack/react-table'
 import { z } from 'zod'
 import { DataTableColumnHeader } from '@/components/common/data-table/data-table-column-header'
 import { PositionDataTableRowActions } from './position-data-table-row-actions'
+import { DirectionSchema } from '@/types/common-schemas'
 
 // Add new Database table?
 const PositionSchema = z.object({
   name: z.string(),
   ticker: z.string(),
-  direction: z.enum(['long', 'short', 'hold']),
+  direction: DirectionSchema,
   quantity: z.number(),
   current_price: z.number(),
   buy_price: z.number(),

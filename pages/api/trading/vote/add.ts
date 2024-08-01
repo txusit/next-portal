@@ -15,7 +15,7 @@ const handler = async (
 ) => {
   const addVote = async () => {
     const parsedBody = AddVoteSchema.parse(req.body)
-    const { email, direction, price } = parsedBody
+    const { email, direction, price, notes } = parsedBody
 
     // Check for invalid input of hold and a non-zero price
     if (direction == 'hold' && price == 0) {
@@ -44,18 +44,29 @@ const handler = async (
     // fetch pitch id
     const { data: pitch, error: fetchPitchError } = await supabase
       .from('pitch')
-      .select('id')
+      .select('id, stock_id')
       .eq('meeting_id', meeting.id)
       .single()
     if (fetchPitchError) throw fetchPitchError
+
+    // fetch portfolio id
+    const { data: portfolio, error: fetchPortfolioError } = await supabase
+      .from('portfolio')
+      .select('id, balance, current_value')
+      .eq('member_id', member.id)
+      .single()
+    if (fetchPortfolioError) throw fetchPortfolioError
 
     // Add new vote
     const newVote: Vote = {
       meeting_id: meeting.id,
       member_id: member.id,
       pitch_id: pitch.id,
+      stock_id: pitch.stock_id,
+      portfolio_id: portfolio.id,
       direction,
       price,
+      notes,
     }
 
     // Check for duplicate vote
@@ -65,16 +76,26 @@ const handler = async (
       .eq('member_id', member.id)
       .eq('meeting_id', meeting.id)
       .eq('pitch_id', pitch.id)
-      .single()
+      .maybeSingle()
     if (fetchVoteError) throw fetchVoteError
     if (vote) {
       throw new ApiError(HttpStatusCode.Conflict, 'Already voted for pitch')
     }
 
+    // Insert vote
     const { error: insertVoteError } = await supabase
       .from('vote')
       .insert(newVote)
     if (insertVoteError) throw insertVoteError
+
+    // Update portfolio
+    const newBalance = portfolio.balance - newVote.price
+    const newValue = portfolio.current_value + price
+    const { error: updatePortfolioError } = await supabase
+      .from('portfolio')
+      .update({ balance: newBalance, current_value: newValue })
+      .eq('id', portfolio.id)
+    if (updatePortfolioError) throw updatePortfolioError
 
     res.status(HttpStatusCode.Created).end()
   }
