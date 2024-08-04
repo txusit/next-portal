@@ -85,3 +85,36 @@ export async function fetchStockHistorical(
     return null
   }
 }
+
+export async function fetchPitchMembers() {
+  try {
+    const stockPitch = await fetchStockPitch()
+    if (!stockPitch) {
+      return []
+    }
+
+    const pitch = stockPitch.pitch
+    const params = { pitchId: pitch.id }
+
+    const response = await axios.get<ResponseData>(
+      '/api/trading/pitch/get/pitch-members',
+      {
+        params,
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Pitch Members Fetch Error', response.data.error)
+      return null
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Pitch members fetch error:', error)
+    handleFetchError('Pitch Members Fetch Error', error)
+    return null
+  }
+}

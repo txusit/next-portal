@@ -3,6 +3,7 @@ import { ZodIssue } from 'zod'
 
 export interface StockPitch {
   pitch: {
+    id: string
     stock_id: string
     direction: string
     description: string

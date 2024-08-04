@@ -11,7 +11,7 @@ const handler = async (
   res: NextApiResponse<ResponseData>
 ) => {
   // Get active meeting id
-  const getActiveStockPitch = async () => {
+  const getPitchMembers = async () => {
     const { data: meeting, error: fetchMeetingError } = await supabase
       .from('meeting')
       .select('id')
@@ -25,7 +25,7 @@ const handler = async (
     // Get pitch using meeting id
     const { data: pitch, error: fetchPitchError } = await supabase
       .from('pitch')
-      .select('id, stock_id, direction, description')
+      .select('id')
       .eq('meeting_id', meeting.id)
       .maybeSingle()
     if (fetchPitchError) throw fetchPitchError
@@ -33,24 +33,37 @@ const handler = async (
       return res.status(HttpStatusCode.NoContent).end()
     }
 
-    // Get stock using stock_id
-    const { data: stock, error: fetchStockError } = await supabase
-      .from('stock')
-      .select('id, name, ticker, price')
-      .eq('id', pitch.stock_id)
-      .maybeSingle()
-    if (fetchStockError) throw fetchStockError
-    if (!stock) {
-      return res.status(HttpStatusCode.NoContent).end()
+    // Get pitch members using pitch id
+    const { data: pitchMembers, error: fetchPitchMembersError } = await supabase
+      .from('pitch_member')
+      .select('member_id')
+      .eq('pitch_id', pitch.id)
+    if (fetchPitchMembersError) throw fetchPitchMembersError
+    if (pitchMembers.length === 0) {
+      res.status(HttpStatusCode.Ok).json({ payload: [] })
     }
 
-    res.status(HttpStatusCode.Ok).json({ payload: { pitch, stock } })
+    const pitchMemberIds = pitchMembers.map(
+      (pitchMember) => pitchMember.member_id
+    )
+
+    // Get members using member id
+    const { data: members, error: fetchMembersError } = await supabase
+      .from('member')
+      .select('first_name, last_name, full_name, email')
+      .in('id', pitchMemberIds)
+    if (fetchMembersError) throw fetchMembersError
+    if (members.length === 0) {
+      res.status(HttpStatusCode.Ok).json({ payload: [] })
+    }
+
+    res.status(HttpStatusCode.Ok).json({ payload: members })
   }
 
   // Loads specified middleware with handlerMainFunction. Will run in order specified.
   const middlewareLoadedHandler = withMiddleware(
     withMethodsGuard(['GET']),
-    getActiveStockPitch
+    getPitchMembers
   )
 
   // withExcpetionFilter wraps around the middleware-loaded handler to catch and handle any thrown errors in a centralized location
