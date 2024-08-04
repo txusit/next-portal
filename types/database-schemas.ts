@@ -31,6 +31,7 @@ export const MemberSchema = z.object({
   username: UsernameSchema,
   email: z.string().email(),
   password: z.string().min(6, { message: 'Must be 6 or more characters long' }),
+  bio: z.string(),
   is_confirmed: z.boolean(),
   created_at: z.string().optional(),
 })

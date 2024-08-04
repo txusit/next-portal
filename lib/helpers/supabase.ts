@@ -120,6 +120,24 @@ async function getMemberByEmail(email: string) {
     .eq('email', email)
     .maybeSingle()
   if (error) throw error
+  if (!member) {
+    return null
+  }
+
+  return member
+}
+
+export async function getMemberById(id: string) {
+  const { data: member, error } = await supabase
+    .from('member')
+    .select('first_name, last_name, full_name, email, bio')
+    .eq('id', id)
+    .maybeSingle()
+  if (error) throw error
+  if (!member) {
+    return null
+  }
+
   return member
 }
 
@@ -177,7 +195,7 @@ export async function getStockHistorical(stockId: string) {
 export async function getActiveMeeting(stockId: string) {
   const { data: meeting, error } = await supabase
     .from('meeting')
-    .select('id, meeting_date, agenda')
+    .select('id, meeting_date, agenda, guest_speaker_member_id')
     .eq('is_active', true)
     .maybeSingle()
   if (error) throw error

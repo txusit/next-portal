@@ -1,9 +1,42 @@
 'use client'
 
+import { Icons } from '@/components/shared/icons'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  fetchActiveMeetingAttendance,
+  insertAttendanceRecord,
+} from '@/lib/api-requests'
+import { useSession } from 'next-auth/react'
+import { useEffect, useState } from 'react'
 
 export function CheckInCard() {
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [isPresent, setIsPresent] = useState<boolean>(false)
+  const { data: session, status } = useSession()
+
+  // Check to see if attendance record exists for current member and current meeting
+
+  useEffect(() => {
+    async function getAttendanceInfo() {
+      if (status === 'authenticated') {
+        const email = session!.user!.email!
+        setIsPresent(await fetchActiveMeetingAttendance(email))
+      }
+      setIsLoading(false)
+    }
+    getAttendanceInfo()
+  }, [session, status])
+
+  async function handleCheckIn() {
+    // Add record to attendance record
+    if (status === 'authenticated') {
+      const email = session!.user!.email!
+      await insertAttendanceRecord(email)
+      setIsPresent(true)
+    }
+  }
+
   return (
     <Card>
       <CardHeader>
@@ -14,7 +47,12 @@ export function CheckInCard() {
         </CardDescription> */}
       </CardHeader>
       <CardContent className='grid gap-6'>
-        <Button className='w-full'>Record Attendance</Button>
+        <Button disabled={isPresent} onClick={handleCheckIn} className='w-full'>
+          {isLoading && <Icons.spinner className='mr-2 h-4 w-4 animate-spin' />}
+          {!isLoading && isPresent
+            ? 'Attendance Submitted'
+            : 'Record Attendance'}
+        </Button>
 
         {/* <div className='grid gap-2'>
           <Label className='flex flex-col space-y-1 mb-2'>

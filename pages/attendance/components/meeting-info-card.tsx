@@ -5,7 +5,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { fetchActiveMeetingAgenda } from '@/lib/api-requests'
+import { fetchActiveMeeting } from '@/lib/api-requests'
 import { MeetingAgenda } from '@/types/common-schemas'
 import { useEffect, useState } from 'react'
 
@@ -16,9 +16,9 @@ export function MeetingInfoCard() {
 
   useEffect(() => {
     async function getStockPitchInfo() {
-      const agendaItems = await fetchActiveMeetingAgenda()
-      if (agendaItems) {
-        setMeetingAgendaItems(agendaItems)
+      const meeting = await fetchActiveMeeting()
+      if (meeting) {
+        setMeetingAgendaItems(meeting.agenda)
       }
       setIsLoading(false)
     }

@@ -2,8 +2,12 @@ import axios, { HttpStatusCode } from 'axios'
 import { handleFetchError } from './utils'
 import { GetStockPosition } from '@/types/endpoint-request-schemas'
 import { ResponseData, StockPitch } from '@/types'
-import { StockHistorical } from '@/types/database-schemas'
-import { MeetingAgenda } from '@/types/common-schemas'
+import {
+  AttendanceRecord,
+  Meeting,
+  Member,
+  StockHistorical,
+} from '@/types/database-schemas'
 
 export async function fetchStockPitch(): Promise<StockPitch | null> {
   try {
@@ -120,9 +124,7 @@ export async function fetchPitchMembers() {
   }
 }
 
-export async function fetchActiveMeetingAgenda(): Promise<
-  MeetingAgenda[] | []
-> {
+export async function fetchActiveMeeting(): Promise<Meeting | null> {
   try {
     const response = await axios.get<ResponseData>(
       '/api/trading/meeting/get/active-meeting',
@@ -135,17 +137,93 @@ export async function fetchActiveMeetingAgenda(): Promise<
 
     if (response.status !== HttpStatusCode.Ok) {
       handleFetchError('Active Meeting Fetch Error', response.data.error)
-      return []
+      return null
     }
 
-    const meeting = response.data.payload
-    if (!meeting) {
-      return []
-    }
-    return meeting.agenda
+    return response.data.payload
   } catch (error) {
     console.error('Active meeting Fetch error:', error)
     handleFetchError('Active Meeting Fetch Error', error)
-    return []
+    return null
+  }
+}
+
+export async function fetchGuestSpeaker(): Promise<Partial<Member> | null> {
+  try {
+    const response = await axios.get<ResponseData>(
+      '/api/trading/meeting/get/guest-speaker',
+      {
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Guest Speaker Fetch Error', response.data.error)
+      return null
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Guest speaker Fetch error:', error)
+    handleFetchError('Guest Speaker Fetch Error', error)
+    return null
+  }
+}
+
+export async function fetchActiveMeetingAttendance(
+  email: string
+): Promise<boolean> {
+  try {
+    const params = {
+      email,
+    }
+
+    const response = await axios.get<ResponseData>(
+      '/api/trading/meeting/get/active-meeting-attendance',
+      {
+        params,
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Attendance Record Fetch Error', response.data.error)
+      return false
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Attendance record Fetch error:', error)
+    handleFetchError('Attendance Record Fetch Error', error)
+    return false
+  }
+}
+
+export async function insertAttendanceRecord(email: string): Promise<void> {
+  try {
+    const params = {
+      email,
+    }
+
+    const response = await axios.post<ResponseData>(
+      '/api/trading/meeting/add/active-meeting-attendance',
+      params,
+      {
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Attendance Record Insert Error', response.data.error)
+    }
+  } catch (error) {
+    console.error('Attendance record Insert error:', error)
+    handleFetchError('Attendance Record Insert Error', error)
   }
 }

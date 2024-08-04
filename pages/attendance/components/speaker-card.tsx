@@ -6,8 +6,27 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { fetchGuestSpeaker } from '@/lib/api-requests'
+import { Member } from '@/types/database-schemas'
+import { useEffect, useState } from 'react'
 
 export function SpeakerCard() {
+  const [guestSpeaker, setGuestSpeaker] = useState<Partial<Member>>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    async function getStockPitchInfo() {
+      const member = await fetchGuestSpeaker()
+      if (member) {
+        setGuestSpeaker(member)
+      }
+
+      setIsLoading(false)
+    }
+
+    getStockPitchInfo()
+  }, [])
+
   return (
     <Card>
       <CardHeader>
@@ -20,22 +39,23 @@ export function SpeakerCard() {
         <div className='flex flex-col items-center text-center justify-between'>
           <Avatar>
             <AvatarImage src='/avatars/01.png' />
-            <AvatarFallback>OM</AvatarFallback>
+            <AvatarFallback>
+              {!isLoading &&
+                guestSpeaker!.first_name![0] + guestSpeaker!.last_name![0]}
+            </AvatarFallback>
           </Avatar>
           <div className='flex items-center space-x-4 p-6 py-4'>
             <div>
-              <p className='text-base font-medium leading-none'>Sofia Davis</p>
-              <p className='text-sm text-muted-foreground'>m@example.com</p>
+              <p className='text-base font-medium leading-none'>
+                {!isLoading && guestSpeaker!.full_name}
+              </p>
+              <p className='text-sm text-muted-foreground'>
+                {!isLoading && guestSpeaker!.email}
+              </p>
             </div>
           </div>
           <p className='text-sm text-muted-foreground ml-0'>
-            Sofia Davis is a seasoned financial analyst with over 8 years of
-            experience in the industry. She holds a Master&apos;s degree in
-            Finance from the University of Chicago and is a Certified Financial
-            Analyst (CFA). Jane specializes in market research, financial
-            modeling, and data analysis. Throughout her career, she has worked
-            with top-tier investment firms, providing insights that have driven
-            strategic decisions and enhanced profitability.
+            {!isLoading && guestSpeaker!.bio}
           </p>
         </div>
 
