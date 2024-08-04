@@ -5,42 +5,9 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
-import { StockPerformance } from './stock-performance'
-
-const data = [
-  {
-    stock_value: 10400,
-    date: new Date('2024-01-01').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 14405,
-    date: new Date('2024-01-02').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 9400,
-    date: new Date('2024-01-03').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 8200,
-    date: new Date('2024-01-04').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 7000,
-    date: new Date('2024-01-05').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 9600,
-    date: new Date('2024-01-06').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 11244,
-    date: new Date('2024-01-07').toISOString().split('T')[0],
-  },
-  {
-    stock_value: 26475,
-    date: new Date('2024-01-08').toISOString().split('T')[0],
-  },
-]
+import { StockPerformanceChart } from './stock-performance-chart'
+import { useEffect, useState } from 'react'
+import { fetchStockHistorical, fetchStockPitch } from '@/lib/api-requests'
 
 // const chartConfig = {
 //   views: {
@@ -56,11 +23,49 @@ const data = [
 //   },
 // }
 
+interface StockPerformanceChartDataPoint {
+  stock_value: number
+  date: string
+}
+
 export function StockPerformanceCard() {
   // const { theme: mode } = useTheme()
   // const [config] = useConfig()
 
   // const theme = themes.find((theme) => theme.name === config.theme)
+
+  const [chartData, setChartData] = useState<StockPerformanceChartDataPoint[]>(
+    []
+  )
+
+  useEffect(() => {
+    async function getStockHistorical() {
+      const stockPitchData = await fetchStockPitch()
+      if (stockPitchData) {
+        const stock = stockPitchData.stock
+        const stockHistorical = await fetchStockHistorical(stock.id)
+        console.log('stockHistorical:', stockHistorical)
+        const usableData = stockHistorical!.map((record) => {
+          return {
+            stock_value: parseFloat(record.close_price),
+            date: record.recorded_date,
+          } as StockPerformanceChartDataPoint
+        })
+
+        setChartData(usableData)
+      }
+    }
+
+    getStockHistorical()
+    // async function getStockPitchInfo() {
+    //   const stockHistorical = await fetchStockHistorical()
+    //   if (stockHistorical) {
+    //     setChartData(stockHistorical)
+    //   }
+    // }
+
+    // getStockPitchInfo()
+  }, [])
 
   return (
     <Card>
@@ -71,7 +76,7 @@ export function StockPerformanceCard() {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <StockPerformance data={data} />
+        <StockPerformanceChart data={chartData} />
       </CardContent>
     </Card>
   )

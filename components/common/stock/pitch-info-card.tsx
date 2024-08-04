@@ -6,24 +6,10 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
-import { handleFetchError, isEmpty } from '@/lib/utils'
-import { ResponseData } from '@/types'
-import { GetStockPosition } from '@/types/endpoint-request-schemas'
-import axios, { HttpStatusCode } from 'axios'
+import { fetchStockPitch, fetchStockPosition } from '@/lib/api-requests'
+import { isEmpty } from '@/lib/utils'
+import { StockPitch } from '@/types'
 import { useEffect, useState } from 'react'
-
-interface StockPitch {
-  pitch: {
-    stock_id: string
-    direction: string
-    description: string
-  }
-  stock: {
-    name: string
-    ticker: string
-    price: string
-  }
-}
 
 export function PitchInfoCard() {
   const [stockPitch, setStockPitch] = useState<StockPitch>()
@@ -116,57 +102,4 @@ export function PitchInfoCard() {
       </CardContent>
     </Card>
   )
-}
-
-async function fetchStockPitch() {
-  try {
-    const response = await axios.get<ResponseData>(
-      '/api/trading/pitch/get/active-stock-pitch',
-      {
-        validateStatus() {
-          return true
-        },
-      }
-    )
-
-    if (response.status !== HttpStatusCode.Ok) {
-      handleFetchError('Stock Pitch Fetch Error', response.data.error)
-      return null
-    }
-
-    return response.data.payload
-  } catch (error) {
-    console.error('Stock pitch fetch error:', error)
-    handleFetchError('Stock Pitch Fetch Error', error)
-    return null
-  }
-}
-
-async function fetchStockPosition(stockId: string) {
-  try {
-    const params: GetStockPosition = {
-      stockId,
-    }
-
-    const response = await axios.get<ResponseData>(
-      '/api/trading/vote/get/position',
-      {
-        params,
-        validateStatus() {
-          return true
-        },
-      }
-    )
-
-    if (response.status !== HttpStatusCode.Ok) {
-      handleFetchError('Position Fetch Error', response.data.error)
-      return null
-    }
-
-    return response.data.payload
-  } catch (error) {
-    console.error('Position fetch error:', error)
-    handleFetchError('Position Fetch Error', error)
-    return null
-  }
 }

@@ -14,7 +14,7 @@ import { PortfolioPerformanceProps } from '@/types'
 
 const chartConfig = {
   views: {
-    label: 'Page Views',
+    label: 'Total Value',
   },
   desktop: {
     label: 'Desktop',

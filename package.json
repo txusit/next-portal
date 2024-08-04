@@ -11,6 +11,7 @@
     "cypress": "cypress open"
   },
   "dependencies": {
+    "@alpacahq/alpaca-trade-api": "^3.1.1",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-avatar": "^1.1.0",
     "@radix-ui/react-checkbox": "^1.1.1",

@@ -1,6 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import { ZodIssue } from 'zod'
 
+export interface StockPitch {
+  pitch: {
+    stock_id: string
+    direction: string
+    description: string
+  }
+  stock: {
+    id: string
+    name: string
+    ticker: string
+    price: string
+  }
+}
+
 export type PortfolioDataPoint = {
   portfolio_value: Number
   date: string

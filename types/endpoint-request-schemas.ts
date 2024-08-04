@@ -108,3 +108,8 @@ export const GetPortfolioSchema = z.object({
   email: EmailSchema,
 })
 export type GetPortfolio = z.infer<typeof GetPortfolioSchema>
+
+export const GetStockHistoricalSchema = z.object({
+  stockId: z.string().min(1),
+})
+export type GetStockHistorical = z.infer<typeof GetStockHistoricalSchema>

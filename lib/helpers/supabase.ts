@@ -160,3 +160,16 @@ export async function getPaidMemberships(paymentRecords: any[]) {
 
   return memberships
 }
+
+export async function getStockHistorical(stockId: string) {
+  const { data: stockHistorical, error } = await supabase
+    .from('stock_historical')
+    .select()
+    .eq('stock_id', stockId)
+  if (error) throw error
+  if (stockHistorical.length === 0) {
+    return []
+  }
+
+  return stockHistorical
+}

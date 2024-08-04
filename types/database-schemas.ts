@@ -89,6 +89,19 @@ export const PaymentRecordSchema = z.object({
   created_at: z.string().optional(),
 })
 
+export const StockHistoricalSchema = z.object({
+  id: z.string().optional(),
+  stock_id: z.string(),
+  close_price: z.string(),
+  high_price: z.number().multipleOf(0.01),
+  low_price: z.number().multipleOf(0.01),
+  trade_count: z.number().int(),
+  open_price: z.number().multipleOf(0.01),
+  recorded_date: z.string().date(),
+  volume: z.number().int(),
+  vwap: z.number(),
+})
+
 export type AttendanceRecord = z.infer<typeof AttendanceRecordSchema>
 export type Member = z.infer<typeof MemberSchema>
 export type Period = z.infer<typeof PeriodSchema>
@@ -98,3 +111,4 @@ export type Pitch = z.infer<typeof PitchSchema>
 export type Stock = z.infer<typeof StockSchema>
 export type Vote = z.infer<typeof VoteSchema>
 export type PaymentRecord = z.infer<typeof PaymentRecordSchema>
+export type StockHistorical = z.infer<typeof StockHistoricalSchema>

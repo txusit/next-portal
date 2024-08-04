@@ -59,6 +59,19 @@ function DemoContainer({
   )
 }
 
+export interface StockPitch {
+  pitch: {
+    stock_id: string
+    direction: string
+    description: string
+  }
+  stock: {
+    name: string
+    ticker: string
+    price: string
+  }
+}
+
 export default function PitchVotePage({
   publicEnv, // Retrieved from getServerSideProps
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {

@@ -22,7 +22,7 @@ export type StockPerformanceProps = {
 
 const chartConfig = {
   views: {
-    label: 'Page Views',
+    label: 'Price',
   },
   desktop: {
     label: 'Desktop',
@@ -34,7 +34,7 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function StockPerformance(props: StockPerformanceProps) {
+export function StockPerformanceChart({ data }: StockPerformanceProps) {
   const { theme: mode } = useTheme()
   const [config] = useConfig()
 
@@ -49,7 +49,7 @@ export function StockPerformance(props: StockPerformanceProps) {
   //   }),
   //   []
   // )
-  const dataKey = 'portfolio_value'
+  const dataKey = 'stock_value'
 
   return (
     <ChartContainer
@@ -58,7 +58,7 @@ export function StockPerformance(props: StockPerformanceProps) {
     >
       <LineChart
         accessibilityLayer
-        data={props.data}
+        data={data}
         margin={{
           left: 12,
           right: 12,
@@ -85,6 +85,7 @@ export function StockPerformance(props: StockPerformanceProps) {
             <ChartTooltipContent
               className='w-[150px]'
               nameKey='views'
+              hideIndicator={true}
               labelFormatter={(value) => {
                 return new Date(value).toLocaleDateString('en-US', {
                   month: 'short',
