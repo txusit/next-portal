@@ -8,6 +8,12 @@ export const NameSchema = z.string().min(1)
 export const EmailSchema = z.string().email()
 export const TokenSchema = z.string().min(1)
 
+export const MeetingAgendaSchema = z.object({
+  title: z.string(),
+  description: z.string(),
+})
+export type MeetingAgenda = z.infer<typeof MeetingAgendaSchema>
+
 export const UUIDSchema = z.string().uuid()
 export type UUIDSchema = z.infer<typeof UUIDSchema>
 

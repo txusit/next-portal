@@ -173,3 +173,17 @@ export async function getStockHistorical(stockId: string) {
 
   return stockHistorical
 }
+
+export async function getActiveMeeting(stockId: string) {
+  const { data: meeting, error } = await supabase
+    .from('meeting')
+    .select('id, meeting_date, agenda')
+    .eq('is_active', true)
+    .maybeSingle()
+  if (error) throw error
+  if (!meeting) {
+    return null
+  }
+
+  return meeting
+}

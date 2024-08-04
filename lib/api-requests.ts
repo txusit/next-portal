@@ -3,6 +3,7 @@ import { handleFetchError } from './utils'
 import { GetStockPosition } from '@/types/endpoint-request-schemas'
 import { ResponseData, StockPitch } from '@/types'
 import { StockHistorical } from '@/types/database-schemas'
+import { MeetingAgenda } from '@/types/common-schemas'
 
 export async function fetchStockPitch(): Promise<StockPitch | null> {
   try {
@@ -116,5 +117,35 @@ export async function fetchPitchMembers() {
     console.error('Pitch members fetch error:', error)
     handleFetchError('Pitch Members Fetch Error', error)
     return null
+  }
+}
+
+export async function fetchActiveMeetingAgenda(): Promise<
+  MeetingAgenda[] | []
+> {
+  try {
+    const response = await axios.get<ResponseData>(
+      '/api/trading/meeting/get/active-meeting',
+      {
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Active Meeting Fetch Error', response.data.error)
+      return []
+    }
+
+    const meeting = response.data.payload
+    if (!meeting) {
+      return []
+    }
+    return meeting.agenda
+  } catch (error) {
+    console.error('Active meeting Fetch error:', error)
+    handleFetchError('Active Meeting Fetch Error', error)
+    return []
   }
 }

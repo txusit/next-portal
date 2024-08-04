@@ -10,7 +10,11 @@
 // export type Vote = Database['public']['Tables']['vote']['Row']
 
 import { z } from 'zod'
-import { DirectionSchema, UsernameSchema } from './common-schemas'
+import {
+  DirectionSchema,
+  MeetingAgendaSchema,
+  UsernameSchema,
+} from './common-schemas'
 
 export const AttendanceRecordSchema = z.object({
   id: z.string().optional(),
@@ -43,6 +47,7 @@ export const MeetingSchema = z.object({
   id: z.string().optional(),
   is_active: z.boolean(),
   meeting_date: z.string(),
+  agenda: z.array(MeetingAgendaSchema),
   created_at: z.string().optional(),
 })
 

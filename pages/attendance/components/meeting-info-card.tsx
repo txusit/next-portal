@@ -5,14 +5,40 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card'
+import { fetchActiveMeetingAgenda } from '@/lib/api-requests'
+import { MeetingAgenda } from '@/types/common-schemas'
+import { useEffect, useState } from 'react'
 
 export function MeetingInfoCard() {
+  const [meetingAgendaItems, setMeetingAgendaItems] =
+    useState<MeetingAgenda[]>()
+  const [isLoading, setIsLoading] = useState<boolean>(true)
+
+  useEffect(() => {
+    async function getStockPitchInfo() {
+      const agendaItems = await fetchActiveMeetingAgenda()
+      if (agendaItems) {
+        setMeetingAgendaItems(agendaItems)
+      }
+      setIsLoading(false)
+    }
+
+    getStockPitchInfo()
+  }, [])
+
+  const currentDate = new Date()
+  const formattedDate = new Intl.DateTimeFormat('en-US', {
+    day: 'numeric',
+    year: 'numeric',
+    month: 'long',
+  }).format(currentDate)
+
   return (
     <Card>
       <CardHeader className='space-y-1 flex-row justify-between'>
         <CardTitle className='text-2xl'>Meeting Agenda</CardTitle>
         <CardDescription className='text-lg text-muted-foreground'>
-          January 5th, 2024
+          {formattedDate}
         </CardDescription>
       </CardHeader>
       <CardContent className='grid gap-4'>
@@ -38,58 +64,26 @@ export function MeetingInfoCard() {
         </div> */}
         {/* <Label className='flex flex-row items-baseline space-x-1'></Label> */}
         <div className='grid gap-1 pt-2'>
-          <div className='flex items-center justify-between space-x-4'>
-            <div className='flex items-center grid grid-cols-4 px-6 py-2'>
-              {/* rounded-lg border bg-card text-card-foreground */}
-              <p className='col-span-1 text-base font-medium leading-none'>
-                Introduction
-              </p>
-              <p className='col-span-3 text-sm text-muted-foreground'>
-                NVIDIA has established itself as a leader in the semiconductor
-                industry, renowned for its cutting-edge graphics processing
-                units (GPUs) and artificial intelligence (AI) technology. With
-                the rapid expansion of AI, gaming, and data center markets,
-              </p>
-            </div>
-          </div>
+          {!isLoading &&
+            meetingAgendaItems?.map((agendaItem, index) => (
+              <div
+                key={index}
+                className='flex items-center justify-between space-x-4'
+              >
+                <div className='flex items-center grid grid-cols-4 px-6 py-2'>
+                  {/* rounded-lg border bg-card text-card-foreground */}
+                  <p className='col-span-1 text-base font-medium leading-none'>
+                    {agendaItem.title}
+                  </p>
+                  <p className='col-span-3 text-sm text-muted-foreground'>
+                    {agendaItem.description}
+                  </p>
+                </div>
+              </div>
+            ))}
+        </div>
 
-          <div className='flex items-center justify-between space-x-4'>
-            <div className='flex items-center grid grid-cols-4 px-6 py-2'>
-              {/* rounded-lg border bg-card text-card-foreground */}
-              <p className='col-span-1 text-base font-medium leading-none'>
-                Guest Speaker
-              </p>
-              <p className='col-span-3 text-sm text-muted-foreground'>
-                NVIDIA has established itself as a leader in the semiconductor
-                industry, renowned for its cutting-edge graphics processing
-                units (GPUs) and artificial intelligence (AI) technology. With
-                the rapid expansion of AI, gaming, and data center
-                markets,processing units (GPUs) and artificial intelligence (AI)
-                technology. With the rapid expansion of AI, gaming, and data
-                center markets,
-              </p>
-            </div>
-          </div>
-
-          <div className='flex items-center justify-between space-x-4'>
-            <div className='flex items-center grid grid-cols-4 px-6 py-2'>
-              {/* rounded-lg border bg-card text-card-foreground */}
-              <p className='col-span-1 text-base font-medium leading-none'>
-                Stock Pitch
-              </p>
-              <p className='col-span-3 text-sm text-muted-foreground'>
-                NVIDIA has established itself as a leader in the semiconductor
-                industry, renowned for its cutting-edge graphics processing
-                units (GPUs) and artificial intelligence (AI) technology. With
-                the rapid expansion of AI, gaming, and data center
-                markets,processing units (GPUs) and artificial intelligence (AI)
-                technology. With the rapid expansion of AI, gaming, and data
-                center markets,
-              </p>
-            </div>
-          </div>
-
-          {/* <Label className='flex flex-col space-y-1'>
+        {/* <Label className='flex flex-col space-y-1'>
             <span>Direction</span>
             <span className='font-normal leading-snug text-muted-foreground'>
               Long
@@ -101,7 +95,6 @@ export function MeetingInfoCard() {
               No
             </span>
           </Label> */}
-        </div>
         {/* <Label className='flex flex-col space-y-1'>
           <span>Description</span>
           <span className='font-normal leading-snug text-muted-foreground'>
