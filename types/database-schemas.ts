@@ -31,7 +31,7 @@ export const MemberSchema = z.object({
   username: UsernameSchema,
   email: z.string().email(),
   password: z.string().min(6, { message: 'Must be 6 or more characters long' }),
-  bio: z.string(),
+  bio: z.string().optional(),
   is_confirmed: z.boolean(),
   created_at: z.string().optional(),
 })
@@ -81,6 +81,7 @@ export const VoteSchema = z.object({
   pitch_id: z.string(),
   stock_id: z.string(),
   portfolio_id: z.string(),
+  buy_price: z.number().multipleOf(0.01),
   direction: DirectionSchema,
   notes: z.string(),
   created_at: z.string().optional(),
@@ -98,7 +99,7 @@ export const PaymentRecordSchema = z.object({
 export const StockHistoricalSchema = z.object({
   id: z.string().optional(),
   stock_id: z.string(),
-  close_price: z.string(),
+  close_price: z.number().multipleOf(0.01),
   high_price: z.number().multipleOf(0.01),
   low_price: z.number().multipleOf(0.01),
   trade_count: z.number().int(),

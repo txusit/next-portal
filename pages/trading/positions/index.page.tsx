@@ -2,29 +2,12 @@ import React, { useEffect, useState } from 'react'
 import { InferGetServerSidePropsType } from 'next'
 import { getServerSideProps } from '@/lib/helpers/client-side/common-get-server-side-props'
 import { RootLayout } from '@/components/shared/root-layout'
-import { columns, PositionWithCalculated } from './components/position-columns'
+import { columns } from './components/position-columns'
 import { PositionDataTable } from './components/position-data-table'
 import { topNavLinkData } from '@/config/nav'
 import { PortfolioPosition } from '@/types/common-schemas'
 import { fetchPortfolioPositions } from '@/lib/api-requests'
 import { useSession } from 'next-auth/react'
-
-// const data: PositionWithCalculated[] = [
-//   {
-//     name: 'NVIDIA Corp',
-//     ticker: 'NVDA',
-//     direction: 'long',
-//     quantity: 1,
-//     current_price: 60,
-//     buy_price: 50,
-//     buy_in_date: '2024-07-01',
-//     total_investment: 50,
-//     notes: 'Some note',
-//     last_updated: '2024-07-08',
-//     return: 10,
-//     percent_change: ((60 - 50) / 50) * 100,
-//   },
-// ]
 
 export default function PositionPage({
   publicEnv, // Retrieved from getServerSideProps
@@ -35,7 +18,7 @@ export default function PositionPage({
   // const theme = themes.find((theme) => theme.name === config.theme)
 
   const [positions, setPositions] = useState<PortfolioPosition[]>([])
-  const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [__isLoading, setIsLoading] = useState<boolean>(true)
   const { data: session, status } = useSession()
 
   useEffect(() => {

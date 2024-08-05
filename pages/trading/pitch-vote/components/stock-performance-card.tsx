@@ -47,7 +47,7 @@ export function StockPerformanceCard() {
         console.log('stockHistorical:', stockHistorical)
         const usableData = stockHistorical!.map((record) => {
           return {
-            stock_value: parseFloat(record.close_price),
+            stock_value: record.close_price,
             date: record.recorded_date,
           } as StockPerformanceChartDataPoint
         })

@@ -3,6 +3,7 @@ import {
   DirectionSchema,
   EmailSchema,
   GradYearSchema,
+  MeetingAgendaSchema,
   NameSchema,
   PasswordSchema,
   TokenSchema,
@@ -67,6 +68,7 @@ export const UpdateAttendanceSchema = z.object({
 
 export const AddMeetingSchema = z.object({
   meetingDate: z.string().datetime(),
+  agenda: z.array(MeetingAgendaSchema)
 })
 
 export const AddPitchSchema = z.object({

@@ -65,6 +65,7 @@ const handler = async (
       stock_id: pitch.stock_id,
       portfolio_id: portfolio.id,
       direction,
+      buy_price: price,
       notes,
     }
 

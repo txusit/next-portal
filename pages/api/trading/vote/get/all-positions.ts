@@ -18,10 +18,13 @@ const handler = async (
     const { email } = parsedQuery
 
     const member = await getMemberByEmail(email)
+    if (!member) {
+      return res.status(HttpStatusCode.NoContent).json({ payload: [] })
+    }
 
     const { data: positions, error: fetchPositionError } = await supabase
       .from('vote')
-      .select('updated_at, stock_id, direction, notes')
+      .select('updated_at, stock_id, buy_price, direction, notes')
       .eq('member_id', member.id)
     if (fetchPositionError) throw fetchPositionError
     if (positions.length === 0) {
@@ -52,25 +55,26 @@ const handler = async (
     }
 
     // Create lookup objects for quick reference
-    const stockLookup = stocks.reduce((acc, stock) => {
+    const stockLookup = stocks.reduce<{
+      [key: string]: { name: string; ticker: string }
+    }>((acc, stock) => {
       acc[stock.id] = { name: stock.name, ticker: stock.ticker }
       return acc
     }, {})
 
-    const historicalLookup = recentStockHistoricals.reduce(
-      (acc, historical) => {
-        acc[historical.stock_id] = historical.close_price // assuming the latest record is needed
-        return acc
-      },
-      {}
-    )
+    const historicalLookup = recentStockHistoricals.reduce<{
+      [key: string]: number
+    }>((acc, historical) => {
+      acc[historical.stock_id] = historical.close_price // assuming the latest record is needed
+      return acc
+    }, {})
 
     // Combine the data
     const combinedPositionData: PortfolioPosition[] = positions.map(
       (position) => {
         const stock = stockLookup[position.stock_id] || {}
-        const currentPrice = historicalLookup[position.stock_id] || null
-        const buyPrice = position.price
+        const currentPrice = historicalLookup[position.stock_id] || 0
+        const buyPrice = position.buy_price
         const direction = position.direction
 
         const combinedPosition: PortfolioPosition = {
@@ -110,7 +114,11 @@ const handler = async (
   return withExceptionFilter(req, res)(middlewareLoadedHandler)
 }
 
-function getReturn(direction: Direction, buyPrice, currentPrice) {
+function getReturn(
+  direction: Direction,
+  buyPrice: number,
+  currentPrice: number
+) {
   if (direction === 'long') {
     return ((currentPrice - buyPrice) / buyPrice) * 100
   } else if (direction === 'short') {
@@ -120,7 +128,11 @@ function getReturn(direction: Direction, buyPrice, currentPrice) {
   }
 }
 
-function getDelta(direction: Direction, buyPrice, currentPrice) {
+function getDelta(
+  direction: Direction,
+  buyPrice: number,
+  currentPrice: number
+) {
   if (direction !== 'long' && direction !== 'short') {
     return 0
   }

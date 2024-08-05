@@ -2,12 +2,7 @@ import axios, { HttpStatusCode } from 'axios'
 import { handleFetchError } from './utils'
 import { GetStockPosition } from '@/types/endpoint-request-schemas'
 import { ResponseData, StockPitch } from '@/types'
-import {
-  AttendanceRecord,
-  Meeting,
-  Member,
-  StockHistorical,
-} from '@/types/database-schemas'
+import { Meeting, Member, StockHistorical } from '@/types/database-schemas'
 import { PortfolioPosition } from '@/types/common-schemas'
 
 export async function fetchStockPitch(): Promise<StockPitch | null> {

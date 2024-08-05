@@ -192,7 +192,7 @@ export async function getStockHistorical(stockId: string) {
   return stockHistorical
 }
 
-export async function getActiveMeeting(stockId: string) {
+export async function getActiveMeeting() {
   const { data: meeting, error } = await supabase
     .from('meeting')
     .select('id, meeting_date, agenda, guest_speaker_member_id')

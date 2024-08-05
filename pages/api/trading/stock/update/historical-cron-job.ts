@@ -97,6 +97,6 @@ async function updateHistoricals(
 
   const { error } = await supabase
     .from('stock_historical')
-    .upsert(data, { onConflict: ['stock_id', 'recorded_date'] })
+    .upsert(data, { onConflict: 'stock_id, recorded_date' })
   if (error) throw error
 }

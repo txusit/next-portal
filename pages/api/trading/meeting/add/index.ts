@@ -16,7 +16,7 @@ const handler = async (
 ) => {
   const addMeeting = async () => {
     const parsedBody = AddMeetingSchema.parse(req.body)
-    const { meetingDate } = parsedBody
+    const { meetingDate, agenda } = parsedBody
 
     // Check if duplicate meeting date exists
     const { data: meeting, error: fetchMeetingError } = await supabase
@@ -41,6 +41,7 @@ const handler = async (
     const newMeeting: Meeting = {
       is_active: true,
       meeting_date: meetingDate,
+      agenda,
     }
     const { error: insertMeetingError } = await supabase
       .from('meeting')
