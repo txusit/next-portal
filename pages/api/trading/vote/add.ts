@@ -65,7 +65,6 @@ const handler = async (
       stock_id: pitch.stock_id,
       portfolio_id: portfolio.id,
       direction,
-      price,
       notes,
     }
 
@@ -89,7 +88,7 @@ const handler = async (
     if (insertVoteError) throw insertVoteError
 
     // Update portfolio
-    const newBalance = portfolio.balance - newVote.price
+    const newBalance = portfolio.balance - price
     const newValue = portfolio.current_value + price
     const { error: updatePortfolioError } = await supabase
       .from('portfolio')

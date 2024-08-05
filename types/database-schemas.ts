@@ -82,9 +82,9 @@ export const VoteSchema = z.object({
   stock_id: z.string(),
   portfolio_id: z.string(),
   direction: DirectionSchema,
-  price: z.number(),
   notes: z.string(),
   created_at: z.string().optional(),
+  updated_at: z.string().date().optional(),
 })
 
 export const PaymentRecordSchema = z.object({

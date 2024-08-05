@@ -1,50 +1,49 @@
 import { ColumnDef } from '@tanstack/react-table'
-import { z } from 'zod'
 import { DataTableColumnHeader } from '@/components/common/data-table/data-table-column-header'
 import { PositionDataTableRowActions } from './position-data-table-row-actions'
-import { DirectionSchema } from '@/types/common-schemas'
+import { PortfolioPosition } from '@/types/common-schemas'
 
 // Add new Database table?
-const PositionSchema = z.object({
-  name: z.string(),
-  ticker: z.string(),
-  direction: DirectionSchema,
-  quantity: z.number(),
-  current_price: z.number(),
-  buy_price: z.number(),
-  buy_in_date: z.string(),
-  total_investment: z.number(),
-  notes: z.string(),
-  last_updated: z.string(),
-})
+// const PositionSchema = z.object({
+//   name: z.string(),
+//   ticker: z.string(),
+//   direction: DirectionSchema,
+//   quantity: z.number(),
+//   current_price: z.number(),
+//   buy_price: z.number(),
+//   buy_in_date: z.string(),
+//   total_investment: z.number(),
+//   notes: z.string(),
+//   last_updated: z.string(),
+// })
 
-const PositionCalculatedSchema = z.object({
-  return: z.number(),
-  percent_change: z.number(),
-})
+// const PositionCalculatedSchema = z.object({
+//   return: z.number(),
+//   percent_change: z.number(),
+// })
 
-export const PositionWithCalculatedSchema = PositionSchema.merge(
-  PositionCalculatedSchema
-)
-export type PositionWithCalculated = z.infer<
-  typeof PositionWithCalculatedSchema
->
+// export const PositionWithCalculatedSchema = PositionSchema.merge(
+//   PositionCalculatedSchema
+// )
+// export type PositionWithCalculated = z.infer<
+//   typeof PositionWithCalculatedSchema
+// >
 
-export const columns: ColumnDef<PositionWithCalculated>[] = [
+export const columns: ColumnDef<PortfolioPosition>[] = [
   {
-    accessorKey: 'last_updated',
+    accessorKey: 'updatedAt',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Last Updated' />
     ),
   },
   {
-    accessorKey: 'ticker',
+    accessorKey: 'stockTicker',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Ticker' />
     ),
   },
   {
-    accessorKey: 'name',
+    accessorKey: 'stockName',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Name' />
     ),
@@ -60,27 +59,15 @@ export const columns: ColumnDef<PositionWithCalculated>[] = [
     },
   },
   {
-    accessorKey: 'quantity',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Quantity' />
-    ),
-  },
-  {
-    accessorKey: 'buy_price',
+    accessorKey: 'buyPrice',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Buy Price' />
     ),
   },
   {
-    accessorKey: 'current_price',
+    accessorKey: 'currentPrice',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Current Price' />
-    ),
-  },
-  {
-    accessorKey: 'total_investment',
-    header: ({ column }) => (
-      <DataTableColumnHeader column={column} title='Total Investment' />
     ),
   },
   {
@@ -90,7 +77,7 @@ export const columns: ColumnDef<PositionWithCalculated>[] = [
     ),
   },
   {
-    accessorKey: 'percent_change',
+    accessorKey: 'percentChange',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title='Percent Change' />
     ),

@@ -104,6 +104,11 @@ export const GetStockPositionSchema = z.object({
 })
 export type GetStockPosition = z.infer<typeof GetStockPositionSchema>
 
+export const GetAllPositionsSchema = z.object({
+  email: EmailSchema,
+})
+export type GetAllPositions = z.infer<typeof GetAllPositionsSchema>
+
 export const GetPortfolioSchema = z.object({
   email: EmailSchema,
 })

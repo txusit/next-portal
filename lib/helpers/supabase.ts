@@ -113,10 +113,10 @@ function getCurrentSemester(): Semester {
   }
 }
 
-async function getMemberByEmail(email: string) {
+export async function getMemberByEmail(email: string) {
   const { data: member, error } = await supabase
     .from('member')
-    .select()
+    .select('id, first_name, last_name, full_name, email, bio')
     .eq('email', email)
     .maybeSingle()
   if (error) throw error
@@ -130,7 +130,7 @@ async function getMemberByEmail(email: string) {
 export async function getMemberById(id: string) {
   const { data: member, error } = await supabase
     .from('member')
-    .select('first_name, last_name, full_name, email, bio')
+    .select('id, first_name, last_name, full_name, email, bio')
     .eq('id', id)
     .maybeSingle()
   if (error) throw error

@@ -1,5 +1,8 @@
 import { z } from 'zod'
 
+export const DirectionSchema = z.enum(['long', 'short', 'hold', 'abstain'])
+export type Direction = z.infer<typeof DirectionSchema>
+
 export const SemesterSchema = z.enum(['fall', 'spring', 'year'])
 export type Semester = z.infer<typeof SemesterSchema>
 
@@ -37,5 +40,15 @@ export const UsernameSchema = z
   .regex(/^(?![_.]).*$/, 'Username cannot start with an underscore or period')
   .regex(/^(?!.*[_.]$).*$/, 'Username cannot end with an underscore or period')
 
-export const DirectionSchema = z.enum(['long', 'short', 'hold', 'abstain'])
-export type Direction = z.infer<typeof DirectionSchema>
+export const PortfolioPositionSchema = z.object({
+  updatedAt: z.string().date(),
+  stockName: z.string(),
+  stockTicker: z.string(),
+  direction: DirectionSchema,
+  buyPrice: z.number().multipleOf(0.01),
+  currentPrice: z.number().multipleOf(0.01),
+  return: z.number().multipleOf(0.01),
+  percentChange: z.number(),
+  notes: z.string(),
+})
+export type PortfolioPosition = z.infer<typeof PortfolioPositionSchema>

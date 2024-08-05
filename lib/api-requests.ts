@@ -8,6 +8,7 @@ import {
   Member,
   StockHistorical,
 } from '@/types/database-schemas'
+import { PortfolioPosition } from '@/types/common-schemas'
 
 export async function fetchStockPitch(): Promise<StockPitch | null> {
   try {
@@ -200,6 +201,37 @@ export async function fetchActiveMeetingAttendance(
     console.error('Attendance record Fetch error:', error)
     handleFetchError('Attendance Record Fetch Error', error)
     return false
+  }
+}
+
+export async function fetchPortfolioPositions(
+  email: string
+): Promise<PortfolioPosition[]> {
+  try {
+    const params = {
+      email,
+    }
+
+    const response = await axios.get<ResponseData>(
+      '/api/trading/vote/get/all-positions',
+      {
+        params,
+        validateStatus() {
+          return true
+        },
+      }
+    )
+
+    if (response.status !== HttpStatusCode.Ok) {
+      handleFetchError('Positions Fetch Error', response.data.error)
+      return []
+    }
+
+    return response.data.payload
+  } catch (error) {
+    console.error('Positions Fetch error:', error)
+    handleFetchError('Positions Fetch Error', error)
+    return []
   }
 }
 
